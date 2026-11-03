@@ -1,0 +1,6 @@
+{
+  "name": "DrSons International - Official Portal Under Construction",
+  "description": "Official maintenance and launch holding portal for DrSons International, specializing in manufacturing and processing of fresh produce, beverages, and food products.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
