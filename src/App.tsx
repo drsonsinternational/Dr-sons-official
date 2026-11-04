@@ -1248,95 +1248,231 @@ export default function App() {
         </div>
       </section>
 
-      {/* COMPACT ENTERPRISE FOOTER */}
-      <footer className="w-full bg-[#f8faf8] border-t border-neutral-200 text-neutral-700 py-6 sm:py-8">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 space-y-5">
+      {/* ENTERPRISE CORPORATE FOOTER */}
+      <footer className="w-full bg-[#f6f8f6] border-t border-neutral-200 text-neutral-600">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-16">
           
-          {/* Main Compact Row */}
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
-            
-            {/* Left: Brand Identification */}
-            <div className="flex items-center gap-3 shrink-0">
-              <img 
-                src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.webp" 
-                alt="D R & SONS INTERNATIONAL" 
-                className="h-9 sm:h-10 w-auto object-contain mix-blend-multiply"
-              />
-              <div className="border-l border-neutral-300 pl-3">
-                <span className="text-xs sm:text-sm font-bold tracking-tight text-[#0a2318] block leading-none">
-                  D R &amp; SONS INTERNATIONAL PVT. LTD.
-                </span>
-                <span className="text-[10px] text-neutral-500 uppercase tracking-widest block mt-0.5">
-                  Food &amp; Beverage Manufacturing · B2B Ingredients
-                </span>
+          {/* Top Brand & Summary Row */}
+          <div className="pb-10 border-b border-neutral-200 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-xl">
+              <a href="#" className="flex items-center gap-3">
+                <img 
+                  src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.webp" 
+                  alt="D R & SONS INTERNATIONAL" 
+                  className="h-10 w-auto object-contain mix-blend-multiply"
+                />
+                <div className="border-l border-neutral-300 pl-3">
+                  <span className="text-sm font-bold tracking-tight text-[#0a2318] block leading-none">
+                    D R &amp; SONS INTERNATIONAL PVT. LTD.
+                  </span>
+                  <span className="text-[10px] text-neutral-500 uppercase tracking-widest block mt-1">
+                    Commercial Food &amp; Beverage Manufacturing
+                  </span>
+                </div>
+              </a>
+              <p className="text-xs text-neutral-600 leading-relaxed pt-1">
+                Incorporated commercial manufacturer producing spray-dried fruit &amp; vegetable powders, packaged beverages, ice cream formulations, and dehydrated food flakes for food service brands and enterprise FMCG distributors.
+              </p>
+            </div>
+
+            {/* Quick Contact Card */}
+            <div className="bg-white border border-neutral-200 p-4 sm:p-5 space-y-2 shrink-0 lg:min-w-[320px]">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+                Direct Commercial Hotline
+              </div>
+              <div className="flex flex-col gap-1.5 text-xs">
+                <a 
+                  href="https://wa.me/919411268879" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="font-mono text-sm font-bold text-[#143e2b] hover:underline flex items-center gap-1.5"
+                >
+                  <MessageSquare className="w-4 h-4 text-emerald-700" />
+                  <span>WhatsApp: +91 9411268879</span>
+                </a>
+                <div className="flex items-center justify-between text-neutral-600 pt-1 border-t border-neutral-100">
+                  <span className="font-mono text-[11px]">contact@drsonsinternational.com</span>
+                  <button
+                    onClick={() => handleCopyEmail('contact@drsonsinternational.com')}
+                    className="p-1 border border-neutral-300 text-neutral-600 hover:bg-neutral-50 cursor-pointer"
+                    title="Copy Email"
+                  >
+                    {copiedEmail ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
+                  </button>
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* Center: Essential Navigation Links */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-neutral-600">
-              <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors">
-                3 Divisions
-              </a>
-              <span className="text-neutral-300" aria-hidden="true">·</span>
-              <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors">
-                Facilities
-              </a>
-              <span className="text-neutral-300" aria-hidden="true">·</span>
-              <button 
-                onClick={() => setLegalModalTab('terms')}
-                className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer"
-              >
-                Terms of Supply
-              </button>
-              <span className="text-neutral-300" aria-hidden="true">·</span>
-              <button 
-                onClick={() => setLegalModalTab('privacy')}
-                className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer"
-              >
-                Privacy Policy (DPDP)
-              </button>
-              <span className="text-neutral-300" aria-hidden="true">·</span>
-              <button 
-                onClick={() => setLegalModalTab('statutory')}
-                className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer"
-              >
-                Statutory Details
-              </button>
+          {/* Multi-Column Directory Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-10">
+            
+            {/* Column 1: Core Divisions */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-[#0a2318] uppercase tracking-wider">
+                Manufacturing Divisions
+              </h4>
+              <ul className="space-y-2 text-xs text-neutral-600">
+                <li>
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Fruit &amp; Vegetable Powders
+                  </a>
+                </li>
+                <li>
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Spray Drying &amp; Drum Drying
+                  </a>
+                </li>
+                <li>
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Non-Alcoholic Beverages
+                  </a>
+                </li>
+                <li>
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Ice Cream Formulations
+                  </a>
+                </li>
+                <li>
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Dehydrated Fruit &amp; Veg Flakes
+                  </a>
+                </li>
+                <li>
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Specialty Food Seasonings
+                  </a>
+                </li>
+              </ul>
             </div>
 
-            {/* Right: Direct Contact Desks */}
-            <div className="flex flex-wrap items-center gap-4 text-xs shrink-0">
-              <a 
-                href="https://wa.me/919411268879" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="font-mono text-[#143e2b] font-bold hover:underline flex items-center gap-1.5"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
-                <span>WhatsApp: 9411268879</span>
-              </a>
+            {/* Column 2: Infrastructure & Capacity */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-[#0a2318] uppercase tracking-wider">
+                Scale &amp; Infrastructure
+              </h4>
+              <ul className="space-y-2 text-xs text-neutral-600">
+                <li>
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    14.5+ Acre Operational Campus
+                  </a>
+                </li>
+                <li>
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    18,500 MT Annual Capacity
+                  </a>
+                </li>
+                <li>
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Class 100k Cleanroom Facility
+                  </a>
+                </li>
+                <li>
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    4 Automated Packaging Lines
+                  </a>
+                </li>
+                <li>
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    In-House Microbiological Lab
+                  </a>
+                </li>
+                <li>
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Cold-Chain Storage Logistics
+                  </a>
+                </li>
+              </ul>
+            </div>
 
-              <div className="flex items-center gap-1.5 text-neutral-700">
-                <span className="font-mono text-[11px]">contact@drsonsinternational.com</span>
-                <button
-                  onClick={() => handleCopyEmail('contact@drsonsinternational.com')}
-                  className="p-1 border border-neutral-300 text-neutral-600 hover:bg-neutral-100 transition-colors cursor-pointer"
-                  title="Copy Corporate Email"
-                >
-                  {copiedEmail ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
-                </button>
+            {/* Column 3: Corporate Governance */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-[#0a2318] uppercase tracking-wider">
+                Corporate Governance
+              </h4>
+              <ul className="space-y-2 text-xs text-neutral-600">
+                <li>
+                  <button 
+                    onClick={() => setLegalModalTab('terms')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
+                  >
+                    Terms of Commercial Supply
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setLegalModalTab('privacy')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
+                  >
+                    Privacy Policy (DPDP Act)
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setLegalModalTab('statutory')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
+                  >
+                    Statutory MCA Information
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setLegalModalTab('terms')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
+                  >
+                    Certificate of Analysis (COA)
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setLegalModalTab('statutory')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
+                  >
+                    FSSAI Standards Compliance
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 4: Trade Desk & Dispatch */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-[#0a2318] uppercase tracking-wider">
+                Trade Desk &amp; Dispatch
+              </h4>
+              <div className="space-y-2 text-xs text-neutral-600">
+                <div>
+                  <span className="text-[10px] uppercase font-mono text-neutral-400 block">Supply Scope</span>
+                  <span className="text-neutral-800">Commercial B2B Wholesale &amp; Institutional Supply</span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-mono text-neutral-400 block">Operating Hours</span>
+                  <span className="text-neutral-800">Monday – Saturday: 08:30 – 19:00 IST</span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-mono text-neutral-400 block">Transit Handling</span>
+                  <span className="text-neutral-800">Palletized Freight &amp; Temperature-Controlled Fleet</span>
+                </div>
+                <div className="pt-1">
+                  <a 
+                    href="#inquiry-desk"
+                    className="inline-flex items-center gap-1 font-semibold text-[#143e2b] hover:underline"
+                  >
+                    <span>Submit Commercial RFQ</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
             </div>
 
           </div>
 
-          {/* Bottom Micro-Bar */}
-          <div className="pt-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-neutral-500">
+          {/* Bottom Copyright & Legal Strip */}
+          <div className="pt-6 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-neutral-500">
             <div>
               &copy; {new Date().getFullYear()} D R &amp; Sons International Private Limited. All rights reserved.
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
               <span>Incorporated under Companies Act, 2013</span>
               <span className="text-neutral-300" aria-hidden="true">·</span>
               <span>MCA India</span>
