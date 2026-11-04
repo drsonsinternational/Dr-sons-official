@@ -1,5 +1,5 @@
 ---
-updated: 2026-11-04T12:17:00+05:30
+updated: 2026-11-04T12:22:00+05:30
 ---
 
 # Project State
@@ -30,6 +30,7 @@ Codebase mapping complete via `/map` and `gsd-researcher`:
 | :--- | :--- | :--- | :--- |
 | Deployment Target | Cloudflare Workers / Pages via `wrangler.jsonc` | 2026-11-03 | Production hosting |
 | Sourcing & Inquiry Flow | Direct WhatsApp Trade Desk routing (+91 9411268879) | 2026-11-03 | Inquiry handling |
+| Canonical Design System | Specified in `DESIGN.md` (Forest green palette, sharp geometry, Plus Jakarta Sans) | 2026-11-04 | All future UI & feature phases |
 
 ## Blockers
 
@@ -43,3 +44,4 @@ None. Holding portal is fully live on Cloudflare.
 ## Session Context
 
 Codebase architecture, components, dependencies, data flow, and technical debt have been surveyed and documented into `.gsd/ARCHITECTURE.md` and `.gsd/STACK.md`.
+
