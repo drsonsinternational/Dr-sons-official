@@ -57,7 +57,7 @@ export default function App() {
     company: '',
     email: '',
     phone: '',
-    division: 'Fruits and Vegetable Powder',
+    division: 'Fruits, Vegetables & Starch Powders',
     volume: 'Commercial Bulk Supply',
     message: ''
   });
@@ -153,8 +153,8 @@ export default function App() {
   };
 
   const tickerItems = [
-    'D R & Sons International Private Limited · Incorporated Enterprise',
-    'Fruit & Vegetable Powders',
+    'D R & Sons International Private Limited · Incorporated Enterprise (Since 2026)',
+    'Fruit, Vegetable & Starch Powders',
     'Non-Alcoholic Drinks & Ice Creams',
     'Fruit & Vegetable Flakes',
     'Advanced Spray & Drum Drying',
@@ -167,15 +167,15 @@ export default function App() {
     {
       id: 'powders',
       number: '01',
-      shortName: 'Fruit & Veg Powders',
-      title: 'Fruits and Vegetable Powder',
-      summary: 'Precision low-temperature spray drying and micro-milling yielding instant solubility and pure natural aroma.',
-      tagline: '100% natural fruit & vegetable powders with authentic flavor',
+      shortName: 'Fruit, Veg & Starch Powders',
+      title: 'Fruits, Vegetables and Starch Powders',
+      summary: 'Precision low-temperature spray drying, specialty food starches, and micro-milling yielding instant solubility and superior formulation consistency.',
+      tagline: 'Pure fruit & vegetable powders and specialty food-grade starches',
       image: '/assets/aistudio/file_000000007504820892cf49a02d280275_ad4da5f2.webp',
       icon: Apple,
-      keyItems: ['Pink Guava Powder', 'Watermelon Powder', 'Orange Powder', 'Tomato & Beetroot'],
-      specs: ['Low-temp spray dried', 'Instant ambient solubility', 'Standardized mesh sizes', 'Nitrogen-flushed barrier pack'],
-      applications: 'Beverages, bakery, instant soups, snacks & baby foods'
+      keyItems: ['Pink Guava Powder', 'Watermelon & Orange Powder', 'Native & Modified Starches', 'Tomato & Beetroot', 'Tapioca & Corn Starches'],
+      specs: ['Low-temp spray dried', 'Instant ambient solubility', 'Industrial food-grade starches', 'Nitrogen-flushed barrier pack'],
+      applications: 'Beverages, bakery, confectionery, instant soups, sauces & snack seasonings'
     },
     {
       id: 'beverages',
@@ -208,10 +208,10 @@ export default function App() {
   const facilitiesData = [
     {
       number: '01',
-      division: 'Fruit & Vegetable Powders',
-      title: 'Spray Drying & Micro-Milling',
-      desc: 'Low-temperature evaporators & micro-milling suites producing free-flowing, nutrient-intact powders.',
-      tags: ['Spray Towers', 'Vacuum Evaporation', 'Standard Mesh'],
+      division: 'Fruit, Vegetable & Starch Powders',
+      title: 'Spray Drying & Starch Micro-Milling',
+      desc: 'Low-temperature evaporators, starch processing suites & micro-milling lines producing free-flowing, nutrient-intact powders.',
+      tags: ['Spray Towers', 'Starch Refining', 'Vacuum Evaporation'],
       icon: Apple
     },
     {
@@ -295,7 +295,7 @@ export default function App() {
                 D R &amp; SONS INTERNATIONAL PVT. LTD.
               </span>
               <span className="text-[9px] text-neutral-500 uppercase tracking-widest block mt-0.5">
-                Food &amp; Beverage Manufacturing
+                Food &amp; Beverage Manufacturing · Since 2026
               </span>
             </div>
           </a>
@@ -387,7 +387,7 @@ export default function App() {
                         D R &amp; SONS INTL
                       </span>
                       <span className="text-[9px] text-neutral-500 uppercase tracking-wider block mt-0.5">
-                        Navigation Dashboard
+                        Since 2026 · Navigation
                       </span>
                     </div>
                   </div>
@@ -612,7 +612,7 @@ export default function App() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-xs sm:text-sm font-mono tracking-wider uppercase text-neutral-300 max-w-lg"
           >
-            Fruit &amp; Vegetable Powders · Drinks &amp; Ice Creams · Flakes
+            Fruit, Vegetable &amp; Starch Powders · Drinks &amp; Ice Creams · Flakes
           </motion.p>
 
           {/* Minimal Dual CTAs */}
@@ -1088,7 +1088,7 @@ export default function App() {
                       onChange={(e) => setInquiryForm({...inquiryForm, division: e.target.value})}
                       className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
                     >
-                      <option value="Fruits and Vegetable Powder">Fruits and Vegetable Powder</option>
+                      <option value="Fruits, Vegetables & Starch Powders">Fruits, Vegetables &amp; Starch Powders</option>
                       <option value="Non-Alcoholic Drinks and Ice Creams">Non-Alcoholic Drinks and Ice Creams</option>
                       <option value="Fruits and Vegetables Flakes">Fruits and Vegetables Flakes</option>
                     </select>
@@ -1156,7 +1156,7 @@ export default function App() {
                     onClick={() => {
                       setInquirySubmitted(false);
                       setRedirectCountdown(null);
-                      setInquiryForm({ name: '', company: '', email: '', phone: '', division: 'Fruits and Vegetable Powder', volume: 'Commercial Bulk Supply', message: '' });
+                      setInquiryForm({ name: '', company: '', email: '', phone: '', division: 'Fruits, Vegetables & Starch Powders', volume: 'Commercial Bulk Supply', message: '' });
                     }}
                     className="text-xs text-neutral-600 underline cursor-pointer"
                   >
@@ -1182,7 +1182,7 @@ export default function App() {
                   D R &amp; Sons International Private Limited
                 </h4>
                 <p className="text-xs text-neutral-500 font-mono">
-                  Incorporated Pvt. Ltd. · Companies Act, 2013
+                  Incorporated Pvt. Ltd. · Since 2026 · Companies Act, 2013
                 </p>
               </div>
             </div>
@@ -1266,12 +1266,12 @@ export default function App() {
                     D R &amp; SONS INTERNATIONAL PVT. LTD.
                   </span>
                   <span className="text-[10px] text-neutral-500 uppercase tracking-widest block mt-1">
-                    Commercial Food &amp; Beverage Manufacturing
+                    Commercial Food &amp; Beverage Manufacturing · Since 2026
                   </span>
                 </div>
               </a>
               <p className="text-xs text-neutral-600 leading-relaxed pt-1">
-                Incorporated commercial manufacturer producing spray-dried fruit &amp; vegetable powders, packaged beverages, ice cream formulations, and dehydrated food flakes for food service brands and enterprise FMCG distributors.
+                Incorporated commercial manufacturer producing spray-dried fruit, vegetable &amp; starch powders, packaged beverages, ice cream formulations, and dehydrated food flakes for food service brands and enterprise FMCG distributors.
               </p>
             </div>
 
@@ -1315,7 +1315,7 @@ export default function App() {
               <ul className="space-y-2 text-xs text-neutral-600">
                 <li>
                   <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    Fruit &amp; Vegetable Powders
+                    Fruit, Vegetable &amp; Starch Powders
                   </a>
                 </li>
                 <li>
@@ -1644,6 +1644,10 @@ export default function App() {
                       <div className="flex justify-between border-b border-neutral-200 pb-1.5">
                         <span className="text-neutral-500">Legal Entity:</span>
                         <span className="font-bold text-neutral-900">D R &amp; Sons International Private Limited</span>
+                      </div>
+                      <div className="flex justify-between border-b border-neutral-200 pb-1.5">
+                        <span className="text-neutral-500">Incorporated:</span>
+                        <span className="font-bold text-neutral-900">Since 2026</span>
                       </div>
                       <div className="flex justify-between border-b border-neutral-200 pb-1.5">
                         <span className="text-neutral-500">Category:</span>
