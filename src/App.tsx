@@ -9,6 +9,7 @@ import {
   Apple,
   Coffee,
   PackageCheck,
+  Droplets,
   Send,
   ShieldCheck,
   ChevronRight,
@@ -155,10 +156,11 @@ export default function App() {
   const tickerItems = [
     'D R & Sons International Private Limited · Incorporated Enterprise (Since 2026)',
     'Fruits, Vegetables Powder and starch',
-    'Non-Alcoholic Drinks & Ice Creams',
     'Fruit & Vegetable Flakes',
+    'Drinking Mineral Water',
+    'Non-Alcoholic Drinks & Ice Creams',
     'Advanced Spray & Drum Drying',
-    'Cleanroom Bottling Lines',
+    'Cleanroom Bottling & Water Purification',
     'FSSAI Certified Commercial Supply',
     'Direct WhatsApp: 9411268879'
   ];
@@ -178,21 +180,8 @@ export default function App() {
       applications: 'Beverages, bakery, confectionery, instant soups, sauces & snack seasonings'
     },
     {
-      id: 'beverages',
-      number: '02',
-      shortName: 'Drinks & Ice Creams',
-      title: 'Non-Alcoholic Drinks and Ice Creams',
-      summary: 'Continuous pasteurization, automated cleanroom bottling, and commercial continuous freezing churn suites.',
-      tagline: 'High-speed bottling and premium packaged frozen desserts',
-      image: '/assets/aistudio/image_081c2200.webp',
-      icon: Coffee,
-      keyItems: ['Bottled Fruit Drinks', 'Packaged Ice Creams', 'Berry Blast & Mango Passion', 'Dairy & Fruit Confections'],
-      specs: ['Continuous pasteurization', 'Cleanroom automated lines', 'Sub-zero frozen dispatch', 'Tamper-evident sealing'],
-      applications: 'Retail brands, supermarket chains, hospitality & distributors'
-    },
-    {
       id: 'flakes',
-      number: '03',
+      number: '02',
       shortName: 'Fruit & Veg Flakes',
       title: 'Fruits and Vegetables Flakes',
       summary: 'Specialized drum drying and gentle hot-air dehydration creating crunchy, rapidly rehydrating flakes.',
@@ -202,6 +191,32 @@ export default function App() {
       keyItems: ['Dehydrated Vegetable Flakes', 'Beetroot Flakes', 'Herbs & Greens', 'Crispy Onion Flakes'],
       specs: ['Continuous drum drying', 'Rapid water rehydration', 'Zero artificial preservatives', 'Hermetic moisture-proof drums'],
       applications: 'Cereals, muesli, instant noodles, soup mixes & snack bars'
+    },
+    {
+      id: 'water',
+      number: '03',
+      shortName: 'Drinking Mineral Water',
+      title: 'Drinking Mineral Water',
+      summary: 'Multi-stage reverse osmosis, ozonation, micron filtration, and mineral remineralization yielding crystal-clear pure drinking water.',
+      tagline: 'Pure packaged mineral water with essential minerals and crisp refreshing taste',
+      image: '/assets/aistudio/drinking_water_packaging.webp',
+      icon: Droplets,
+      keyItems: ['Packaged Mineral Water (500ml & 1L)', 'Bulk Institutional Dispenser Jars', 'Mineral-Balanced Spring Formula', 'Touch-Free Cleanroom Bottling'],
+      specs: ['Multi-stage RO & Ozonation', 'Touch-free bottling line', '100% Recyclable food-grade PET', 'Tamper-evident sealing'],
+      applications: 'Retail brands, corporate offices, hospitality, airline catering & institutions'
+    },
+    {
+      id: 'beverages',
+      number: '04',
+      shortName: 'Drinks & Ice Creams',
+      title: 'Non-Alcoholic Drinks and Ice Creams',
+      summary: 'Continuous pasteurization, automated cleanroom bottling, and commercial continuous freezing churn suites.',
+      tagline: 'High-speed bottling and premium packaged frozen desserts',
+      image: '/assets/aistudio/image_081c2200.webp',
+      icon: Coffee,
+      keyItems: ['Bottled Fruit Drinks', 'Packaged Ice Creams', 'Berry Blast & Mango Passion', 'Dairy & Fruit Confections'],
+      specs: ['Continuous pasteurization', 'Cleanroom automated lines', 'Sub-zero frozen dispatch', 'Tamper-evident sealing'],
+      applications: 'Retail brands, supermarket chains, hospitality & distributors'
     }
   ];
 
@@ -216,19 +231,27 @@ export default function App() {
     },
     {
       number: '02',
-      division: 'Drinks & Ice Creams',
-      title: 'Automated Bottling & Freezing',
-      desc: 'Cleanroom UHT bottling lines and commercial continuous churn freeze suites for packaged retail goods.',
-      tags: ['UHT Pasteurization', 'Auto-Capping', 'Cold-Chain Dispatch'],
-      icon: Coffee
-    },
-    {
-      number: '03',
-      division: 'Fruit & Vegetable Flakes',
+      division: 'Fruits and Vegetables Flakes',
       title: 'Drum Drying & Dehydration',
       desc: 'Continuous drum dryers producing crispy inclusions and culinary flakes with instant rehydration.',
       tags: ['Drum Rollers', 'Flake Calibration', 'Nitrogen Seal'],
       icon: PackageCheck
+    },
+    {
+      number: '03',
+      division: 'Drinking Mineral Water',
+      title: 'Automated Mineral Water Purification & Bottling',
+      desc: 'Multi-stage RO, micron filtration, ozonation, and automated touch-free bottling lines for packaged drinking water.',
+      tags: ['RO & Ozonation', 'Cleanroom Bottling', 'Mineral Balance'],
+      icon: Droplets
+    },
+    {
+      number: '04',
+      division: 'Drinks & Ice Creams',
+      title: 'Automated Bottling & Freezing Suites',
+      desc: 'Cleanroom UHT bottling lines and commercial continuous churn freeze suites for packaged retail goods.',
+      tags: ['UHT Pasteurization', 'Auto-Capping', 'Cold-Chain Dispatch'],
+      icon: Coffee
     }
   ];
 
@@ -302,7 +325,7 @@ export default function App() {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-neutral-700">
-            <a href="#divisions" className="hover:text-emerald-900 transition-colors">3 Divisions</a>
+            <a href="#divisions" className="hover:text-emerald-900 transition-colors">4 Divisions</a>
             <a href="#facilities" className="hover:text-emerald-900 transition-colors">Facilities</a>
             <button 
               onClick={() => setLegalModalTab('terms')}
@@ -421,7 +444,7 @@ export default function App() {
                     >
                       <div className="flex items-center gap-2.5">
                         <Apple className="w-4 h-4 text-emerald-700" />
-                        <span>3 Manufacturing Divisions</span>
+                        <span>4 Manufacturing Divisions</span>
                       </div>
                       <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
                     </a>
@@ -612,7 +635,7 @@ export default function App() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-xs sm:text-sm font-mono tracking-wider uppercase text-neutral-300 max-w-lg"
           >
-            Fruits, Vegetables Powder and starch · Drinks &amp; Ice Creams · Flakes
+            Fruits, Vegetables Powder and starch · Flakes · Drinking Mineral Water · Drinks &amp; Ice Creams
           </motion.p>
 
           {/* Minimal Dual CTAs */}
@@ -674,7 +697,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECTION: 3 CORE REGISTERED MANUFACTURING DIVISIONS (Horizontal Scroll Enabled) */}
+      {/* SECTION: 4 CORE REGISTERED MANUFACTURING DIVISIONS (Horizontal Scroll Enabled) */}
       <section id="divisions" className="w-full py-10 sm:py-16 px-3 sm:px-6 lg:px-12 bg-white border-b border-neutral-200">
         <div className="w-full max-w-7xl mx-auto space-y-6">
           
@@ -682,7 +705,7 @@ export default function App() {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-neutral-200 pb-4">
             <div className="space-y-1">
               <div className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
-                Core Portfolio · 3 Registered Wings
+                Core Portfolio · 4 Registered Wings
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900">
                 Manufacturing <span className="font-serif-brand italic text-emerald-900 font-normal">Divisions</span>
@@ -692,7 +715,7 @@ export default function App() {
             {/* Horizontal Swipe Affordance & Navigation */}
             <div className="flex items-center justify-between sm:justify-end gap-3">
               <span className="text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 border border-emerald-900/10">
-                ← Swipe 3 Divisions →
+                ← Swipe 4 Divisions →
               </span>
               <div className="flex items-center gap-1.5">
                 <button
@@ -716,7 +739,7 @@ export default function App() {
           </div>
 
           {/* MOBILE VIEW: Circle Images for Category Buttons */}
-          <div className="flex sm:hidden items-center justify-around gap-2 py-2 px-1 border-b border-neutral-100">
+          <div className="flex sm:hidden items-center justify-between gap-1.5 py-2 px-1 border-b border-neutral-100 overflow-x-auto no-scrollbar">
             {divisionsData.map((div, idx) => {
               const isActive = activeDivision === idx;
               return (
@@ -727,11 +750,11 @@ export default function App() {
                     e.preventDefault();
                     scrollToDivision(idx);
                   }}
-                  className="flex flex-col items-center gap-1.5 focus:outline-hidden cursor-pointer group flex-1 max-w-[105px]"
+                  className="flex flex-col items-center gap-1 focus:outline-hidden cursor-pointer group flex-1 min-w-[70px] max-w-[85px]"
                   title={`Division ${div.number}: ${div.title}`}
                 >
                   <div
-                    className={`relative w-16 h-16 rounded-full p-[2.5px] transition-all duration-300 ${
+                    className={`relative w-14 h-14 rounded-full p-[2px] transition-all duration-300 ${
                       isActive
                         ? 'ring-2 ring-emerald-700 ring-offset-2 scale-105 shadow-md bg-emerald-700'
                         : 'border-2 border-neutral-300 opacity-80 group-hover:opacity-100 group-hover:border-neutral-400 bg-white'
@@ -1089,8 +1112,9 @@ export default function App() {
                       className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
                     >
                       <option value="Fruits, Vegetables Powder and starch">Fruits, Vegetables Powder and starch</option>
-                      <option value="Non-Alcoholic Drinks and Ice Creams">Non-Alcoholic Drinks and Ice Creams</option>
                       <option value="Fruits and Vegetables Flakes">Fruits and Vegetables Flakes</option>
+                      <option value="Drinking Mineral Water">Drinking Mineral Water</option>
+                      <option value="Non-Alcoholic Drinks and Ice Creams">Non-Alcoholic Drinks and Ice Creams</option>
                     </select>
                   </div>
                   <div>
@@ -1271,7 +1295,7 @@ export default function App() {
                 </div>
               </a>
               <p className="text-xs text-neutral-600 leading-relaxed pt-1">
-                Incorporated commercial enterprise specializing in fruits, vegetables powder and starch, non-alcoholic drinks and ice creams, and dehydrated fruit and vegetable flakes.
+                Incorporated commercial enterprise specializing in fruits, vegetables powder and starch, dehydrated fruit &amp; vegetable flakes, packaged drinking mineral water, and non-alcoholic drinks and ice creams.
               </p>
             </div>
 
