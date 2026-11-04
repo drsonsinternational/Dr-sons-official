@@ -189,3 +189,4 @@ When extending DrSons International into full product catalogs, client dashboard
 2. **Keep the Box Geometry Clean:** Avoid overly rounded bubbly cards (`rounded-3xl`); maintain sharp or tailored corners (`rounded-none`, `rounded-sm`, or `rounded-md` max) to preserve the corporate industrial aesthetic.
 3. **Visible Trade Hotline:** Always keep the WhatsApp / phone number (`+91 9411268879`) accessible in headers, footers, and modal CTAs.
 4. **Export-Grade Precision:** Every data point, volume specification, and pricing tier should feature tabular typography (`font-mono`) and clean border dividers.
+
