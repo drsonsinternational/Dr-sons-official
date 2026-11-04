@@ -3,9 +3,9 @@ import React, { useState, useRef } from 'react';
 // ==========================================
 // ASSET CONSTANTS
 // ==========================================
-const LOGO_DARK = "https://www.drytechindia.com/drytech-logo.png";
-const LOGO_WHITE = "https://www.drytechindia.com/drytech-logo-white.svg";
-const FOOTER_LOGO = "https://www.drytechindia.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fdrytech-footer-logo.c0fbefe0.png&w=828&q=90";
+const LOGO_DARK = "/assets/brand/dr-sons-international-logo.png";
+const LOGO_WHITE = "/assets/brand/dr-sons-international-logo-white.png";
+const FOOTER_LOGO = "/assets/brand/dr-sons-international-logo.png";
 
 // Brand Sub-Logos
 const BRAND_LOGOS = {
@@ -255,11 +255,11 @@ export default function App() {
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 xl:px-14 h-20 sm:h-24 flex items-center justify-between">
           
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2">
+          <a href="#" className="flex items-center gap-2 group">
             <img 
               src={LOGO_DARK} 
-              alt="Drytech Logo" 
-              className="h-10 sm:h-12 w-auto object-contain"
+              alt="DR & SONS INTERNATIONAL Logo" 
+              className="h-12 sm:h-14 md:h-16 w-auto object-contain transition-transform group-hover:scale-105"
             />
           </a>
 
@@ -1059,11 +1059,13 @@ export default function App() {
             
             {/* Col 1: Logo & Company Address */}
             <div className="lg:col-span-4 space-y-6">
-              <img 
-                src={LOGO_WHITE} 
-                alt="Drytech Logo" 
-                className="h-10 w-auto object-contain"
-              />
+              <div className="inline-block bg-white/95 backdrop-blur-xs rounded-2xl px-4 py-2.5 shadow-md">
+                <img 
+                  src={LOGO_DARK} 
+                  alt="DR & SONS INTERNATIONAL Logo" 
+                  className="h-12 sm:h-14 w-auto object-contain"
+                />
+              </div>
 
               <div className="space-y-4 text-xs leading-relaxed text-slate-300">
                 <div>
@@ -1196,13 +1198,13 @@ export default function App() {
 
             <div>
               <span className="text-[11px] font-mono uppercase tracking-widest text-[#0093cb] font-bold">
-                Drytech Global Trade
+                DR &amp; SONS INTERNATIONAL · Global Trade Desk
               </span>
               <h3 className="font-display font-bold text-2xl text-[#052d3d] mt-1">
                 Get in touch with us
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Speak to our formulation specialists for custom spray-dried solutions and sample requests.
+                Speak to our formulation specialists for custom spray-dried &amp; dehydrated solutions and sample requests.
               </p>
             </div>
 
