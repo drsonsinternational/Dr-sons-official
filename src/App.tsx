@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
   FileText,
   X,
   Building,
@@ -542,8 +543,8 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* HERO SECTION: Compact Full-Width Ambient Video Banner */}
-      <section className="relative w-full min-h-[420px] sm:min-h-[500px] lg:min-h-[580px] flex items-center justify-center overflow-hidden bg-[#0c2117]">
+      {/* HERO SECTION: Fullscreen Ambient Industrial Video Banner */}
+      <section className="relative w-full h-[calc(100dvh-56px)] sm:h-[calc(100dvh-73px)] min-h-[580px] flex items-center justify-center overflow-hidden bg-[#0c2117]">
         
         {/* Background Ambient Industrial Video */}
         <video 
@@ -559,7 +560,7 @@ export default function App() {
           loop 
           playsInline 
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover scale-105"
+          className="absolute inset-0 w-full h-full object-cover object-center"
         >
           <source 
             src="https://www.drytechindia.com/assets/home/banner/drytech-banner-video.MP4" 
@@ -567,8 +568,8 @@ export default function App() {
           />
         </video>
 
-        {/* High-Contrast Gradient Scrim */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#071911] via-[#092217]/75 to-[#0b281b]/55" />
+        {/* Subtle High-Contrast Gradient Scrim */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#071911]/90 via-[#071911]/50 to-[#071911]/35" />
 
         {/* Rotating Concentric Trajectory Ring */}
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden opacity-30">
@@ -634,6 +635,18 @@ export default function App() {
           </motion.div>
 
         </div>
+
+        {/* Subtle Scroll Indicator at Bottom of Hero */}
+        <a 
+          href="#divisions" 
+          aria-label="Scroll down to divisions"
+          className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 text-white/70 hover:text-white transition-colors group cursor-pointer"
+        >
+          <span className="text-[10px] font-mono tracking-widest uppercase text-emerald-300/80 group-hover:text-emerald-200">
+            Scroll
+          </span>
+          <ChevronDown className="w-4 h-4 animate-bounce text-emerald-400 group-hover:text-emerald-300" />
+        </a>
       </section>
 
       {/* CONTINUOUS LOOPING OPERATIONAL MARQUEE */}
