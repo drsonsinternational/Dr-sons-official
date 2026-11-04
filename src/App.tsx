@@ -308,7 +308,7 @@ export default function App() {
           <a href="#" className="flex items-center gap-2 sm:gap-3 group shrink-0">
             <div className="h-9 sm:h-12 flex items-center">
               <img 
-                src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.webp" 
+                src="/assets/brand/drsons_logo.webp" 
                 alt="D R & SONS INTERNATIONAL" 
                 className="h-9 sm:h-12 w-auto object-contain mix-blend-multiply"
               />
@@ -401,7 +401,7 @@ export default function App() {
                 <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-[#fafbfa]">
                   <div className="flex items-center gap-2">
                     <img
-                      src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.webp"
+                      src="/assets/brand/drsons_logo.webp"
                       alt="D R & SONS INTERNATIONAL"
                       className="h-8 w-auto object-contain mix-blend-multiply"
                     />
@@ -1196,7 +1196,7 @@ export default function App() {
             <div className="space-y-2.5">
               <div className="h-10 w-auto flex items-center">
                 <img 
-                  src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.webp" 
+                  src="/assets/brand/drsons_logo.webp" 
                   alt="D R & SONS INTERNATIONAL" 
                   className="h-10 w-auto object-contain mix-blend-multiply"
                 />
@@ -1281,7 +1281,7 @@ export default function App() {
             <div className="space-y-2 max-w-xl">
               <a href="#" className="flex items-center gap-3">
                 <img 
-                  src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.webp" 
+                  src="/assets/brand/drsons_logo.webp" 
                   alt="D R & SONS INTERNATIONAL" 
                   className="h-10 w-auto object-contain mix-blend-multiply"
                 />
