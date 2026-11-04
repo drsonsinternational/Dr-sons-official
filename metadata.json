@@ -1,6 +1,6 @@
 {
-  "name": "DrSons International - Official Portal Under Construction",
-  "description": "Official maintenance and launch holding portal for DrSons International, specializing in manufacturing and processing of fresh produce, beverages, and food products.",
+  "name": "DrSons International Private Limited",
+  "description": "DrSons International Private Limited is an incorporated commercial manufacturer specializing in fruits and vegetable powders, non-alcoholic drinks and ice creams, and dehydrated fruits and vegetables flakes.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

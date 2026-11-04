@@ -1,1284 +1,1485 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  Check, 
+  Copy, 
+  ArrowRight, 
+  MessageSquare, 
+  ExternalLink,
+  Apple,
+  Coffee,
+  PackageCheck,
+  Send,
+  ShieldCheck,
+  ChevronRight,
+  ChevronLeft,
+  FileText,
+  X,
+  Building,
+  Scale,
+  Lock,
+  FileCheck
+} from 'lucide-react';
 
-// ==========================================
-// ASSET CONSTANTS
-// ==========================================
-const LOGO_DARK = "/assets/brand/dr-sons-international-logo.png";
-const LOGO_WHITE = "/assets/brand/dr-sons-international-logo-white.png";
-const FOOTER_LOGO = "/assets/brand/dr-sons-international-logo.png";
-
-// Brand Sub-Logos
-const BRAND_LOGOS = {
-  nutritif: "https://www.drytechindia.com/assets/logos/nutritif.svg",
-  kremadel: "https://www.drytechindia.com/assets/logos/kremadel.svg",
-  liposharp: "https://www.drytechindia.com/assets/logos/liposharp.svg",
-  maxaphos: "https://www.drytechindia.com/assets/logos/maxaphos.svg",
-  capnova: "https://www.drytechindia.com/assets/logos/capnova.svg",
-  frutinov: "https://www.drytechindia.com/assets/logos/frutinov.svg",
-  drytang: "https://www.drytechindia.com/assets/logos/drytang.svg",
-};
-
-// Client Industry Logos
-const CLIENT_LOGOS = [
-  { name: "Nestle", src: "https://www.drytechindia.com/assets/home/industry/nestle.png" },
-  { name: "Mondelez", src: "https://www.drytechindia.com/assets/home/industry/mondelez-international.png" },
-  { name: "Hindustan Unilever", src: "https://www.drytechindia.com/assets/home/industry/hindustan-unilever-limited.png" },
-  { name: "PepsiCo", src: "https://www.drytechindia.com/assets/home/industry/pepsico.png" },
-  { name: "Danone", src: "https://www.drytechindia.com/assets/home/industry/danone.png" },
-  { name: "ITC Limited", src: "https://www.drytechindia.com/assets/home/industry/itc-limited.png" },
-  { name: "IFF", src: "https://www.drytechindia.com/assets/home/industry/iff.png" },
-  { name: "Givaudan", src: "https://www.drytechindia.com/assets/home/industry/givaudan.png" },
-  { name: "Symrise", src: "https://www.drytechindia.com/assets/home/industry/symrise.png" },
-  { name: "DSM-Firmenich", src: "https://www.drytechindia.com/assets/home/industry/dms-firmenich.png" },
-  { name: "Mars", src: "https://www.drytechindia.com/assets/home/industry/mars.png" },
-  { name: "Kelloggs", src: "https://www.drytechindia.com/assets/home/industry/kelloggs.png" },
-  { name: "Ferrero", src: "https://www.drytechindia.com/assets/home/industry/ferrero.png" },
-  { name: "Haldirams", src: "https://www.drytechindia.com/assets/home/industry/haldirams.png" },
-  { name: "Amway", src: "https://www.drytechindia.com/assets/home/industry/amway.png" },
-  { name: "Herbalife", src: "https://www.drytechindia.com/assets/home/industry/herbalife.png" },
-  { name: "Sun Pharma", src: "https://www.drytechindia.com/assets/home/industry/sun-pharma.png" },
-  { name: "Dohler", src: "https://www.drytechindia.com/assets/home/industry/dohler.png" },
-  { name: "Promasidor", src: "https://www.drytechindia.com/assets/home/industry/promasidor.png" },
-  { name: "DS Group", src: "https://www.drytechindia.com/assets/home/industry/ds-group.png" },
-  { name: "Cafe Coffee Day", src: "https://www.drytechindia.com/assets/home/industry/cafe-coffeday.png" },
-  { name: "GSK", src: "https://www.drytechindia.com/assets/home/industry/gsk.png" },
-  { name: "Perfetti", src: "https://www.drytechindia.com/assets/home/industry/perfetti.png" },
-  { name: "General Mills", src: "https://www.drytechindia.com/assets/home/industry/general-mills.png" }
-];
-
-// Stats Images
-const STATS_IMAGES = {
-  unit: "https://www.drytechindia.com/_next/image?url=%2Fassets%2Fhome%2Fstats%2Fdrytech-unit-01-and-02-images.png&w=1920&q=95",
-  customers: "https://www.drytechindia.com/_next/image?url=%2Fassets%2Fhome%2Fstats%2Fcustomers-image.png&w=3840&q=95",
-  factory: "https://www.drytechindia.com/_next/image?url=%2Fassets%2Fhome%2Fstats%2Fimage-of-factory-new.png&w=1920&q=95",
-  products: "https://www.drytechindia.com/_next/image?url=%2Fassets%2Fhome%2Fstats%2Fproducts.png&w=3840&q=95",
-  drinks: "https://www.drytechindia.com/_next/image?url=%2Fassets%2Fhome%2Fstats%2Fdrinks-image.png&w=3840&q=95"
-};
-
-// Versatility Cards
-const VERSATILITY_ITEMS = [
-  {
-    title: "Health and nutraceuticals",
-    desc: "Enabling bioavailability and compliance in health-forward formulations.",
-    img: "https://www.drytechindia.com/assets/home/versatility/health-and-nutraceuticals-new.png"
-  },
-  {
-    title: "Baking and confectionery",
-    desc: "Elevating indulgence with consistent flavor, color, and texture.",
-    img: "https://www.drytechindia.com/assets/home/versatility/baking-and-confectionery.png"
-  },
-  {
-    title: "Dairy",
-    desc: "Transforming freshness into stable longevity with nutrition retention.",
-    img: "https://www.drytechindia.com/assets/home/versatility/dairy_product.jpeg"
-  },
-  {
-    title: "Beverages",
-    desc: "Ensuring solubility, stability, and taste in every sip.",
-    img: "https://www.drytechindia.com/assets/home/versatility/beverages.png"
-  },
-  {
-    title: "Pharmaceuticals and cosmetics",
-    desc: "Empowering efficacy with encapsulation, stability, and compliance excellence.",
-    img: "https://www.drytechindia.com/assets/home/versatility/pharmaceuticals-and-cosmetics.jpg"
-  },
-  {
-    title: "Frozen desserts",
-    desc: "Freezing texture, stability, and indulgence for delightful bites and scoops.",
-    img: "https://www.drytechindia.com/assets/home/versatility/frozen-desserts.jpg"
-  },
-  {
-    title: "Seasonings",
-    desc: "Adding aroma, flavor, and functionality to tasteful blends.",
-    img: "https://www.drytechindia.com/assets/home/versatility/seasonings_.png"
-  },
-  {
-    title: "Snacks and savories",
-    desc: "Enhancing taste, texture, and shelf stability.",
-    img: "https://www.drytechindia.com/assets/home/versatility/snacks-and-savories.png"
-  },
-  {
-    title: "Convenience foods",
-    desc: "Driving taste, goodness, and performance in RTC and RTE treats.",
-    img: "https://www.drytechindia.com/assets/home/versatility/convenience-foods.png"
-  }
-];
-
-// Product Formulations Data
-const PRODUCTS_DATA = [
-  {
-    id: "fat-bases",
-    name: "Fat Bases",
-    img: "https://www.drytechindia.com/assets/home/products/fat-bases.png",
-    desc: "High-stability spray-dried fat powders engineered for creamy mouthfeel, emulsion stability, and optimal solubility in dry premixes."
-  },
-  {
-    id: "caseinates",
-    name: "Caseinates",
-    img: "https://www.drytechindia.com/assets/home/products/caseinates.png",
-    desc: "Premium dairy proteins offering superior emulsification, water binding, and nutritional fortification in dietetic and clinical nutrition."
-  },
-  {
-    id: "non-dairy-creamer",
-    name: "Non-dairy Creamer",
-    img: "https://www.drytechindia.com/assets/home/products/kremadel-non-dairy-creamer.png",
-    desc: "Instant dissolvable spray-dried creamer delivering rich, velvety texture to coffee, tea, and dry beverage mixes."
-  },
-  {
-    id: "instant-fat-filled",
-    name: "Instant Fat-filled Powder",
-    img: "https://www.drytechindia.com/assets/home/products/instant-fat-filled-powder.png",
-    desc: "Cost-effective, highly soluble dairy alternative with balanced dairy solids and refined vegetable oils."
-  },
-  {
-    id: "beverage-whitener",
-    name: "Beverage Whitener",
-    img: "https://www.drytechindia.com/assets/home/products/beverage-whitener.png",
-    desc: "Specially formulated for hot beverages, providing brilliant whiteness and smooth dissolution without curdling."
-  },
-  {
-    id: "liposomes",
-    name: "Liposomes",
-    img: "https://www.drytechindia.com/assets/home/products/liposomes.png",
-    desc: "Advanced functional delivery systems encapsulating active nutraceutical ingredients for enhanced bio-absorption."
-  },
-  {
-    id: "phosphates",
-    name: "Phosphates",
-    img: "https://www.drytechindia.com/assets/home/products/maxap-phosphates-new.png",
-    desc: "Functional phosphate systems providing acidity regulation, moisture retention, and mineral fortification."
-  },
-  {
-    id: "encapsulated-acids",
-    name: "Encapsulated Acids",
-    img: "https://www.drytechindia.com/assets/home/products/encapsulated-acids.png",
-    desc: "Controlled-release organic acids engineered for bakery leavening, confection gummies, and extended shelf freshness."
-  },
-  {
-    id: "tomato-powder",
-    name: "Tomato Powder",
-    img: "https://www.drytechindia.com/assets/home/products/drytang-tomato-powder.png",
-    desc: "Spray-dried from ripe field tomatoes, delivering authentic tang, rich lycopene color, and umami depth for seasonings and soups."
-  },
-  {
-    id: "gum-arabic",
-    name: "Gum Arabic",
-    img: "https://www.drytechindia.com/assets/home/products/gum-arabic-powders-new.png",
-    desc: "Asia's leading spray-dried acacia gum, acting as a natural soluble fiber, flavor fixative, and emulsion stabilizer."
-  },
-  {
-    id: "cheese-powder",
-    name: "Cheese Powder",
-    img: "https://www.drytechindia.com/assets/home/products/cheese-powder.png",
-    desc: "The flavor of authentic farm-fresh cheese in free-flowing powder form for convenience, extended shelf-life, and functionality excellence."
-  },
-  {
-    id: "fruit-powders",
-    name: "Fruit Powders",
-    img: "https://www.drytechindia.com/assets/home/products/fruit-powders.png",
-    desc: "Pure spray-dried fruit purees preserving natural volatiles, sweet acidity, and vitamins across mango, citrus, and berries."
-  },
-  {
-    id: "natural-colorants",
-    name: "Natural Colorants",
-    img: "https://www.drytechindia.com/assets/home/products/natural-colorants.png",
-    desc: "Clean-label vibrant pigments derived from beetroot and caramel, offering heat-stable natural hues for food and pharma."
-  },
-  {
-    id: "hvp",
-    name: "Hydrolyzed Vegetable Protein Powder",
-    img: "https://www.drytechindia.com/assets/home/products/hydrolized-vegetable-protein-powder.png",
-    desc: "Natural savory flavor enhancer providing deep savory bouillon notes for snack seasonings, broths, and sauces."
-  },
-  {
-    id: "tamarind-powder",
-    name: "Tamarind Powder",
-    img: "https://www.drytechindia.com/assets/home/products/tamarind-powder.png",
-    desc: "Tangy, tart spray-dried tamarind extract with authentic fruity tartness for instant chutneys, seasonings, and marinades."
-  }
-];
-
-// Impact Cards
-const IMPACT_CARDS = [
-  {
-    title: "32+ years in the market and counting",
-    desc: "We have been pioneering spray-dried innovation since 1992. From being India’s first manufacturer of spray-dried tomato powder to becoming Asia’s largest manufacturer of spray-dried Gum Arabic, our universe continues to expand.",
-    img: "https://www.drytechindia.com/assets/home/impact/frame-01.png"
-  },
-  {
-    title: "Backed by research, confirmed with application",
-    desc: "From concept to launch, reason guides every ingredient’s creation. While research ensures technical rigor, a dedicated application lab tests viability, enabling performance-driven solutions at scale.",
-    img: "https://www.drytechindia.com/assets/home/impact/frame-02.png"
-  },
-  {
-    title: "Going the extra mile with contract manufacturing",
-    desc: "Be it function-specific formulations or regulation-based composition, we leverage our expertise and technology to create shelf-ready products for customers. With contract manufacturing, customers gain reliable solutions, at scale, with precision.",
-    img: "https://www.drytechindia.com/assets/home/impact/frame-03-new.png"
-  },
-  {
-    title: "Sustainability",
-    desc: "Embedding conscious choices into our DNA, we ensure that every ingredient we create nourishes not only consumers but also the world we share.",
-    metrics: [
-      "1,350 kVA of daily clean energy generation from solar panels",
-      "4.6 ML of monthly water recycling capacity"
-    ],
-    img: "https://www.drytechindia.com/assets/home/impact/sustainability.png"
-  }
-];
+interface NotificationState {
+  type: 'success' | null;
+  message: string;
+}
 
 export default function App() {
+  const [activeDivision, setActiveDivision] = useState<number>(0);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [inquirySubmitted, setInquirySubmitted] = useState(false);
+  const [whatsappRedirectUrl, setWhatsappRedirectUrl] = useState('');
+  const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
+  const [notification, setNotification] = useState<NotificationState>({ type: null, message: '' });
+  
+  // Legal Modal State: 'terms' | 'privacy' | 'statutory' | null
+  const [legalModalTab, setLegalModalTab] = useState<'terms' | 'privacy' | 'statutory' | null>(null);
+
+  // Mobile Dashboard Drawer State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [productsDropdownOpen, setProductsDropdownOpen] = useState(false);
-  const [selectedProductIndex, setSelectedProductIndex] = useState(10); // default to Cheese Powder
-  const [activeUnit, setActiveUnit] = useState<1 | 2>(1);
-  const [contactModalOpen, setContactModalOpen] = useState(false);
 
-  // Horizontal scroll container ref for Versatility
-  const versatilityScrollRef = useRef<HTMLDivElement>(null);
+  // Horizontal scroll container ref for facilities
+  const facilitiesScrollRef = useRef<HTMLDivElement>(null);
 
-  const scrollVersatility = (direction: 'left' | 'right') => {
-    if (versatilityScrollRef.current) {
-      const offset = direction === 'left' ? -380 : 380;
-      versatilityScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+  // Inquiry Form State
+  const [inquiryForm, setInquiryForm] = useState({
+    name: '',
+    company: '',
+    email: '',
+    phone: '',
+    division: 'Fruits and Vegetable Powder',
+    volume: 'Commercial Bulk Supply',
+    message: ''
+  });
+
+  const showNotification = (message: string) => {
+    setNotification({ type: 'success', message });
+    setTimeout(() => {
+      setNotification({ type: null, message: '' });
+    }, 3200);
+  };
+
+  const handleCopyEmail = (emailStr: string) => {
+    navigator.clipboard.writeText(emailStr);
+    setCopiedEmail(true);
+    showNotification('Corporate email copied to clipboard.');
+    setTimeout(() => setCopiedEmail(false), 2000);
+  };
+
+  const handleInquirySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inquiryForm.name || !inquiryForm.email) return;
+
+    const textLines = [
+      `*Commercial Inquiry - DrSons International Pvt. Ltd.*`,
+      `*Entity:* DrSons International Private Limited`,
+      `*Name:* ${inquiryForm.name}`,
+      `*Company:* ${inquiryForm.company || 'Not Specified'}`,
+      `*Email:* ${inquiryForm.email}`,
+      `*Phone:* ${inquiryForm.phone || 'Not Specified'}`,
+      `*Division:* ${inquiryForm.division}`,
+      `*Order Volume:* ${inquiryForm.volume}`,
+      `*Specifications:* ${inquiryForm.message || 'Standard Specifications'}`
+    ];
+    const encodedText = encodeURIComponent(textLines.join('\n'));
+    const url = `https://wa.me/919411268879?text=${encodedText}`;
+
+    setWhatsappRedirectUrl(url);
+    setInquirySubmitted(true);
+    setRedirectCountdown(3);
+    showNotification('Inquiry registered. Redirecting to WhatsApp desk...');
+
+    setTimeout(() => {
+      window.location.href = url;
+    }, 2800);
+  };
+
+  // Countdown timer for automatic redirect
+  useEffect(() => {
+    if (redirectCountdown === null || redirectCountdown <= 0) return;
+    const timer = setTimeout(() => {
+      setRedirectCountdown(redirectCountdown - 1);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [redirectCountdown]);
+
+  // Touch swipe handling for buttery-smooth division sliding
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleDivisionTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleDivisionTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+
+    // Trigger horizontal slide if horizontal intent is clear
+    if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+      if (deltaX < 0) {
+        // Swiped left -> next division
+        setActiveDivision((prev) => Math.min(divisionsData.length - 1, prev + 1));
+      } else {
+        // Swiped right -> previous division
+        setActiveDivision((prev) => Math.max(0, prev - 1));
+      }
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
+  const scrollToDivision = (idx: number) => {
+    setActiveDivision(idx);
+  };
+
+  const scrollFacilities = (direction: 'left' | 'right') => {
+    if (facilitiesScrollRef.current) {
+      const offset = direction === 'left' ? -320 : 320;
+      facilitiesScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
     }
   };
 
-  const selectedProduct = PRODUCTS_DATA[selectedProductIndex];
+  const tickerItems = [
+    'DrSons International Private Limited · Incorporated Enterprise',
+    'Fruit & Vegetable Powders',
+    'Non-Alcoholic Drinks & Ice Creams',
+    'Fruit & Vegetable Flakes',
+    'Advanced Spray & Drum Drying',
+    'Cleanroom Bottling Lines',
+    'FSSAI Certified Commercial Supply',
+    'Direct WhatsApp: 9411268879'
+  ];
+
+  const divisionsData = [
+    {
+      id: 'powders',
+      number: '01',
+      shortName: 'Fruit & Veg Powders',
+      title: 'Fruits and Vegetable Powder',
+      summary: 'Precision low-temperature spray drying and micro-milling yielding instant solubility and pure natural aroma.',
+      tagline: '100% natural fruit & vegetable powders with authentic flavor',
+      image: '/assets/aistudio/file_000000007504820892cf49a02d280275_ad4da5f2.png',
+      icon: Apple,
+      keyItems: ['Pink Guava Powder', 'Watermelon Powder', 'Orange Powder', 'Tomato & Beetroot'],
+      specs: ['Low-temp spray dried', 'Instant ambient solubility', 'Standardized mesh sizes', 'Nitrogen-flushed barrier pack'],
+      applications: 'Beverages, bakery, instant soups, snacks & baby foods'
+    },
+    {
+      id: 'beverages',
+      number: '02',
+      shortName: 'Drinks & Ice Creams',
+      title: 'Non-Alcoholic Drinks and Ice Creams',
+      summary: 'Continuous pasteurization, automated cleanroom bottling, and commercial continuous freezing churn suites.',
+      tagline: 'High-speed bottling and premium packaged frozen desserts',
+      image: '/assets/aistudio/image_081c2200.png',
+      icon: Coffee,
+      keyItems: ['Bottled Fruit Drinks', 'Packaged Ice Creams', 'Berry Blast & Mango Passion', 'Dairy & Fruit Confections'],
+      specs: ['Continuous pasteurization', 'Cleanroom automated lines', 'Sub-zero frozen dispatch', 'Tamper-evident sealing'],
+      applications: 'Retail brands, supermarket chains, hospitality & distributors'
+    },
+    {
+      id: 'flakes',
+      number: '03',
+      shortName: 'Fruit & Veg Flakes',
+      title: 'Fruits and Vegetables Flakes',
+      summary: 'Specialized drum drying and gentle hot-air dehydration creating crunchy, rapidly rehydrating flakes.',
+      tagline: 'Dehydrated crispy flakes with instant rehydration & vibrant taste',
+      image: '/assets/aistudio/image_449cc89f.png',
+      icon: PackageCheck,
+      keyItems: ['Dehydrated Vegetable Flakes', 'Beetroot Flakes', 'Herbs & Greens', 'Crispy Onion Flakes'],
+      specs: ['Continuous drum drying', 'Rapid water rehydration', 'Zero artificial preservatives', 'Hermetic moisture-proof drums'],
+      applications: 'Cereals, muesli, instant noodles, soup mixes & snack bars'
+    }
+  ];
+
+  const facilitiesData = [
+    {
+      number: '01',
+      division: 'Fruit & Vegetable Powders',
+      title: 'Spray Drying & Micro-Milling',
+      desc: 'Low-temperature evaporators & micro-milling suites producing free-flowing, nutrient-intact powders.',
+      tags: ['Spray Towers', 'Vacuum Evaporation', 'Standard Mesh'],
+      icon: Apple
+    },
+    {
+      number: '02',
+      division: 'Drinks & Ice Creams',
+      title: 'Automated Bottling & Freezing',
+      desc: 'Cleanroom UHT bottling lines and commercial continuous churn freeze suites for packaged retail goods.',
+      tags: ['UHT Pasteurization', 'Auto-Capping', 'Cold-Chain Dispatch'],
+      icon: Coffee
+    },
+    {
+      number: '03',
+      division: 'Fruit & Vegetable Flakes',
+      title: 'Drum Drying & Dehydration',
+      desc: 'Continuous drum dryers producing crispy inclusions and culinary flakes with instant rehydration.',
+      tags: ['Drum Rollers', 'Flake Calibration', 'Nitrogen Seal'],
+      icon: PackageCheck
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-white text-[#333333] font-sans antialiased overflow-x-hidden selection:bg-[#0093cb] selection:text-white">
+    <div className="min-h-screen w-full bg-[#fbfdfb] text-[#122218] flex flex-col font-sans selection:bg-[#143e2b] selection:text-white relative">
       
-      {/* ─────────────────────────────────────────────────────────────
-          1. NAVIGATION BAR
-      ───────────────────────────────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#f0f0f0] transition-all">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 xl:px-14 h-20 sm:h-24 flex items-center justify-between">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {notification.message && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className="fixed top-4 left-4 right-4 sm:left-auto sm:right-6 sm:top-auto sm:bottom-6 z-50 bg-[#0c2419] text-white px-4 py-3 shadow-2xl border border-emerald-700/50 flex items-center gap-3 text-xs"
+          >
+            <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="font-medium tracking-wide flex-1">{notification.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* FLOATING WHATSAPP LOGO BUTTON ON BOTTOM LEFT */}
+      <motion.a
+        initial={{ opacity: 0, scale: 0.7 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.5, duration: 0.4 }}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.92 }}
+        href="https://wa.me/919411268879"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-5 left-5 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#25D366] text-white shadow-2xl flex items-center justify-center hover:bg-[#20ba59] active:scale-95 transition-all hover:shadow-emerald-500/30 group"
+        title="Chat on WhatsApp (+91 9411268879)"
+        aria-label="Chat on WhatsApp (+91 9411268879)"
+      >
+        {/* Subtle Online Ping Ring */}
+        <span className="absolute -inset-1 rounded-full bg-[#25D366] opacity-35 animate-ping pointer-events-none" />
+
+        {/* Authentic WhatsApp SVG Logo */}
+        <svg 
+          className="w-7 h-7 sm:w-8 sm:h-8 fill-current relative z-10 drop-shadow-xs" 
+          viewBox="0 0 24 24" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+      </motion.a>
+
+      {/* HEADER / NAVIGATION */}
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-neutral-200">
+        <div className="w-full px-4 sm:px-8 lg:px-10 py-2.5 sm:py-3.5 flex items-center justify-between gap-4">
           
-          {/* Logo */}
-          <a href="#" className="flex items-center gap-2 group">
-            <img 
-              src={LOGO_DARK} 
-              alt="DR & SONS INTERNATIONAL Logo" 
-              className="h-12 sm:h-14 md:h-16 w-auto object-contain transition-transform group-hover:scale-105"
-            />
+          {/* Logo Lockup */}
+          <a href="#" className="flex items-center gap-2 sm:gap-3 group shrink-0">
+            <div className="h-9 sm:h-12 flex items-center">
+              <img 
+                src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.png" 
+                alt="DR & SONS INTERNATIONAL" 
+                className="h-9 sm:h-12 w-auto object-contain mix-blend-multiply"
+              />
+            </div>
+            <div className="border-l border-neutral-200 pl-2.5 hidden md:block">
+              <span className="text-xs sm:text-sm font-bold tracking-tight text-[#0a2318] block leading-none">
+                DR &amp; SONS INTERNATIONAL PVT. LTD.
+              </span>
+              <span className="text-[9px] text-neutral-500 uppercase tracking-widest block mt-0.5">
+                Food &amp; Beverage Manufacturing
+              </span>
+            </div>
           </a>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden lg:flex items-center gap-8 text-[15px] font-medium text-[#424242]">
-            
-            {/* Products Dropdown Trigger */}
-            <div 
-              className="relative py-4 cursor-pointer group"
-              onMouseEnter={() => setProductsDropdownOpen(true)}
-              onMouseLeave={() => setProductsDropdownOpen(false)}
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-neutral-700">
+            <a href="#divisions" className="hover:text-emerald-900 transition-colors">3 Divisions</a>
+            <a href="#facilities" className="hover:text-emerald-900 transition-colors">Facilities</a>
+            <button 
+              onClick={() => setLegalModalTab('terms')}
+              className="hover:text-emerald-900 transition-colors cursor-pointer text-neutral-600 font-medium"
             >
-              <div className="flex items-center gap-1.5 hover:text-[#0093cb] transition-colors">
-                <span>Products</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right rotate-90 w-4 h-4 text-slate-500">
-                  <path d="m9 18 6-6-6-6"></path>
-                </svg>
-              </div>
-
-              {/* Mega Dropdown Menu */}
-              {productsDropdownOpen && (
-                <div className="absolute top-full -left-20 w-[880px] bg-white rounded-2xl shadow-2xl border border-slate-100 p-8 grid grid-cols-3 gap-6 animate-in fade-in duration-200">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-                      <img src={BRAND_LOGOS.nutritif} alt="Nutritif" className="h-4 w-auto" />
-                      <span className="font-display font-semibold text-sm text-[#052d3d]">Nutrition</span>
-                    </div>
-                    <ul className="text-xs space-y-2 text-slate-600">
-                      <li className="hover:text-[#0093cb] cursor-pointer">Fat Bases</li>
-                      <li className="hover:text-[#0093cb] cursor-pointer">Caseinates</li>
-                    </ul>
-
-                    <div className="flex items-center gap-2 border-b border-slate-100 pb-2 pt-3">
-                      <img src={BRAND_LOGOS.kremadel} alt="Kremadel" className="h-4 w-auto" />
-                      <span className="font-display font-semibold text-sm text-[#052d3d]">Creaming Solutions</span>
-                    </div>
-                    <ul className="text-xs space-y-2 text-slate-600">
-                      <li className="hover:text-[#0093cb] cursor-pointer">Non-dairy Creamer</li>
-                      <li className="hover:text-[#0093cb] cursor-pointer">Instant Fat-filled Powder</li>
-                      <li className="hover:text-[#0093cb] cursor-pointer">Beverage Whitener</li>
-                    </ul>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-                      <img src={BRAND_LOGOS.liposharp} alt="Liposharp" className="h-4 w-auto" />
-                      <span className="font-display font-semibold text-sm text-[#052d3d]">Functional Delivery Systems</span>
-                    </div>
-                    <ul className="text-xs space-y-2 text-slate-600">
-                      <li className="hover:text-[#0093cb] cursor-pointer">Liposomes</li>
-                      <li className="hover:text-[#0093cb] cursor-pointer">Phosphates</li>
-                      <li className="hover:text-[#0093cb] cursor-pointer">Encapsulated Acids</li>
-                    </ul>
-
-                    <div className="flex items-center gap-2 border-b border-slate-100 pb-2 pt-3">
-                      <img src={BRAND_LOGOS.frutinov} alt="Frutinov" className="h-4 w-auto" />
-                      <span className="font-display font-semibold text-sm text-[#052d3d]">Natural Ingredients</span>
-                    </div>
-                    <ul className="text-xs space-y-2 text-slate-600">
-                      <li className="hover:text-[#0093cb] cursor-pointer">Gum Arabic</li>
-                      <li className="hover:text-[#0093cb] cursor-pointer">Fruit Powders</li>
-                    </ul>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-                      <img src={BRAND_LOGOS.drytang} alt="Drytang" className="h-4 w-auto" />
-                      <span className="font-display font-semibold text-sm text-[#052d3d]">Seasoning Ingredients</span>
-                    </div>
-                    <ul className="text-xs space-y-2 text-slate-600">
-                      <li className="hover:text-[#0093cb] cursor-pointer">Tomato Powder</li>
-                      <li className="hover:text-[#0093cb] cursor-pointer">Cheese Powder</li>
-                      <li className="hover:text-[#0093cb] cursor-pointer">Hydrolyzed Vegetable Protein</li>
-                      <li className="hover:text-[#0093cb] cursor-pointer">Tamarind Powder</li>
-                    </ul>
-
-                    <div className="flex items-center gap-2 border-b border-slate-100 pb-2 pt-3">
-                      <span className="font-display font-semibold text-sm text-[#052d3d]">Natural Colorants</span>
-                    </div>
-                    <ul className="text-xs space-y-2 text-slate-600">
-                      <li className="hover:text-[#0093cb] cursor-pointer">Beetroot Powder</li>
-                      <li className="hover:text-[#0093cb] cursor-pointer">Caramel Powder</li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <a href="#contract-manufacturing" className="hover:text-[#0093cb] transition-colors">Contract Manufacturing</a>
-            <a href="#rd" className="hover:text-[#0093cb] transition-colors">R&amp;D</a>
-            <a href="#about" className="hover:text-[#0093cb] transition-colors">About us</a>
-            <a href="#careers" className="hover:text-[#0093cb] transition-colors">Careers</a>
-            <a href="#contact" className="hover:text-[#0093cb] transition-colors">Contact us</a>
-          </div>
-
-          {/* Contact Button */}
-          <div className="hidden sm:flex items-center">
-            <button
-              onClick={() => setContactModalOpen(true)}
-              className="px-6 py-3 rounded-full bg-[#0093cb] hover:bg-[#007cad] text-white text-sm font-semibold tracking-wide flex items-center gap-2 transition-all shadow-md shadow-cyan-600/20 cursor-pointer"
-            >
-              <span>Contact us</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right">
-                <path d="m9 18 6-6-6-6"></path>
-              </svg>
+              Legal Terms
             </button>
-          </div>
+            <a href="#inquiry-desk" className="hover:text-emerald-900 transition-colors">Trade Desk</a>
+          </nav>
 
-          {/* Mobile Menu Toggle */}
-          <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-slate-800"
-          >
-            {mobileMenuOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x">
-                <path d="M18 6 6 18"></path>
-                <path d="m6 6 12 12"></path>
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-menu">
-                <path d="M4 5h16"></path>
-                <path d="M4 12h16"></path>
-                <path d="M4 19h16"></path>
-              </svg>
-            )}
-          </button>
-        </div>
-
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-b border-slate-200 px-6 py-6 space-y-4 text-base font-medium">
-            <a href="#products" onClick={() => setMobileMenuOpen(false)} className="block py-2 border-b border-slate-100">Products</a>
-            <a href="#contract-manufacturing" onClick={() => setMobileMenuOpen(false)} className="block py-2 border-b border-slate-100">Contract Manufacturing</a>
-            <a href="#rd" onClick={() => setMobileMenuOpen(false)} className="block py-2 border-b border-slate-100">R&amp;D</a>
-            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="block py-2 border-b border-slate-100">About us</a>
-            <a href="#careers" onClick={() => setMobileMenuOpen(false)} className="block py-2 border-b border-slate-100">Careers</a>
-            <button
-              onClick={() => { setMobileMenuOpen(false); setContactModalOpen(true); }}
-              className="w-full py-3 mt-4 rounded-full bg-[#0093cb] text-white text-center font-semibold text-sm"
-            >
-              Contact us
-            </button>
-          </div>
-        )}
-      </nav>
-
-      {/* ─────────────────────────────────────────────────────────────
-          2. HERO SECTION
-      ───────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[92vh] flex items-center justify-center pt-28 pb-20 px-4 sm:px-8 xl:px-14 bg-gradient-to-b from-[#052d3d] via-[#08465e] to-[#052d3d] text-white overflow-hidden text-center">
-        
-        {/* Background Image / Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay pointer-events-none"
-          style={{ backgroundImage: `url('https://www.drytechindia.com/assets/home/impact/background.jpg')` }}
-        ></div>
-
-        {/* Big Rotating Circular Gradient Vector from Drytech Design */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[500px] md:w-[674px] h-[340px] sm:h-[500px] md:h-[674px] pointer-events-none select-none">
-          <svg 
-            className="w-full h-full animate-spin-slow opacity-60" 
-            viewBox="0 0 674 674" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path 
-              opacity="0.35" 
-              d="M336.575 0.950166C151.217 0.95015 0.952135 151.404 0.952119 337C0.952103 522.596 151.217 673.05 336.575 673.05C521.934 673.05 672.198 522.596 672.198 337C672.198 151.404 521.934 0.950248 336.575 0.950166Z" 
-              stroke="url(#paint0_linear_hero)" 
-              strokeWidth="1.9"
-            />
-            <defs>
-              <linearGradient id="paint0_linear_hero" x1="673.148" y1="337" x2="0.00167952" y2="337" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#F2889C" stopOpacity="0" />
-                <stop offset="0.666756" stopColor="#F2889C" />
-                <stop offset="0.755213" stopColor="#D6CB75" />
-                <stop offset="0.850962" stopColor="#80D3F6" />
-                <stop offset="1" stopColor="#80D3F6" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 max-w-5xl mx-auto space-y-8">
-          
-          <div className="space-y-4">
-            <h1 className="font-display font-medium text-3xl sm:text-5xl md:text-6xl lg:text-[70px] leading-[1.15] tracking-tight text-white">
-              Helping customers create<br />
-              <span className="font-bold">market-winning formulations</span><br />
-              with <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-200 to-teal-200">spray-dried innovation</span>
-            </h1>
-
-            <p className="max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-slate-200 font-light leading-relaxed">
-              Explore high-quality spray-dried ingredients for F&amp;B, pharma &amp; nutritional applications, trusted by 1,000+ global brands for performance &amp; consistency at scale.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+          {/* Direct WhatsApp Callout & Mobile Three-Bar Button */}
+          <div className="flex items-center gap-2">
             <a
-              href="#products"
-              className="px-8 py-4 rounded-full bg-[#0093cb] hover:bg-[#007cad] text-white text-sm font-semibold tracking-wide flex items-center gap-2 shadow-lg shadow-cyan-900/40 transition-all transform hover:-translate-y-0.5"
+              href="https://wa.me/919411268879"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-900/20 text-xs font-medium transition-colors"
             >
-              <span>Explore products</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right">
-                <path d="m9 18 6-6-6-6"></path>
-              </svg>
+              <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
+              <span className="hidden sm:inline">WhatsApp:</span>
+              <span className="font-mono font-semibold text-[11px] sm:text-xs">9411268879</span>
             </a>
 
-            <button
-              onClick={() => setContactModalOpen(true)}
-              className="px-8 py-4 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-semibold tracking-wide backdrop-blur-xs transition-all cursor-pointer"
+            <a
+              href="#inquiry-desk"
+              className="hidden lg:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#143e2b] hover:bg-[#0c271b] text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
             >
-              Contact us
+              <span>Get Quote</span>
+              <ArrowRight className="w-3 h-3" />
+            </a>
+
+            {/* Three Bar Lines (Hamburger) in Top Right Corner */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden flex flex-col justify-center items-center gap-[4.5px] w-9 h-9 border border-neutral-300 bg-white hover:bg-neutral-50 active:scale-95 transition-all cursor-pointer shadow-2xs"
+              aria-label="Open Navigation Dashboard"
+              title="Open Navigation Dashboard"
+            >
+              <span className="w-4 h-[2px] bg-neutral-900 rounded-full block"></span>
+              <span className="w-4 h-[2px] bg-neutral-900 rounded-full block"></span>
+              <span className="w-4 h-[2px] bg-neutral-900 rounded-full block"></span>
             </button>
           </div>
 
         </div>
+      </header>
 
-      </section>
+      {/* MOBILE NAVIGATION DASHBOARD DRAWER */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+            />
 
-      {/* ─────────────────────────────────────────────────────────────
-          3. SECTION: TRUSTED BY INDUSTRY LEADERS
-      ───────────────────────────────────────────────────────────── */}
-      <section className="py-16 sm:py-20 bg-white border-b border-slate-100 overflow-hidden">
-        
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 xl:px-14 flex items-center justify-between mb-12">
-          
-          {/* Left Decorative Hatched Lines SVG */}
-          <div className="hidden md:block">
-            <svg className="w-[100px] lg:w-[130px] 2xl:w-[185px] shrink-0" viewBox="0 0 185 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M91.168 -217.516L325.202 6.15307" stroke="#6CC18E" />
-              <path d="M81.4951 -207.395L315.529 16.2741" stroke="#80D3F6" />
-              <path d="M71.8223 -197.273L418.831 134.366" stroke="#D6CB75" />
-              <path d="M62.1494 -187.152L409.158 144.488" stroke="#FABB75" />
-              <path d="M52.4766 -177.031L399.485 154.609" stroke="#F2889C" />
-              <path d="M42.8037 -166.91L389.812 164.73" stroke="#6CC18E" />
-              <path d="M33.1309 -156.789L380.139 174.851" stroke="#80D3F6" />
-              <path d="M23.458 -146.668L370.467 184.972" stroke="#D6CB75" />
-              <rect x="0.393904" y="0.393904" width="184.212" height="139.212" stroke="url(#paint_hatched_left)" strokeWidth="0.787807" />
-              <defs>
-                <linearGradient id="paint_hatched_left" x1="0" y1="70" x2="185" y2="70" gradientUnits="userSpaceOnUse">
-                  <stop offset="0.125" stopColor="#F2889C" />
-                  <stop offset="0.480769" stopColor="#D6CB75" />
-                  <stop offset="0.850962" stopColor="#80D3F6" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-
-          <div className="text-center mx-auto">
-            <h2 className="font-display font-medium text-2xl sm:text-3xl lg:text-4xl text-[#052d3d] tracking-tight">
-              Trusted by <span className="font-bold">industry leaders</span>
-            </h2>
-          </div>
-
-          {/* Right Decorative Hatched Lines SVG */}
-          <div className="hidden md:block">
-            <svg className="w-[100px] lg:w-[130px] 2xl:w-[185px] shrink-0 transform scale-x-[-1]" viewBox="0 0 185 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M91.168 -217.516L325.202 6.15307" stroke="#6CC18E" />
-              <path d="M81.4951 -207.395L315.529 16.2741" stroke="#80D3F6" />
-              <path d="M71.8223 -197.273L418.831 134.366" stroke="#D6CB75" />
-              <path d="M62.1494 -187.152L409.158 144.488" stroke="#FABB75" />
-              <path d="M52.4766 -177.031L399.485 154.609" stroke="#F2889C" />
-              <rect x="0.393904" y="0.393904" width="184.212" height="139.212" stroke="url(#paint_hatched_right)" strokeWidth="0.787807" />
-              <defs>
-                <linearGradient id="paint_hatched_right" x1="0" y1="70" x2="185" y2="70" gradientUnits="userSpaceOnUse">
-                  <stop offset="0.125" stopColor="#F2889C" />
-                  <stop offset="0.480769" stopColor="#D6CB75" />
-                  <stop offset="0.850962" stopColor="#80D3F6" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-
-        </div>
-
-        {/* Client Logos Marquee Row 1 */}
-        <div className="relative w-full overflow-hidden flex items-center mb-6">
-          <div className="animate-marquee flex items-center gap-12 sm:gap-16 whitespace-nowrap">
-            {CLIENT_LOGOS.concat(CLIENT_LOGOS).map((logo, idx) => (
-              <div key={idx} className="h-12 sm:h-14 w-32 sm:w-40 flex items-center justify-center grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all">
-                <img src={logo.src} alt={logo.name} className="max-h-full max-w-full object-contain" />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Client Logos Marquee Row 2 (Reverse) */}
-        <div className="relative w-full overflow-hidden flex items-center">
-          <div className="animate-marquee-reverse flex items-center gap-12 sm:gap-16 whitespace-nowrap">
-            {CLIENT_LOGOS.slice().reverse().concat(CLIENT_LOGOS).map((logo, idx) => (
-              <div key={idx} className="h-12 sm:h-14 w-32 sm:w-40 flex items-center justify-center grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all">
-                <img src={logo.src} alt={logo.name} className="max-h-full max-w-full object-contain" />
-              </div>
-            ))}
-          </div>
-        </div>
-
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          4. SECTION: A GROWING LEGACY IN SPRAY-DRIED INGREDIENTS
-      ───────────────────────────────────────────────────────────── */}
-      <section id="about" className="py-20 sm:py-28 max-w-[1440px] mx-auto px-4 sm:px-8 xl:px-14">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          
-          {/* Left Column Text */}
-          <div className="lg:col-span-5 space-y-6">
-            <h2 className="font-display font-medium text-3xl sm:text-4xl lg:text-[46px] leading-[1.18] text-[#052d3d] tracking-tight">
-              A growing legacy<br />
-              <span className="font-bold">in spray-dried ingredients</span>
-            </h2>
-
-            <div className="space-y-4 text-slate-600 text-[15px] sm:text-base leading-relaxed font-normal">
-              <p>
-                Welcome to <strong>Drytech</strong>—your partner for steadfast and versatile spray-dried ingredients.
-              </p>
-              <p>
-                We have been shaping and enriching consumer experiences with innovation and consistency <strong>since 1992</strong>. With more than <strong>50 high-quality spray-dried ingredients</strong>, we address the formulation needs of our customers <strong>across 52+ countries</strong>.
-              </p>
-              <p>
-                Our team’s drive for value-added solutions, coupled with a commitment to purity and sustainability, has enabled us to become a global leader in the spray-dried specialty ingredients space.
-              </p>
-            </div>
-
-            <div className="pt-2">
-              <button 
-                onClick={() => setContactModalOpen(true)}
-                className="px-8 py-3.5 rounded-full bg-[#0093cb] hover:bg-[#007cad] text-white text-sm font-semibold tracking-wide flex items-center gap-2 shadow-md shadow-cyan-600/20 transition-all cursor-pointer"
-              >
-                <span>Know more</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right">
-                  <path d="m9 18 6-6-6-6"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Right Column Bento Metrics Grid */}
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5">
-            
-            {/* Bento 1: 50 acre manufacturing unit with Unit 1 & Unit 2 */}
-            <div className="relative rounded-2xl overflow-hidden min-h-[260px] bg-slate-900 group shadow-md">
-              <img 
-                src={STATS_IMAGES.unit} 
-                alt="50 acre manufacturing unit" 
-                className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-              
-              <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-                <button 
-                  onClick={() => setActiveUnit(1)} 
-                  className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all ${activeUnit === 1 ? 'bg-[#0093cb] text-white' : 'bg-black/50 text-slate-300'}`}
-                >
-                  Unit 1
-                </button>
-                <button 
-                  onClick={() => setActiveUnit(2)} 
-                  className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all ${activeUnit === 2 ? 'bg-[#0093cb] text-white' : 'bg-black/50 text-slate-300'}`}
-                >
-                  Unit 2
-                </button>
-              </div>
-
-              <div className="absolute bottom-5 left-5 right-5 text-white z-10">
-                <div className="font-display font-extrabold text-4xl sm:text-5xl text-white">50</div>
-                <div className="text-sm font-semibold tracking-wide text-cyan-200 mt-1">acre manufacturing unit</div>
-              </div>
-            </div>
-
-            {/* Bento 2: 1500+ happy customers worldwide */}
-            <div className="relative rounded-2xl overflow-hidden min-h-[260px] bg-slate-900 group shadow-md">
-              <img 
-                src={STATS_IMAGES.customers} 
-                alt="1500+ happy customers worldwide" 
-                className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-              <div className="absolute bottom-5 left-5 right-5 text-white z-10">
-                <div className="font-display font-extrabold text-4xl sm:text-5xl text-white">1,500<span className="text-cyan-400">+</span></div>
-                <div className="text-sm font-semibold tracking-wide text-cyan-200 mt-1">happy customers worldwide</div>
-              </div>
-            </div>
-
-            {/* Bento 3: 100000 MT p.a. production capacity */}
-            <div className="sm:col-span-2 relative rounded-2xl overflow-hidden min-h-[260px] bg-slate-900 group shadow-md">
-              <img 
-                src={STATS_IMAGES.factory} 
-                alt="100,000 MT p.a. production capacity" 
-                className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
-              <div className="absolute bottom-6 left-6 right-6 text-white z-10 max-w-md">
-                <div className="font-display font-extrabold text-4xl sm:text-5xl text-white">100,000 <span className="text-xl sm:text-2xl font-medium text-cyan-300">MT p.a.</span></div>
-                <div className="text-sm font-semibold tracking-wide text-slate-200 mt-1">production capacity (spray-dried ingredients)</div>
-              </div>
-            </div>
-
-            {/* Bento 4: 15 million PET jars */}
-            <div className="relative rounded-2xl overflow-hidden min-h-[260px] bg-slate-900 group shadow-md">
-              <img 
-                src={STATS_IMAGES.products} 
-                alt="15 million PET jars" 
-                className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-              <div className="absolute bottom-5 left-5 right-5 text-white z-10">
-                <div className="font-display font-extrabold text-4xl sm:text-5xl text-white">15 <span className="text-lg font-medium text-cyan-300">million</span></div>
-                <div className="text-xs sm:text-sm font-semibold tracking-wide text-slate-200 mt-1">PET jars p.a. capacity for infant &amp; clinical nutrition</div>
-              </div>
-            </div>
-
-            {/* Bento 5: 65 million liters UHT beverages */}
-            <div className="relative rounded-2xl overflow-hidden min-h-[260px] bg-slate-900 group shadow-md">
-              <img 
-                src={STATS_IMAGES.drinks} 
-                alt="65 million liters UHT beverages" 
-                className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-              <div className="absolute bottom-5 left-5 right-5 text-white z-10">
-                <div className="font-display font-extrabold text-4xl sm:text-5xl text-white">65 <span className="text-lg font-medium text-cyan-300">million</span></div>
-                <div className="text-xs sm:text-sm font-semibold tracking-wide text-slate-200 mt-1">liters p.a. packing capacity for UHT beverages</div>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          5. SECTION: DRIVEN BY VERSATILITY, CURATED FOR VALUE
-      ───────────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-[#f7f7f7] border-t border-b border-slate-200/80">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 xl:px-14">
-          
-          {/* Header & Controls */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-            <div>
-              <h2 className="font-display font-medium text-3xl sm:text-4xl lg:text-[46px] leading-tight text-[#052d3d] tracking-tight">
-                Driven by <span className="font-bold">versatility</span>, curated for <span className="font-bold">value</span>
-              </h2>
-              <p className="text-slate-600 text-base sm:text-lg mt-2">
-                Applications across <strong className="text-slate-900">food, pharma,</strong> and <strong className="text-slate-900">beyond</strong>.
-              </p>
-            </div>
-
-            {/* Arrow Controls using exact SVGs from prompt */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => scrollVersatility('left')}
-                className="w-12 h-12 rounded-full bg-white border border-slate-300 hover:border-[#0093cb] hover:text-[#0093cb] flex items-center justify-center transition-all shadow-xs cursor-pointer"
-                title="Scroll Left"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-move-left w-6 h-6">
-                  <path d="M6 8L2 12L6 16"></path>
-                  <path d="M2 12H22"></path>
-                </svg>
-              </button>
-
-              <button
-                onClick={() => scrollVersatility('right')}
-                className="w-12 h-12 rounded-full bg-white border border-slate-300 hover:border-[#0093cb] hover:text-[#0093cb] flex items-center justify-center transition-all shadow-xs cursor-pointer"
-                title="Scroll Right"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-move-right w-6 h-6">
-                  <path d="M18 8L22 12L18 16"></path>
-                  <path d="M2 12H22"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Horizontal Scrollable Slider */}
-          <div 
-            ref={versatilityScrollRef}
-            className="flex gap-6 overflow-x-auto pb-6 no-scrollbar snap-x snap-mandatory"
-          >
-            {VERSATILITY_ITEMS.map((item, idx) => (
-              <div 
-                key={idx}
-                className="w-[300px] sm:w-[360px] shrink-0 bg-white rounded-2xl overflow-hidden border border-slate-200/90 hover:border-cyan-400 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group snap-start"
-              >
-                <div>
-                  <div className="h-[230px] w-full overflow-hidden bg-slate-100">
-                    <img 
-                      src={item.img} 
-                      alt={item.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            {/* Slide-out Dashboard Panel */}
+            <motion.aside
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+              className="absolute top-0 right-0 bottom-0 w-[86vw] max-w-sm bg-white shadow-2xl flex flex-col justify-between overflow-y-auto border-l border-neutral-200"
+            >
+              {/* Drawer Top */}
+              <div>
+                {/* Header */}
+                <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-[#fafbfa]">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.png"
+                      alt="DR & SONS INTERNATIONAL"
+                      className="h-8 w-auto object-contain mix-blend-multiply"
                     />
+                    <div>
+                      <span className="text-xs font-bold tracking-tight text-[#0a2318] block leading-none">
+                        DR &amp; SONS INTL
+                      </span>
+                      <span className="text-[9px] text-neutral-500 uppercase tracking-wider block mt-0.5">
+                        Navigation Dashboard
+                      </span>
+                    </div>
                   </div>
-                  <div className="p-6 space-y-2">
-                    <h3 className="font-display font-bold text-xl text-[#052d3d] group-hover:text-[#0093cb] transition-colors">
-                      {item.title}
-                    </h3>
-                    <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                      {item.desc}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="p-6 pt-0">
-                  <button 
-                    onClick={() => setContactModalOpen(true)}
-                    className="text-xs font-semibold uppercase tracking-wider text-[#0093cb] hover:text-[#007cad] flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <span>Explore formulations</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right">
-                      <path d="m9 18 6-6-6-6"></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          6. SECTION: TRANSFORMING CUSTOMER NEEDS INTO MARKET BREAKTHROUGHS
-      ───────────────────────────────────────────────────────────── */}
-      <section id="products" className="py-24 max-w-[1440px] mx-auto px-4 sm:px-8 xl:px-14">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          
-          {/* Left Column: Heading, Paragraphs & Product Selector List */}
-          <div className="lg:col-span-7 space-y-8">
-            <div>
-              <h2 className="font-display font-medium text-3xl sm:text-4xl lg:text-[46px] leading-[1.18] text-[#052d3d] tracking-tight">
-                Transforming<br />
-                <span className="font-bold">customer needs</span> into<br />
-                <span className="font-bold text-[#0093cb]">market breakthroughs</span>
-              </h2>
-
-              <div className="mt-4 space-y-3 text-slate-600 text-sm sm:text-base leading-relaxed">
-                <p>
-                  Ever-changing market trends and consumer needs are redefining markets globally. With sustainable choices, health consciousness, and stringent regulations, customer acquisition and retention for brands are more difficult than ever.
-                </p>
-                <p>
-                  At <strong>Drytech</strong>, we convert these challenges into market-winning formulations for customers with our <strong>spray-dried ingredients</strong>. We transform raw ingredients into stable, functional powders that deliver great experiences at scale with a sharp focus on versatility, market trends, and consumer preferences.
-                </p>
-              </div>
-            </div>
-
-            {/* Interactive Product Selection Pills Grid */}
-            <div className="space-y-3">
-              <div className="text-xs uppercase font-mono tracking-widest text-slate-500 font-semibold">Select Formulation:</div>
-              <div className="flex flex-wrap gap-2">
-                {PRODUCTS_DATA.map((prod, idx) => (
                   <button
-                    key={prod.id}
-                    onClick={() => setSelectedProductIndex(idx)}
-                    className={`px-3.5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer ${
-                      selectedProductIndex === idx
-                        ? 'bg-[#0093cb] text-white shadow-md shadow-cyan-600/20'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-8 h-8 flex items-center justify-center border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 cursor-pointer transition-colors"
+                    aria-label="Close Dashboard"
                   >
-                    {prod.name}
+                    <X className="w-4 h-4" />
                   </button>
-                ))}
-              </div>
-            </div>
-          </div>
+                </div>
 
-          {/* Right Column: Featured Product Card / Bowl Display */}
-          <div className="lg:col-span-5">
-            <div className="sticky top-32 rounded-3xl bg-gradient-to-br from-cyan-50/70 to-blue-50/50 border border-cyan-100 p-8 sm:p-10 shadow-xl space-y-6 text-center">
-              
-              <div className="relative w-64 h-64 sm:w-72 sm:h-72 mx-auto flex items-center justify-center">
-                {/* Rotating subtle halo */}
-                <div className="absolute inset-0 rounded-full border border-cyan-200/60 animate-spin-slow"></div>
-                <img 
-                  src={selectedProduct.img} 
-                  alt={selectedProduct.name}
-                  className="w-56 h-56 object-contain drop-shadow-2xl transform hover:scale-105 transition-transform duration-500"
-                />
-              </div>
+                {/* Dashboard Status Pill */}
+                <div className="px-4 py-2 bg-emerald-50/80 border-b border-emerald-900/10 flex items-center gap-2 text-[10px] font-mono text-emerald-900">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Incorporated Private Limited · FSSAI</span>
+                </div>
 
-              <div className="space-y-2">
-                <span className="text-[11px] font-mono uppercase tracking-widest px-3 py-1 rounded-full bg-white font-bold text-[#0093cb] shadow-2xs">
-                  Spray-Dried Specialty
-                </span>
-                <h3 className="font-display font-bold text-2xl sm:text-3xl text-[#052d3d]">
-                  {selectedProduct.name}
-                </h3>
-                <p className="text-slate-600 text-sm leading-relaxed max-w-sm mx-auto">
-                  {selectedProduct.desc}
-                </p>
-              </div>
-
-              <div className="pt-2">
-                <button
-                  onClick={() => setContactModalOpen(true)}
-                  className="px-8 py-3.5 rounded-full bg-[#0093cb] hover:bg-[#007cad] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 mx-auto shadow-md transition-all cursor-pointer"
-                >
-                  <span>Know more</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right">
-                    <path d="m9 18 6-6-6-6"></path>
-                  </svg>
-                </button>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          7. SECTION: BEYOND INGREDIENTS. FOR IMPACT.
-      ───────────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-[#052d3d] text-white">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 xl:px-14">
-          
-          <div className="max-w-3xl space-y-4 mb-16">
-            <h2 className="font-display font-medium text-3xl sm:text-4xl lg:text-[46px] leading-tight text-white tracking-tight">
-              Beyond ingredients.<br />
-              <span className="font-bold text-cyan-300">For impact.</span>
-            </h2>
-            <p className="text-slate-300 text-base sm:text-lg font-light leading-relaxed">
-              When you share a challenge with us, we see beyond products. We aim to create <strong className="text-white">memorable experiences</strong> and <strong className="text-white">associations</strong>—the building blocks of lasting brand equity.
-            </p>
-          </div>
-
-          {/* 4 Impact Pillars Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {IMPACT_CARDS.map((card, idx) => (
-              <div 
-                key={idx}
-                className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xs hover:border-cyan-400/40 transition-all duration-300 flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="h-64 sm:h-72 w-full overflow-hidden bg-black/30">
-                    <img 
-                      src={card.img} 
-                      alt={card.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
+                {/* Navigation Links */}
+                <div className="p-4 space-y-4">
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-neutral-400 font-semibold">
+                    Core Dashboard
                   </div>
-                  <div className="p-6 sm:p-8 space-y-3">
-                    <h3 className="font-display font-bold text-xl sm:text-2xl text-white">
-                      {card.title}
-                    </h3>
-                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                      {card.desc}
-                    </p>
 
-                    {card.metrics && (
-                      <div className="pt-2 space-y-2 text-xs font-medium text-cyan-200">
-                        {card.metrics.map((m, i) => (
-                          <div key={i} className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                            <span>{m}</span>
-                          </div>
-                        ))}
+                  <nav className="space-y-1">
+                    <a
+                      href="#divisions"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-between p-2.5 text-xs font-bold text-neutral-900 hover:bg-emerald-50/60 border border-transparent hover:border-emerald-800/20 transition-all"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Apple className="w-4 h-4 text-emerald-700" />
+                        <span>3 Manufacturing Divisions</span>
                       </div>
-                    )}
+                      <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
+                    </a>
+
+                    <div className="pl-6 pr-2 py-1 space-y-1.5 border-l-2 border-emerald-800/20 ml-4 my-1">
+                      {divisionsData.map((div, idx) => (
+                        <button
+                          key={`drawer-div-${div.id}`}
+                          onClick={() => {
+                            scrollToDivision(idx);
+                            setMobileMenuOpen(false);
+                          }}
+                          className="flex items-center gap-2.5 w-full text-left py-1 text-xs text-neutral-700 hover:text-emerald-950 hover:bg-neutral-50 px-1.5 transition-colors cursor-pointer"
+                        >
+                          <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-neutral-200">
+                            <img src={div.image} alt="" className="w-full h-full object-cover" />
+                          </div>
+                          <span className="font-medium truncate">{div.title}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    <a
+                      href="#facilities"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-between p-2.5 text-xs font-bold text-neutral-900 hover:bg-emerald-50/60 border border-transparent hover:border-emerald-800/20 transition-all"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <PackageCheck className="w-4 h-4 text-emerald-700" />
+                        <span>Production Infrastructure</span>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
+                    </a>
+
+                    <a
+                      href="#inquiry-desk"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-between p-2.5 text-xs font-bold text-neutral-900 hover:bg-emerald-50/60 border border-transparent hover:border-emerald-800/20 transition-all"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Send className="w-4 h-4 text-emerald-700" />
+                        <span>Commercial Inquiry Desk</span>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
+                    </a>
+                  </nav>
+
+                  <div className="pt-3 border-t border-neutral-200">
+                    <div className="text-[10px] font-mono uppercase tracking-widest text-neutral-400 font-semibold mb-2">
+                      Legal Disclosures (Pvt Ltd)
+                    </div>
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setLegalModalTab('terms');
+                        }}
+                        className="flex items-center justify-between w-full p-2 text-xs text-neutral-700 hover:text-emerald-950 hover:bg-neutral-50 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-3.5 h-3.5 text-emerald-800" />
+                          <span>Terms of Commercial Supply</span>
+                        </div>
+                        <ChevronRight className="w-3 h-3 text-neutral-400" />
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setLegalModalTab('privacy');
+                        }}
+                        className="flex items-center justify-between w-full p-2 text-xs text-neutral-700 hover:text-emerald-950 hover:bg-neutral-50 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Lock className="w-3.5 h-3.5 text-emerald-800" />
+                          <span>Privacy Policy (DPDP Act)</span>
+                        </div>
+                        <ChevronRight className="w-3 h-3 text-neutral-400" />
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setLegalModalTab('statutory');
+                        }}
+                        className="flex items-center justify-between w-full p-2 text-xs text-neutral-700 hover:text-emerald-950 hover:bg-neutral-50 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Building className="w-3.5 h-3.5 text-emerald-800" />
+                          <span>Statutory Company Details</span>
+                        </div>
+                        <ChevronRight className="w-3 h-3 text-neutral-400" />
+                      </button>
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                <div className="p-6 sm:p-8 pt-0">
-                  <button 
-                    onClick={() => setContactModalOpen(true)}
-                    className="text-xs font-semibold uppercase tracking-wider text-cyan-300 hover:text-white flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <span>Read more</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right">
-                      <path d="m9 18 6-6-6-6"></path>
-                    </svg>
-                  </button>
+              {/* Drawer Bottom Actions */}
+              <div className="p-4 border-t border-neutral-200 bg-[#fafbfa] space-y-2.5">
+                <a
+                  href="https://wa.me/919411268879"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#143e2b] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#0c281c] transition-colors"
+                >
+                  <MessageSquare className="w-4 h-4 text-emerald-300" />
+                  <span>WhatsApp: 9411268879</span>
+                </a>
+
+                <a
+                  href="#inquiry-desk"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-1.5 py-2 px-4 bg-white border border-neutral-300 text-neutral-800 text-xs font-semibold uppercase tracking-wider hover:bg-neutral-50"
+                >
+                  <span>Request Specifications</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+
+                <div className="pt-1 text-center text-[10px] text-neutral-400 font-mono">
+                  DrSons International Private Limited
                 </div>
               </div>
-            ))}
+            </motion.aside>
           </div>
+        )}
+      </AnimatePresence>
 
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          8. SECTION: A NEVER-FADING COMMITMENT TO TRUST & COMPLIANCE
-      ───────────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-white border-b border-slate-100">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 xl:px-14 text-center space-y-12">
-          
-          <div className="max-w-2xl mx-auto space-y-3">
-            <h2 className="font-display font-medium text-3xl sm:text-4xl lg:text-[46px] text-[#052d3d] tracking-tight">
-              A never-fading commitment<br />
-              <span className="font-bold">to trust and compliance</span>
-            </h2>
-            <p className="text-slate-500 text-sm sm:text-base">
-              Certified by premier international standards to ensure quality, safety, and traceability.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 items-center justify-center">
-            
-            <div className="flex items-center justify-center border border-slate-200 rounded-xl p-6 h-28 hover:shadow-md transition-all">
-              <img 
-                src="https://www.drytechindia.com/_next/image?url=%2Fassets%2Fhome%2Ftrused-by%2Ffssai.png&w=384&q=95" 
-                alt="FSSAI" 
-                className="max-h-12 w-auto object-contain"
-              />
-            </div>
-
-            <div className="flex items-center justify-center border border-slate-200 rounded-xl p-6 h-28 hover:shadow-md transition-all">
-              <img 
-                src="https://www.drytechindia.com/_next/image?url=%2Fassets%2Fhome%2Ftrused-by%2Fiso-9001.png&w=384&q=95" 
-                alt="ISO 9001" 
-                className="max-h-12 w-auto object-contain"
-              />
-            </div>
-
-            <div className="flex items-center justify-center border border-slate-200 rounded-xl p-6 h-28 hover:shadow-md transition-all">
-              <span className="font-display font-bold text-sm text-[#052d3d] tracking-wider">ISO 14001</span>
-            </div>
-
-            <div className="flex items-center justify-center border border-slate-200 rounded-xl p-6 h-28 hover:shadow-md transition-all">
-              <span className="font-display font-bold text-sm text-[#052d3d] tracking-wider">ISO 22000</span>
-            </div>
-
-            <div className="flex items-center justify-center border border-slate-200 rounded-xl p-6 h-28 hover:shadow-md transition-all">
-              <span className="font-display font-bold text-sm text-[#052d3d] tracking-wider">HACCP</span>
-            </div>
-
-            <div className="flex items-center justify-center border border-slate-200 rounded-xl p-6 h-28 hover:shadow-md transition-all">
-              <span className="font-display font-bold text-sm text-[#052d3d] tracking-wider">HALAL &amp; KOSHER</span>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          9. SECTION: GIVE YOUR PRODUCTS THE EDGE OF INNOVATION (CTA)
-      ───────────────────────────────────────────────────────────── */}
-      <section className="py-28 bg-gradient-to-b from-[#052d3d] to-[#08465e] text-white text-center relative overflow-hidden">
+      {/* HERO SECTION: Compact Full-Width Ambient Video Banner */}
+      <section className="relative w-full min-h-[420px] sm:min-h-[500px] lg:min-h-[580px] flex items-center justify-center overflow-hidden bg-[#0c2117]">
         
-        {/* Animated Circular Gradient Rings from Drytech */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] sm:w-[600px] h-[420px] sm:h-[600px] pointer-events-none select-none">
+        {/* Background Ambient Industrial Video */}
+        <video 
+          ref={(el) => {
+            if (el) {
+              el.defaultMuted = true;
+              el.muted = true;
+              el.play().catch(() => {});
+            }
+          }}
+          autoPlay 
+          muted 
+          loop 
+          playsInline 
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover scale-105"
+        >
+          <source 
+            src="https://www.drytechindia.com/assets/home/banner/drytech-banner-video.MP4" 
+            type="video/mp4" 
+          />
+        </video>
+
+        {/* High-Contrast Gradient Scrim */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#071911] via-[#092217]/75 to-[#0b281b]/55" />
+
+        {/* Rotating Concentric Trajectory Ring */}
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden opacity-30">
           <svg 
-            className="w-full h-full animate-spin-slow opacity-40" 
+            className="w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] animate-spin-slow" 
             viewBox="0 0 674 674" 
             fill="none" 
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path 
-              d="M337.427 0.554719C151.849 0.554703 1.40819 151.186 1.40817 337C1.40816 522.814 151.849 673.445 337.427 673.445C523.004 673.445 673.445 522.814 673.445 337C673.445 151.186 523.004 0.554801 337.427 0.554719Z" 
-              stroke="url(#paint0_cta)" 
-              strokeWidth="1.10911"
-            />
-            <defs>
-              <linearGradient id="paint0_cta" x1="674" y1="337" x2="0.853242" y2="337" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#F2889C" stopOpacity="0" />
-                <stop offset="0.125" stopColor="#F2889C" />
-                <stop offset="0.480769" stopColor="#D6CB75" />
-                <stop offset="0.850962" stopColor="#80D3F6" />
-                <stop offset="1" stopColor="#80D3F6" stopOpacity="0" />
-              </linearGradient>
-            </defs>
+            <circle cx="337" cy="337" r="335" stroke="#4ade80" strokeWidth="1.5" strokeDasharray="6 8" />
+            <circle cx="337" cy="337" r="260" stroke="#86efac" strokeWidth="1" strokeDasharray="4 6" />
+            <circle cx="337" cy="337" r="180" stroke="#ffffff" strokeWidth="1" opacity="0.4" />
           </svg>
         </div>
 
-        <div className="relative z-10 max-w-3xl mx-auto px-4 space-y-8">
-          <h2 className="font-display font-medium text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-tight">
-            Give your products the<br />
-            <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-200 to-teal-200">
-              edge of innovation
-            </span>
-          </h2>
+        {/* Animated Hero Content (Tightly spaced, minimal text) */}
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-8 py-16 sm:py-24 text-center flex flex-col items-center space-y-4 sm:space-y-6">
 
-          <div className="pt-2">
-            <button
-              onClick={() => setContactModalOpen(true)}
-              className="px-10 py-4 rounded-full bg-[#0093cb] hover:bg-[#007cad] text-white text-base font-semibold tracking-wide shadow-xl shadow-cyan-900/50 hover:shadow-cyan-600/30 transition-all transform hover:-translate-y-0.5 cursor-pointer"
+          {/* Minimalist Look Heading */}
+          <motion.h1 
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]"
+          >
+            Purity in <span className="font-serif-brand italic font-normal text-[#86efac]">Every Batch</span>
+          </motion.h1>
+
+          {/* Minimal Category Subline */}
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-xs sm:text-sm font-mono tracking-wider uppercase text-neutral-300 max-w-lg"
+          >
+            Fruit &amp; Vegetable Powders · Drinks &amp; Ice Creams · Flakes
+          </motion.p>
+
+          {/* Minimal Dual CTAs */}
+          <motion.div 
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex flex-wrap items-center justify-center gap-3 pt-1"
+          >
+            <a
+              href="#divisions"
+              className="px-5 sm:px-7 py-2.5 sm:py-3 bg-[#22c55e] hover:bg-[#16a34a] text-[#071f14] text-xs font-bold uppercase tracking-wider transition-all hover:shadow-lg flex items-center gap-1.5"
             >
-              Contact us
-            </button>
-          </div>
-        </div>
+              <span>Explore Divisions</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </a>
 
+            <a
+              href="https://wa.me/919411268879"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 sm:px-7 py-2.5 sm:py-3 bg-black/40 hover:bg-black/60 text-white border border-white/25 text-xs font-semibold uppercase tracking-wider backdrop-blur-md transition-all flex items-center gap-1.5"
+            >
+              <MessageSquare className="w-3.5 h-3.5 text-emerald-300" />
+              <span>WhatsApp: 9411268879</span>
+            </a>
+          </motion.div>
+
+        </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────
-          10. FOOTER
-      ───────────────────────────────────────────────────────────── */}
-      <footer className="bg-[#052d3d] text-slate-300 text-xs border-t border-cyan-950">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 xl:px-14 py-20">
+      {/* CONTINUOUS LOOPING OPERATIONAL MARQUEE */}
+      <section className="w-full border-y border-neutral-200 bg-[#143e2b] text-white py-2.5 overflow-hidden select-none">
+        <div className="animate-marquee flex items-center gap-6 text-[11px] font-medium uppercase tracking-widest">
+          {tickerItems.map((item, idx) => (
+            <div key={`ticker-1-${idx}`} className="flex items-center gap-6 shrink-0">
+              <span className="text-emerald-100">{item}</span>
+              <span className="text-emerald-400/60" aria-hidden="true">◆</span>
+            </div>
+          ))}
+          {tickerItems.map((item, idx) => (
+            <div key={`ticker-2-${idx}`} className="flex items-center gap-6 shrink-0">
+              <span className="text-emerald-100">{item}</span>
+              <span className="text-emerald-400/60" aria-hidden="true">◆</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION: 3 CORE REGISTERED MANUFACTURING DIVISIONS (Horizontal Scroll Enabled) */}
+      <section id="divisions" className="w-full py-10 sm:py-16 px-3 sm:px-6 lg:px-12 bg-white border-b border-neutral-200">
+        <div className="w-full max-w-7xl mx-auto space-y-6">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12">
-            
-            {/* Col 1: Logo & Company Address */}
-            <div className="lg:col-span-4 space-y-6">
-              <div className="inline-block bg-white/95 backdrop-blur-xs rounded-2xl px-4 py-2.5 shadow-md">
-                <img 
-                  src={LOGO_DARK} 
-                  alt="DR & SONS INTERNATIONAL Logo" 
-                  className="h-12 sm:h-14 w-auto object-contain"
-                />
+          {/* Header & Horizontal Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-neutral-200 pb-4">
+            <div className="space-y-1">
+              <div className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
+                Core Portfolio · 3 Registered Wings
               </div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900">
+                Manufacturing <span className="font-serif-brand italic text-emerald-900 font-normal">Divisions</span>
+              </h2>
+            </div>
 
-              <div className="space-y-4 text-xs leading-relaxed text-slate-300">
-                <div>
-                  <strong className="text-white block font-medium">Drytech Processes (India) Private Limited</strong>
-                  <div className="text-slate-400 mt-1">Corporate Office:</div>
-                  <div>T/13-14, ‘B’ Wing, 3rd Floor, Pinnacle Business Park, Mahakali Caves Road, Andheri East, Mumbai, Maharashtra—400093.</div>
-                </div>
-
-                <div className="space-y-1">
-                  <div><strong className="text-white">Email:</strong> <a href="mailto:marketing@drytechindia.com" className="text-cyan-300 hover:underline">marketing@drytechindia.com</a></div>
-                  <div><strong className="text-white">Phone:</strong> +91 22 6859 24 01/03</div>
-                </div>
-
-                <div className="pt-2 border-t border-cyan-900/60">
-                  <div className="text-slate-400">Manufacturing Unit:</div>
-                  <div>Nagpur Road, Pandhurna, Madhya Pradesh—480334.</div>
-                  <div><strong className="text-white">Phone:</strong> +91 97 5241 34 26/27/47</div>
-                </div>
-              </div>
-
-              {/* Social Icons from Prompt */}
-              <div className="pt-2 flex items-center gap-4">
-                <a 
-                  href="https://www.linkedin.com/company/drytech-processes-india-pvt-ltd/" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-cyan-600 flex items-center justify-center text-white transition-colors"
-                  title="LinkedIn"
+            {/* Horizontal Swipe Affordance & Navigation */}
+            <div className="flex items-center justify-between sm:justify-end gap-3">
+              <span className="text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 border border-emerald-900/10">
+                ← Swipe 3 Divisions →
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => scrollToDivision(Math.max(0, activeDivision - 1))}
+                  disabled={activeDivision === 0}
+                  className="w-8 h-8 flex items-center justify-center border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                  title="Previous Division"
                 >
-                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"></path>
-                  </svg>
-                </a>
-
-                <a 
-                  href="https://www.facebook.com/drytechprocesses" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-cyan-600 flex items-center justify-center text-white transition-colors"
-                  title="Facebook"
+                  <ChevronLeft className="w-4 h-4 text-neutral-700" />
+                </button>
+                <button
+                  onClick={() => scrollToDivision(Math.min(divisionsData.length - 1, activeDivision + 1))}
+                  disabled={activeDivision === divisionsData.length - 1}
+                  className="w-8 h-8 flex items-center justify-center border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                  title="Next Division"
                 >
-                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M400 32H48A48 48 0 0 0 0 80v352a48 48 0 0 0 48 48h137.25V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.27c-30.81 0-40.42 19.12-40.42 38.73V256h68.78l-11 71.69h-57.78V480H400a48 48 0 0 0 48-48V80a48 48 0 0 0-48-48z"></path>
-                  </svg>
-                </a>
+                  <ChevronRight className="w-4 h-4 text-neutral-700" />
+                </button>
               </div>
             </div>
-
-            {/* Col 2: Quick Links */}
-            <div className="lg:col-span-2 space-y-3">
-              <h5 className="font-display font-semibold text-white text-sm uppercase tracking-wider text-cyan-200">
-                Quick Links
-              </h5>
-              <ul className="space-y-2 text-slate-300">
-                <li><a href="#" className="hover:text-cyan-300 transition-colors">Home</a></li>
-                <li><a href="#contract-manufacturing" className="hover:text-cyan-300 transition-colors">Contract Manufacturing</a></li>
-                <li><a href="#rd" className="hover:text-cyan-300 transition-colors">R&amp;D</a></li>
-                <li><a href="#about" className="hover:text-cyan-300 transition-colors">About Us</a></li>
-                <li><a href="#careers" className="hover:text-cyan-300 transition-colors">Careers</a></li>
-                <li><a href="#contact" onClick={() => setContactModalOpen(true)} className="hover:text-cyan-300 transition-colors">Contact Us</a></li>
-              </ul>
-            </div>
-
-            {/* Col 3: Products Part 1 */}
-            <div className="lg:col-span-3 space-y-3">
-              <h5 className="font-display font-semibold text-white text-sm uppercase tracking-wider text-cyan-200">
-                Nutrition &amp; Creaming
-              </h5>
-              <ul className="space-y-2 text-slate-300">
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Fat Bases</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Caseinates</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Non-dairy Creamer</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Instant Fat-filled Powder</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Beverage Whitener</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Liposomes &amp; Delivery Systems</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Functional Phosphates</a></li>
-              </ul>
-            </div>
-
-            {/* Col 4: Products Part 2 */}
-            <div className="lg:col-span-3 space-y-3">
-              <h5 className="font-display font-semibold text-white text-sm uppercase tracking-wider text-cyan-200">
-                Ingredients &amp; Seasonings
-              </h5>
-              <ul className="space-y-2 text-slate-300">
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Gum Arabic Powders</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Pure Fruit Powders</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Tomato Powder</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Cheese Powder</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Hydrolyzed Vegetable Protein</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Tamarind Powder</a></li>
-                <li><a href="#products" className="hover:text-cyan-300 transition-colors">Natural Colorants (Beetroot/Caramel)</a></li>
-              </ul>
-            </div>
-
           </div>
 
-          <div className="mt-16 pt-8 border-t border-cyan-950 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-400 text-[11px]">
-            <div>
-              &copy; 2026 Drytech Processes (India) Private Limited. All Rights Reserved.
+          {/* MOBILE VIEW: Circle Images for Category Buttons */}
+          <div className="flex sm:hidden items-center justify-around gap-2 py-2 px-1 border-b border-neutral-100">
+            {divisionsData.map((div, idx) => {
+              const isActive = activeDivision === idx;
+              return (
+                <button
+                  type="button"
+                  key={`mobile-circle-${div.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToDivision(idx);
+                  }}
+                  className="flex flex-col items-center gap-1.5 focus:outline-hidden cursor-pointer group flex-1 max-w-[105px]"
+                  title={`Division ${div.number}: ${div.title}`}
+                >
+                  <div
+                    className={`relative w-16 h-16 rounded-full p-[2.5px] transition-all duration-300 ${
+                      isActive
+                        ? 'ring-2 ring-emerald-700 ring-offset-2 scale-105 shadow-md bg-emerald-700'
+                        : 'border-2 border-neutral-300 opacity-80 group-hover:opacity-100 group-hover:border-neutral-400 bg-white'
+                    }`}
+                  >
+                    <div className="w-full h-full rounded-full overflow-hidden bg-neutral-100 relative">
+                      <img
+                        src={div.image}
+                        alt={div.shortName}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                    </div>
+                    {isActive && (
+                      <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-emerald-700 ring-2 ring-white" />
+                    )}
+                  </div>
+                  <span
+                    className={`text-[11px] text-center leading-tight line-clamp-2 px-0.5 transition-colors ${
+                      isActive
+                        ? 'text-emerald-950 font-bold'
+                        : 'text-neutral-600 font-medium'
+                    }`}
+                  >
+                    {div.shortName}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* DESKTOP VIEW: Sleek Tabs with Thumbnail Circles & Numbers */}
+          <div className="hidden sm:flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+            {divisionsData.map((div, idx) => {
+              const isActive = activeDivision === idx;
+              return (
+                <button
+                  type="button"
+                  key={`desktop-tab-${div.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToDivision(idx);
+                  }}
+                  className={`shrink-0 px-3.5 py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border flex items-center gap-2.5 ${
+                    isActive
+                      ? 'border-emerald-800 text-emerald-950 bg-emerald-50 shadow-2xs'
+                      : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
+                  }`}
+                >
+                  <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-neutral-300 bg-neutral-100">
+                    <img src={div.image} alt="" className="w-full h-full object-cover" />
+                  </div>
+                  <span className="font-mono text-emerald-800">{div.number}.</span>
+                  <span>{div.shortName}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* SILKY SMOOTH GPU-ACCELERATED SLIDING CARDS TRACK */}
+          <div 
+            className="overflow-hidden w-full relative select-none"
+            onTouchStart={handleDivisionTouchStart}
+            onTouchEnd={handleDivisionTouchEnd}
+          >
+            <div 
+              className="flex transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
+              style={{ transform: `translateX(-${activeDivision * 100}%)` }}
+            >
+              {divisionsData.map((current, idx) => {
+                const CurrentIcon = current.icon;
+                return (
+                  <div 
+                    key={current.id}
+                    className="w-full shrink-0 px-0.5 sm:px-1"
+                  >
+                    <div className="bg-[#fafbfa] border border-neutral-200/90 hover:border-emerald-900/30 p-5 sm:p-7 flex flex-col justify-between transition-all shadow-xs">
+                      
+                      {/* Card Header & Content */}
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
+                              <CurrentIcon className="w-3.5 h-3.5 text-emerald-700" />
+                              <span>Division {current.number} · DrSons International</span>
+                            </div>
+                            <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight mt-1">
+                              {current.title}
+                            </h3>
+                          </div>
+                          <span className="font-mono text-lg font-bold text-neutral-300">
+                            {current.number}
+                          </span>
+                        </div>
+
+                        {/* Image & Tagline Split */}
+                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+                          <div className="sm:col-span-5 overflow-hidden border border-neutral-200 bg-white shadow-2xs">
+                            <img 
+                              src={current.image} 
+                              alt={current.title} 
+                              className="w-full aspect-16/9 sm:h-44 object-cover object-center hover:scale-105 transition-transform duration-500"
+                            />
+                          </div>
+                          <div className="sm:col-span-7 space-y-2">
+                            <p className="text-xs text-neutral-700 leading-relaxed">
+                              {current.summary}
+                            </p>
+                            
+                            {/* Compact Key Item Chips */}
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              {current.keyItems.map((item, i) => (
+                                <span key={i} className="px-2 py-0.5 bg-white border border-neutral-200 text-[11px] text-neutral-800 font-medium">
+                                  {item}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Technical Specs Tags */}
+                        <div className="pt-2 border-t border-neutral-200/80">
+                          <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 mb-1.5">
+                            Technical Highlights:
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5 text-[11px] text-neutral-700">
+                            {current.specs.map((spec, i) => (
+                              <div key={i} className="flex items-center gap-1.5 bg-white px-2 py-1 border border-neutral-200/60">
+                                <Check className="w-3 h-3 text-emerald-700 shrink-0" />
+                                <span className="truncate">{spec}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                      </div>
+
+                      {/* Card Bottom Actions */}
+                      <div className="pt-4 mt-4 border-t border-neutral-200 flex items-center justify-between gap-3">
+                        <a
+                          href="#inquiry-desk"
+                          onClick={() => setInquiryForm({...inquiryForm, division: current.title})}
+                          className="px-4 py-2 bg-[#143e2b] hover:bg-[#0c271b] text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                        >
+                          <span>Get Quote</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </a>
+
+                        <a
+                          href={`https://wa.me/919411268879?text=${encodeURIComponent(`Hi DrSons Trade Desk, I am inquiring about Division ${current.number}: ${current.title}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-900 hover:text-emerald-950"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
+                          <span>WhatsApp Desk</span>
+                        </a>
+                      </div>
+
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div className="flex items-center gap-6">
-              <a href="#" className="hover:text-cyan-300 transition-colors">Privacy Policy</a>
+          </div>
+
+          {/* Smooth Pagination Indicators */}
+          <div className="flex items-center justify-center gap-2 pt-2">
+            {divisionsData.map((div, idx) => (
+              <button
+                type="button"
+                key={`indicator-${div.id}`}
+                onClick={() => scrollToDivision(idx)}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  activeDivision === idx ? 'w-8 bg-emerald-700' : 'w-2 bg-neutral-300 hover:bg-neutral-400'
+                }`}
+                aria-label={`Go to Division ${div.number}`}
+              />
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* SECTION: PRODUCTION FACILITIES & INFRASTRUCTURE (Horizontal Scroll Track on Mobile) */}
+      <section id="facilities" className="w-full py-10 sm:py-16 px-3 sm:px-6 lg:px-12 bg-[#fafbfa] border-b border-neutral-200">
+        <div className="w-full max-w-7xl mx-auto space-y-6">
+          
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-neutral-200 pb-4">
+            <div className="space-y-1">
+              <div className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
+                Facility &amp; Technical Suites
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900">
+                Production <span className="font-serif-brand italic text-emerald-900 font-normal">Infrastructure</span>
+              </h2>
+            </div>
+            
+            <div className="flex items-center justify-between sm:justify-end gap-2">
+              <span className="text-[11px] font-mono text-neutral-500 bg-white px-2 py-1 border border-neutral-200">
+                ← Swipe Facilities →
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => scrollFacilities('left')}
+                  className="w-7 h-7 flex items-center justify-center border border-neutral-200 bg-white hover:bg-neutral-100 cursor-pointer"
+                  title="Scroll Left"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => scrollFacilities('right')}
+                  className="w-7 h-7 flex items-center justify-center border border-neutral-200 bg-white hover:bg-neutral-100 cursor-pointer"
+                  title="Scroll Right"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Horizontal Facilities Rail (Compact, responsive, zero excessive scrolling) */}
+          <div 
+            ref={facilitiesScrollRef}
+            className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 no-scrollbar"
+          >
+            {facilitiesData.map((fac, idx) => {
+              const FacIcon = fac.icon;
+              return (
+                <div 
+                  key={idx}
+                  className="snap-start shrink-0 w-[85vw] sm:w-[360px] lg:w-[390px] border border-neutral-200 bg-white p-5 space-y-3 shadow-2xs hover:border-emerald-800/40 transition-all"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="w-9 h-9 bg-emerald-50 text-emerald-900 border border-emerald-900/15 flex items-center justify-center">
+                      <FacIcon className="w-4 h-4 stroke-[1.5]" />
+                    </div>
+                    <span className="text-[11px] font-mono font-bold text-emerald-800">
+                      LINE {fac.number}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block">
+                      {fac.division}
+                    </span>
+                    <h3 className="text-base font-bold text-neutral-900 mt-0.5">
+                      {fac.title}
+                    </h3>
+                  </div>
+
+                  <p className="text-xs text-neutral-600 leading-relaxed">
+                    {fac.desc}
+                  </p>
+
+                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-neutral-100">
+                    {fac.tags.map((t, i) => (
+                      <span key={i} className="text-[10px] font-mono px-2 py-0.5 bg-neutral-100 text-neutral-700">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* SECTION: COMMERCIAL QUOTATION & WHATSAPP ROUTING DESK (Streamlined, concise) */}
+      <section id="inquiry-desk" className="w-full py-10 sm:py-16 px-3 sm:px-6 lg:px-12 bg-white">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Inquiry Form */}
+          <div className="lg:col-span-7 bg-[#fafbfa] border border-neutral-200 p-5 sm:p-8 space-y-4 shadow-xs">
+            <div>
+              <div className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold flex items-center gap-1.5">
+                <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
+                <span>WhatsApp Trade Desk · Direct Routing</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 mt-1">
+                Commercial Supply Inquiry
+              </h3>
+              <p className="text-xs text-neutral-600 mt-0.5">
+                Quick quote routing directly to WhatsApp: <strong className="font-semibold text-neutral-900">+91 9411268879</strong>
+              </p>
+            </div>
+
+            {!inquirySubmitted ? (
+              <form onSubmit={handleInquirySubmit} className="space-y-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={inquiryForm.name}
+                      onChange={(e) => setInquiryForm({...inquiryForm, name: e.target.value})}
+                      placeholder="David Richardson"
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
+                      Company
+                    </label>
+                    <input
+                      type="text"
+                      value={inquiryForm.company}
+                      onChange={(e) => setInquiryForm({...inquiryForm, company: e.target.value})}
+                      placeholder="Apex Global Foods"
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
+                      Corporate Email *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={inquiryForm.email}
+                      onChange={(e) => setInquiryForm({...inquiryForm, email: e.target.value})}
+                      placeholder="corporate@domain.com"
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
+                      Phone / Mobile
+                    </label>
+                    <input
+                      type="tel"
+                      value={inquiryForm.phone}
+                      onChange={(e) => setInquiryForm({...inquiryForm, phone: e.target.value})}
+                      placeholder="+91 / International"
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
+                      Division
+                    </label>
+                    <select
+                      value={inquiryForm.division}
+                      onChange={(e) => setInquiryForm({...inquiryForm, division: e.target.value})}
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                    >
+                      <option value="Fruits and Vegetable Powder">Fruits and Vegetable Powder</option>
+                      <option value="Non-Alcoholic Drinks and Ice Creams">Non-Alcoholic Drinks and Ice Creams</option>
+                      <option value="Fruits and Vegetables Flakes">Fruits and Vegetables Flakes</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
+                      Target Volume
+                    </label>
+                    <select
+                      value={inquiryForm.volume}
+                      onChange={(e) => setInquiryForm({...inquiryForm, volume: e.target.value})}
+                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                    >
+                      <option value="Commercial Bulk Supply">Commercial Wholesale / Bulk</option>
+                      <option value="Semi-Bulk Regular Supply">Semi-Bulk Regular</option>
+                      <option value="Sample Run">Trial Batch / Sample Run</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
+                    Requirements (Optional)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={inquiryForm.message}
+                    onChange={(e) => setInquiryForm({...inquiryForm, message: e.target.value})}
+                    placeholder="Product specifics, custom packaging, or delivery timeline."
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                  />
+                </div>
+
+                <div className="pt-1">
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto px-6 py-2.5 bg-[#143e2b] hover:bg-[#0c271b] text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <span>Submit &amp; Open WhatsApp</span>
+                    <Send className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="p-6 bg-emerald-50 border border-emerald-800/40 text-neutral-900 space-y-3">
+                <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
+                  <Check className="w-4 h-4" />
+                  <span>Inquiry Prepared</span>
+                </div>
+                <p className="text-xs text-neutral-700 leading-relaxed">
+                  Redirecting to WhatsApp (<strong className="font-mono">9411268879</strong>){redirectCountdown !== null && redirectCountdown > 0 ? ` in ${redirectCountdown}s...` : ' now.'}
+                </p>
+                <div className="flex flex-wrap items-center gap-3 pt-1">
+                  <a
+                    href={whatsappRedirectUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#143e2b] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#0c271b]"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>Open WhatsApp (9411268879)</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <button
+                    onClick={() => {
+                      setInquirySubmitted(false);
+                      setRedirectCountdown(null);
+                      setInquiryForm({ name: '', company: '', email: '', phone: '', division: 'Fruits and Vegetable Powder', volume: 'Commercial Bulk Supply', message: '' });
+                    }}
+                    className="text-xs text-neutral-600 underline cursor-pointer"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Corporate Information Desk with Private Limited Identity */}
+          <div className="lg:col-span-5 bg-white border border-neutral-200 p-5 sm:p-8 space-y-5 shadow-xs">
+            <div className="space-y-2.5">
+              <div className="h-10 w-auto flex items-center">
+                <img 
+                  src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.png" 
+                  alt="DR & SONS INTERNATIONAL" 
+                  className="h-10 w-auto object-contain mix-blend-multiply"
+                />
+              </div>
+              <div>
+                <h4 className="text-lg font-bold text-neutral-900">
+                  DrSons International Private Limited
+                </h4>
+                <p className="text-xs text-neutral-500 font-mono">
+                  Incorporated Pvt. Ltd. · Companies Act, 2013
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
+                <span className="text-neutral-500">Trade WhatsApp:</span>
+                <a
+                  href="https://wa.me/919411268879"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-emerald-900 font-bold hover:underline flex items-center gap-1"
+                >
+                  <MessageSquare className="w-3 h-3 text-emerald-700" />
+                  <span>+91 9411268879</span>
+                </a>
+              </div>
+
+              <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
+                <span className="text-neutral-500">Corporate Email:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-[11px] text-neutral-800">contact@drsonsinternational.com</span>
+                  <button
+                    onClick={() => handleCopyEmail('contact@drsonsinternational.com')}
+                    className="p-1 border border-neutral-300 text-neutral-600 hover:bg-neutral-50 cursor-pointer"
+                    title="Copy Email"
+                  >
+                    {copiedEmail ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
+                <span className="text-neutral-500">Statutory Status:</span>
+                <span className="font-medium text-neutral-800">Private Limited · MCA India</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-neutral-500">Compliance Terms:</span>
+                <button
+                  onClick={() => setLegalModalTab('terms')}
+                  className="font-medium text-emerald-900 underline cursor-pointer text-xs"
+                >
+                  View Legal Terms
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1.5 text-emerald-950 font-semibold">
+                <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+                <span>Incorporated Pvt Ltd</span>
+              </div>
+              <button
+                onClick={() => setLegalModalTab('statutory')}
+                className="text-xs font-semibold text-emerald-900 hover:text-emerald-950 underline cursor-pointer"
+              >
+                Statutory View
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* COMPACT CORPORATE FOOTER */}
+      <footer className="w-full bg-[#fafbfa] border-t border-neutral-200 py-8 sm:py-10">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 space-y-6">
+          
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <img 
+                src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.png" 
+                alt="DR & SONS INTERNATIONAL" 
+                className="h-10 w-auto object-contain mix-blend-multiply"
+              />
+              <p className="text-[11px] text-neutral-600">
+                DrSons International Private Limited · Commercial Food &amp; Beverage Manufacturing
+              </p>
+            </div>
+
+            {/* Quick Link Chips */}
+            <div className="flex flex-wrap items-center gap-3 text-xs text-neutral-600">
+              <button 
+                onClick={() => setLegalModalTab('terms')}
+                className="hover:text-emerald-900 transition-colors cursor-pointer"
+              >
+                Terms of Supply
+              </button>
               <span>·</span>
-              <a href="#" className="hover:text-cyan-300 transition-colors">Terms of Use</a>
+              <button 
+                onClick={() => setLegalModalTab('privacy')}
+                className="hover:text-emerald-900 transition-colors cursor-pointer"
+              >
+                Privacy (DPDP)
+              </button>
               <span>·</span>
-              <a href="#" className="hover:text-cyan-300 transition-colors">Sitemap</a>
+              <button 
+                onClick={() => setLegalModalTab('statutory')}
+                className="hover:text-emerald-900 transition-colors cursor-pointer"
+              >
+                Statutory Details
+              </button>
+              <span>·</span>
+              <a 
+                href="https://wa.me/919411268879" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-emerald-900 font-bold hover:underline"
+              >
+                WhatsApp Desk: 9411268879
+              </a>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-neutral-500">
+            <div>
+              &copy; {new Date().getFullYear()} DrSons International Private Limited. All rights reserved.
+            </div>
+            <div>
+              Registered under Companies Act, 2013 · Ministry of Corporate Affairs, India
             </div>
           </div>
 
         </div>
       </footer>
 
-      {/* ─────────────────────────────────────────────────────────────
-          CONTACT MODAL
-      ───────────────────────────────────────────────────────────── */}
-      {contactModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 space-y-5 relative max-h-[92vh] overflow-y-auto shadow-2xl">
-            
-            <button
-              onClick={() => setContactModalOpen(false)}
-              className="absolute top-5 right-5 text-slate-400 hover:text-slate-800 p-1 cursor-pointer"
+      {/* LEGAL TERMS MODAL (FOR PRIVATE LIMITED COMPANY) */}
+      <AnimatePresence>
+        {legalModalTab && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white border border-neutral-200 w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x">
-                <path d="M18 6 6 18"></path>
-                <path d="m6 6 12 12"></path>
-              </svg>
-            </button>
-
-            <div>
-              <span className="text-[11px] font-mono uppercase tracking-widest text-[#0093cb] font-bold">
-                DR &amp; SONS INTERNATIONAL · Global Trade Desk
-              </span>
-              <h3 className="font-display font-bold text-2xl text-[#052d3d] mt-1">
-                Get in touch with us
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Speak to our formulation specialists for custom spray-dried &amp; dehydrated solutions and sample requests.
-              </p>
-            </div>
-
-            <form 
-              onSubmit={(e) => {
-                e.preventDefault();
-                alert('Thank you! Your inquiry has been recorded.');
-                setContactModalOpen(false);
-              }}
-              className="space-y-4 pt-2"
-            >
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Full Name *</label>
-                <input 
-                  type="text" 
-                  required 
-                  placeholder="e.g. David Richardson" 
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-cyan-600"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Company</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. Global Foods Ltd." 
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-cyan-600"
-                  />
+              {/* Modal Header */}
+              <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-[#fafbfa]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 border border-emerald-900/20 bg-emerald-50 text-emerald-900 flex items-center justify-center">
+                    <Scale className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-neutral-900 leading-tight">
+                      Corporate Legal Terms
+                    </h3>
+                    <p className="text-[10px] text-neutral-500 font-mono">
+                      DrSons International Private Limited
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Email *</label>
-                  <input 
-                    type="email" 
-                    required 
-                    placeholder="procurement@brand.com" 
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-cyan-600"
-                  />
-                </div>
+
+                <button 
+                  onClick={() => setLegalModalTab(null)}
+                  className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer"
+                  title="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Product Area of Interest</label>
-                <select className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-cyan-600 bg-white">
-                  <option>Nutrition &amp; Fat Bases</option>
-                  <option>Creaming Solutions &amp; Dairy Whiteners</option>
-                  <option>Functional Liposomes &amp; Delivery Systems</option>
-                  <option>Spray-Dried Gum Arabic</option>
-                  <option>Seasoning Powders (Tomato, Cheese, HVP)</option>
-                  <option>Contract Manufacturing &amp; Spray Drying</option>
-                </select>
+              {/* Modal Tabs */}
+              <div className="flex border-b border-neutral-200 bg-white px-3 overflow-x-auto no-scrollbar">
+                <button
+                  onClick={() => setLegalModalTab('terms')}
+                  className={`py-2 px-3 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer border-b-2 -mb-px flex items-center gap-1.5 ${
+                    legalModalTab === 'terms'
+                      ? 'border-emerald-800 text-emerald-950 bg-emerald-50/50'
+                      : 'border-transparent text-neutral-500 hover:text-neutral-900'
+                  }`}
+                >
+                  <FileText className="w-3 h-3 text-emerald-700" />
+                  <span>Terms of Supply</span>
+                </button>
+                <button
+                  onClick={() => setLegalModalTab('privacy')}
+                  className={`py-2 px-3 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer border-b-2 -mb-px flex items-center gap-1.5 ${
+                    legalModalTab === 'privacy'
+                      ? 'border-emerald-800 text-emerald-950 bg-emerald-50/50'
+                      : 'border-transparent text-neutral-500 hover:text-neutral-900'
+                  }`}
+                >
+                  <Lock className="w-3 h-3 text-emerald-700" />
+                  <span>Privacy (DPDP)</span>
+                </button>
+                <button
+                  onClick={() => setLegalModalTab('statutory')}
+                  className={`py-2 px-3 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer border-b-2 -mb-px flex items-center gap-1.5 ${
+                    legalModalTab === 'statutory'
+                      ? 'border-emerald-800 text-emerald-950 bg-emerald-50/50'
+                      : 'border-transparent text-neutral-500 hover:text-neutral-900'
+                  }`}
+                >
+                  <Building className="w-3 h-3 text-emerald-700" />
+                  <span>Statutory Info</span>
+                </button>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Your Requirements / Message *</label>
-                <textarea 
-                  rows={3} 
-                  required 
-                  placeholder="Tell us about your formulation goals, desired quantities, or technical specs." 
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-cyan-600"
-                />
+              {/* Modal Content */}
+              <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs text-neutral-700 leading-relaxed max-h-[55vh]">
+                
+                {legalModalTab === 'terms' && (
+                  <div className="space-y-3.5">
+                    <div>
+                      <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider mb-1">
+                        1. Corporate Entity &amp; Application
+                      </h4>
+                      <p>
+                        Governs commercial quotations, orders, and dispatches by <strong>DrSons International Private Limited</strong> (incorporated under Companies Act, 2013, MCA India).
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider mb-1">
+                        2. Orders, GST &amp; Invoicing
+                      </h4>
+                      <p>
+                        Supplies require formal PO confirmation and official GST tax invoicing. Statutory levies applied as per Government of India schedules.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider mb-1">
+                        3. Quality Verification &amp; COA
+                      </h4>
+                      <p>
+                        Dispatches are backed by Certificate of Analysis (COA) conforming to FSSAI food safety and physical/chemical compliance standards.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider mb-1">
+                        4. Perishables &amp; Cold-Chain
+                      </h4>
+                      <p>
+                        Perishable goods are dispatched under temperature-controlled packaging. Transit risks transfer upon carrier handover unless insured logistics are booked.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {legalModalTab === 'privacy' && (
+                  <div className="space-y-3.5">
+                    <div>
+                      <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider mb-1">
+                        1. DPDP Act, 2023 Compliance
+                      </h4>
+                      <p>
+                        Data handled in compliance with India&apos;s Digital Personal Data Protection Act, 2023.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider mb-1">
+                        2. Commercial Data Use
+                      </h4>
+                      <p>
+                        Submitted business inquiries are strictly used to fulfill manufacturing quotes, share specifications, and communicate via WhatsApp (+91 9411268879) or corporate email.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider mb-1">
+                        3. Formulation Confidentiality
+                      </h4>
+                      <p>
+                        Client custom recipes and specifications are maintained under strict corporate non-disclosure protocols.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {legalModalTab === 'statutory' && (
+                  <div className="space-y-3">
+                    <div className="border border-neutral-200 bg-[#fafbfa] p-3 space-y-2 font-mono text-[11px]">
+                      <div className="flex justify-between border-b border-neutral-200 pb-1.5">
+                        <span className="text-neutral-500">Legal Entity:</span>
+                        <span className="font-bold text-neutral-900">DrSons International Private Limited</span>
+                      </div>
+                      <div className="flex justify-between border-b border-neutral-200 pb-1.5">
+                        <span className="text-neutral-500">Category:</span>
+                        <span className="font-bold text-neutral-900">Private Limited (Pvt. Ltd.)</span>
+                      </div>
+                      <div className="flex justify-between border-b border-neutral-200 pb-1.5">
+                        <span className="text-neutral-500">Authority:</span>
+                        <span className="font-bold text-neutral-900">Ministry of Corporate Affairs (MCA)</span>
+                      </div>
+                      <div className="flex justify-between border-b border-neutral-200 pb-1.5">
+                        <span className="text-neutral-500">Standards:</span>
+                        <span className="font-bold text-neutral-900">FSSAI Certified Facilities</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-neutral-500">Direct Desk:</span>
+                        <span className="font-bold text-emerald-900">+91 9411268879</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
               </div>
 
-              <button
-                type="submit"
-                className="w-full py-3 rounded-full bg-[#0093cb] hover:bg-[#007cad] text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-md"
-              >
-                Submit Inquiry
-              </button>
-            </form>
+              {/* Modal Footer */}
+              <div className="p-3 border-t border-neutral-200 bg-[#fafbfa] flex items-center justify-end">
+                <button
+                  onClick={() => setLegalModalTab(null)}
+                  className="px-4 py-1.5 bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
 
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
     </div>
   );
