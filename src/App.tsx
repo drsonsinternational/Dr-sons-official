@@ -57,7 +57,7 @@ export default function App() {
     company: '',
     email: '',
     phone: '',
-    division: 'Fruits, Vegetables, Starch and Powder',
+    division: 'Fruits, Vegetables Powder and starch',
     volume: 'Commercial Bulk Supply',
     message: ''
   });
@@ -154,7 +154,7 @@ export default function App() {
 
   const tickerItems = [
     'D R & Sons International Private Limited · Incorporated Enterprise (Since 2026)',
-    'Fruits, Vegetables, Starch and Powder',
+    'Fruits, Vegetables Powder and starch',
     'Non-Alcoholic Drinks & Ice Creams',
     'Fruit & Vegetable Flakes',
     'Advanced Spray & Drum Drying',
@@ -167,8 +167,8 @@ export default function App() {
     {
       id: 'powders',
       number: '01',
-      shortName: 'Fruits, Veg, Starch & Powder',
-      title: 'Fruits, Vegetables, Starch and Powder',
+      shortName: 'Fruits, Veg Powder & Starch',
+      title: 'Fruits, Vegetables Powder and starch',
       summary: 'Precision low-temperature spray drying, specialty food starches, and micro-milling yielding instant solubility and superior formulation consistency.',
       tagline: 'Pure fruit & vegetable powders, food starches, and calibrated formulation powders',
       image: '/assets/aistudio/file_000000007504820892cf49a02d280275_ad4da5f2.webp',
@@ -208,7 +208,7 @@ export default function App() {
   const facilitiesData = [
     {
       number: '01',
-      division: 'Fruits, Vegetables, Starch & Powder',
+      division: 'Fruits, Vegetables Powder and starch',
       title: 'Spray Drying & Starch Micro-Milling',
       desc: 'Low-temperature evaporators, starch processing suites & micro-milling lines producing free-flowing, nutrient-intact powders.',
       tags: ['Spray Towers', 'Starch Refining', 'Vacuum Evaporation'],
@@ -612,7 +612,7 @@ export default function App() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-xs sm:text-sm font-mono tracking-wider uppercase text-neutral-300 max-w-lg"
           >
-            Fruits, Vegetables, Starch &amp; Powder · Drinks &amp; Ice Creams · Flakes
+            Fruits, Vegetables Powder and starch · Drinks &amp; Ice Creams · Flakes
           </motion.p>
 
           {/* Minimal Dual CTAs */}
@@ -1088,7 +1088,7 @@ export default function App() {
                       onChange={(e) => setInquiryForm({...inquiryForm, division: e.target.value})}
                       className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
                     >
-                      <option value="Fruits, Vegetables, Starch and Powder">Fruits, Vegetables, Starch and Powder</option>
+                      <option value="Fruits, Vegetables Powder and starch">Fruits, Vegetables Powder and starch</option>
                       <option value="Non-Alcoholic Drinks and Ice Creams">Non-Alcoholic Drinks and Ice Creams</option>
                       <option value="Fruits and Vegetables Flakes">Fruits and Vegetables Flakes</option>
                     </select>
@@ -1156,7 +1156,7 @@ export default function App() {
                     onClick={() => {
                       setInquirySubmitted(false);
                       setRedirectCountdown(null);
-                      setInquiryForm({ name: '', company: '', email: '', phone: '', division: 'Fruits, Vegetables, Starch and Powder', volume: 'Commercial Bulk Supply', message: '' });
+                      setInquiryForm({ name: '', company: '', email: '', phone: '', division: 'Fruits, Vegetables Powder and starch', volume: 'Commercial Bulk Supply', message: '' });
                     }}
                     className="text-xs text-neutral-600 underline cursor-pointer"
                   >
@@ -1271,7 +1271,7 @@ export default function App() {
                 </div>
               </a>
               <p className="text-xs text-neutral-600 leading-relaxed pt-1">
-                Incorporated commercial enterprise specializing in fruits, vegetables, starch and powder, non-alcoholic drinks and ice creams, and dehydrated fruit and vegetable flakes.
+                Incorporated commercial enterprise specializing in fruits, vegetables powder and starch, non-alcoholic drinks and ice creams, and dehydrated fruit and vegetable flakes.
               </p>
             </div>
 
