@@ -1271,7 +1271,7 @@ export default function App() {
                 </div>
               </a>
               <p className="text-xs text-neutral-600 leading-relaxed pt-1">
-                Incorporated commercial manufacturer producing spray-dried fruit, vegetable &amp; starch powders, packaged beverages, ice cream formulations, and dehydrated food flakes for food service brands and enterprise FMCG distributors.
+                Incorporated commercial enterprise specializing in fruit, vegetable and starch powders, non-alcoholic drinks and ice creams, and dehydrated fruit and vegetable flakes.
               </p>
             </div>
 
@@ -1304,88 +1304,114 @@ export default function App() {
             </div>
           </div>
 
-          {/* Multi-Column Directory Grid */}
+          {/* Multi-Column Directory Grid (Strictly grounded in website content) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-10">
             
-            {/* Column 1: Core Divisions */}
+            {/* Column 1: Core Manufacturing Divisions */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold text-[#0a2318] uppercase tracking-wider">
                 Manufacturing Divisions
               </h4>
               <ul className="space-y-2 text-xs text-neutral-600">
-                <li>
-                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    Fruit, Vegetable &amp; Starch Powders
-                  </a>
-                </li>
-                <li>
-                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    Spray Drying &amp; Drum Drying
-                  </a>
-                </li>
-                <li>
-                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    Non-Alcoholic Beverages
-                  </a>
-                </li>
-                <li>
-                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    Ice Cream Formulations
-                  </a>
-                </li>
-                <li>
-                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    Dehydrated Fruit &amp; Veg Flakes
-                  </a>
-                </li>
-                <li>
-                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    Specialty Food Seasonings
+                {divisionsData.map((div, idx) => (
+                  <li key={`footer-div-${div.id}`}>
+                    <button
+                      onClick={() => {
+                        scrollToDivision(idx);
+                        const el = document.getElementById('divisions');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="hover:text-[#143e2b] hover:underline transition-colors text-left cursor-pointer block"
+                    >
+                      {div.number}. {div.title}
+                    </button>
+                  </li>
+                ))}
+                <li className="pt-1">
+                  <a 
+                    href="#divisions" 
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#143e2b] hover:underline"
+                  >
+                    <span>Explore All Divisions</span>
+                    <ArrowRight className="w-3 h-3" />
                   </a>
                 </li>
               </ul>
             </div>
 
-            {/* Column 2: Infrastructure & Capacity */}
+            {/* Column 2: Production Facilities */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold text-[#0a2318] uppercase tracking-wider">
-                Scale &amp; Infrastructure
+                Production Facilities
+              </h4>
+              <ul className="space-y-2 text-xs text-neutral-600">
+                {facilitiesData.map((fac, idx) => (
+                  <li key={`footer-fac-${idx}`}>
+                    <a 
+                      href="#facilities" 
+                      className="hover:text-[#143e2b] hover:underline transition-colors block text-left"
+                    >
+                      Line {fac.number}. {fac.title}
+                    </a>
+                  </li>
+                ))}
+                <li className="pt-1">
+                  <a 
+                    href="#facilities" 
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#143e2b] hover:underline"
+                  >
+                    <span>View Infrastructure</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 3: Commercial Desk */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-[#0a2318] uppercase tracking-wider">
+                Commercial Trade Desk
               </h4>
               <ul className="space-y-2 text-xs text-neutral-600">
                 <li>
-                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    14.5+ Acre Operational Campus
+                  <a 
+                    href="#inquiry-desk" 
+                    className="hover:text-[#143e2b] hover:underline transition-colors block"
+                  >
+                    Submit Specifications &amp; RFQ
                   </a>
                 </li>
                 <li>
-                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    18,500 MT Annual Capacity
+                  <a 
+                    href="https://wa.me/919411268879"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#143e2b] hover:underline transition-colors block font-mono text-[11px]"
+                  >
+                    WhatsApp: +91 9411268879
                   </a>
                 </li>
                 <li>
-                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    Class 100k Cleanroom Facility
-                  </a>
+                  <button
+                    onClick={() => handleCopyEmail('contact@drsonsinternational.com')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left font-mono text-[11px] block"
+                  >
+                    contact@drsonsinternational.com
+                  </button>
                 </li>
-                <li>
-                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    4 Automated Packaging Lines
-                  </a>
-                </li>
-                <li>
-                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    In-House Microbiological Lab
-                  </a>
-                </li>
-                <li>
-                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
-                    Cold-Chain Storage Logistics
+                <li className="pt-1">
+                  <a 
+                    href="#inquiry-desk"
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#143e2b] hover:underline"
+                  >
+                    <span>Request Quotation</span>
+                    <ArrowRight className="w-3 h-3" />
                   </a>
                 </li>
               </ul>
             </div>
 
-            {/* Column 3: Corporate Governance */}
+            {/* Column 4: Corporate Governance & Legal */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold text-[#0a2318] uppercase tracking-wider">
                 Corporate Governance
@@ -1412,15 +1438,7 @@ export default function App() {
                     onClick={() => setLegalModalTab('statutory')}
                     className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
                   >
-                    Statutory MCA Information
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => setLegalModalTab('terms')}
-                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
-                  >
-                    Certificate of Analysis (COA)
+                    Statutory Company Details
                   </button>
                 </li>
                 <li>
@@ -1428,40 +1446,10 @@ export default function App() {
                     onClick={() => setLegalModalTab('statutory')}
                     className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
                   >
-                    FSSAI Standards Compliance
+                    MCA &amp; FSSAI Compliance
                   </button>
                 </li>
               </ul>
-            </div>
-
-            {/* Column 4: Trade Desk & Dispatch */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold text-[#0a2318] uppercase tracking-wider">
-                Trade Desk &amp; Dispatch
-              </h4>
-              <div className="space-y-2 text-xs text-neutral-600">
-                <div>
-                  <span className="text-[10px] uppercase font-mono text-neutral-400 block">Supply Scope</span>
-                  <span className="text-neutral-800">Commercial B2B Wholesale &amp; Institutional Supply</span>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-mono text-neutral-400 block">Operating Hours</span>
-                  <span className="text-neutral-800">Monday – Saturday: 08:30 – 19:00 IST</span>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-mono text-neutral-400 block">Transit Handling</span>
-                  <span className="text-neutral-800">Palletized Freight &amp; Temperature-Controlled Fleet</span>
-                </div>
-                <div className="pt-1">
-                  <a 
-                    href="#inquiry-desk"
-                    className="inline-flex items-center gap-1 font-semibold text-[#143e2b] hover:underline"
-                  >
-                    <span>Submit Commercial RFQ</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </a>
-                </div>
-              </div>
             </div>
 
           </div>
