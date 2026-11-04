@@ -1248,204 +1248,138 @@ export default function App() {
         </div>
       </section>
 
-      {/* INDUSTRY-READY ENTERPRISE CORPORATE FOOTER */}
-      <footer className="w-full bg-[#061a11] text-neutral-300 border-t border-[#143e2b] relative overflow-hidden">
-        {/* Subtle Background Radial Highlights */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-600/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-400/5 rounded-full blur-3xl pointer-events-none" />
-
-        {/* 1. PRE-FOOTER COMMERCIAL ENGAGEMENT BANNER */}
-        <div className="border-b border-[#0f3422] bg-[#092217]/90 backdrop-blur-xs py-8 sm:py-10">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 text-[11px] font-mono tracking-wider uppercase">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Commercial Trade Desk Active · Pan-India Dispatch</span>
-              </div>
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight">
-                Scale Your Food &amp; Beverage Formulations with Industrial Consistency
-              </h3>
-              <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
-                Direct wholesale contracting for spray-dried fruit &amp; vegetable powders, commercial beverage syrups, dairy bases, and dehydrated flakes.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
-              <a
-                href="https://wa.me/919411268879"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 sm:px-6 py-3 bg-[#22c55e] hover:bg-[#16a34a] text-[#071f14] text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg hover:shadow-emerald-500/20 active:scale-95"
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>WhatsApp Desk: 9411268879</span>
-              </a>
-
-              <a
-                href="#inquiry-desk"
-                className="px-5 sm:px-6 py-3 bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-semibold uppercase tracking-wider backdrop-blur-md transition-all flex items-center gap-2 active:scale-95"
-              >
-                <span>Request Quotation</span>
-                <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* 2. MAIN 5-COLUMN INDUSTRIAL DIRECTORY GRID */}
+      {/* ENTERPRISE CORPORATE FOOTER */}
+      <footer className="w-full bg-[#f8faf8] border-t border-neutral-200 text-neutral-700">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
             
-            {/* COLUMN 1: Company Profile & Brand (Col 4 on 12-col grid) */}
+            {/* COMPANY IDENTIFICATION (4 Cols) */}
             <div className="lg:col-span-4 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-white p-2 rounded-xs shadow-xs shrink-0">
-                  <img 
-                    src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.png" 
-                    alt="DR & SONS INTERNATIONAL" 
-                    className="h-10 w-auto object-contain"
-                  />
-                </div>
-                <div>
-                  <span className="text-sm font-bold text-white tracking-tight block leading-tight">
+              <a href="#" className="flex items-center gap-3 group">
+                <img 
+                  src="/assets/aistudio/Gemini_Generated_Image_pwmnjfpwmnjfpwmn__1__a830e598.png" 
+                  alt="DR & SONS INTERNATIONAL" 
+                  className="h-10 w-auto object-contain mix-blend-multiply"
+                />
+                <div className="border-l border-neutral-300 pl-3">
+                  <span className="text-sm font-bold tracking-tight text-[#0a2318] block leading-none">
                     DR &amp; SONS INTERNATIONAL
                   </span>
-                  <span className="text-[10px] text-emerald-400 font-mono tracking-widest uppercase block mt-0.5">
+                  <span className="text-[10px] text-neutral-500 uppercase tracking-widest block mt-1">
                     Private Limited Company
                   </span>
                 </div>
-              </div>
+              </a>
 
-              <p className="text-xs text-neutral-300 leading-relaxed font-light">
-                Incorporated commercial manufacturer and ingredient innovator specializing in spray-dried fruit &amp; vegetable powders, non-alcoholic drink concentrates, ice cream formulations, and dehydrated food flakes for enterprise FMCG and food service brands.
+              <p className="text-xs text-neutral-600 leading-relaxed max-w-sm">
+                Incorporated commercial manufacturer specializing in spray-dried fruit &amp; vegetable powders, non-alcoholic drink formulations, ice cream bases, and dehydrated food flakes for food service brands and enterprise FMCG processors.
               </p>
 
-              {/* Statutory & Regulatory Trust Badges */}
-              <div className="pt-2 border-t border-[#0e3322] space-y-2">
-                <div className="text-[10px] font-mono tracking-wider text-emerald-400/80 uppercase">
-                  Statutory &amp; Quality Approvals
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  <span className="px-2 py-0.5 bg-[#092217] border border-emerald-500/25 text-emerald-200 text-[10px] font-mono">
-                    MCA Reg. 2013
-                  </span>
-                  <span className="px-2 py-0.5 bg-[#092217] border border-emerald-500/25 text-emerald-200 text-[10px] font-mono">
-                    FSSAI Certified
-                  </span>
-                  <span className="px-2 py-0.5 bg-[#092217] border border-emerald-500/25 text-emerald-200 text-[10px] font-mono">
-                    ISO 22000
-                  </span>
-                  <span className="px-2 py-0.5 bg-[#092217] border border-emerald-500/25 text-emerald-200 text-[10px] font-mono">
-                    HACCP System
-                  </span>
-                  <span className="px-2 py-0.5 bg-[#092217] border border-emerald-500/25 text-emerald-200 text-[10px] font-mono">
-                    GMP Compliant
-                  </span>
-                </div>
+              <div className="pt-2 text-[11px] text-neutral-500 font-mono space-y-1">
+                <div>Corporate Status: Private Limited Enterprise</div>
+                <div>Regulatory Body: Ministry of Corporate Affairs (MCA), India</div>
+                <div>Compliance: FSSAI Certified · ISO 22000 · HACCP Standards</div>
               </div>
             </div>
 
-            {/* COLUMN 2: Manufacturing Divisions (Col 2) */}
+            {/* MANUFACTURING DIVISIONS (2 Cols) */}
             <div className="lg:col-span-2 space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                <Apple className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Divisions</span>
+              <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                Divisions
               </h4>
-              <ul className="space-y-2 text-xs text-neutral-300">
+              <ul className="space-y-2 text-xs text-neutral-600">
                 <li>
-                  <a href="#divisions" className="hover:text-emerald-300 transition-colors block">
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
                     Fruit &amp; Vegetable Powders
                   </a>
                 </li>
                 <li>
-                  <a href="#divisions" className="hover:text-emerald-300 transition-colors block">
-                    Spray Drying &amp; Drum Drying
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Spray &amp; Drum Drying
                   </a>
                 </li>
                 <li>
-                  <a href="#divisions" className="hover:text-emerald-300 transition-colors block">
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
                     Non-Alcoholic Beverages
                   </a>
                 </li>
                 <li>
-                  <a href="#divisions" className="hover:text-emerald-300 transition-colors block">
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
                     Ice Cream Formulations
                   </a>
                 </li>
                 <li>
-                  <a href="#divisions" className="hover:text-emerald-300 transition-colors block">
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
                     Dehydrated Flakes
                   </a>
                 </li>
                 <li>
-                  <a href="#divisions" className="hover:text-emerald-300 transition-colors block">
-                    Specialty Food Seasonings
+                  <a href="#divisions" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Specialty Seasonings
                   </a>
                 </li>
                 <li>
-                  <a href="#inquiry-desk" className="hover:text-emerald-300 transition-colors block">
+                  <a href="#inquiry-desk" className="hover:text-[#143e2b] hover:underline transition-colors block">
                     Contract Manufacturing
                   </a>
                 </li>
               </ul>
             </div>
 
-            {/* COLUMN 3: Technical Scale & Capabilities (Col 2) */}
+            {/* INFRASTRUCTURE & STANDARDS (2 Cols) */}
             <div className="lg:col-span-2 space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                <Factory className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Capabilities</span>
+              <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                Manufacturing
               </h4>
-              <ul className="space-y-2 text-xs text-neutral-300">
+              <ul className="space-y-2 text-xs text-neutral-600">
                 <li>
-                  <a href="#facilities" className="hover:text-emerald-300 transition-colors block">
-                    14.5+ Acre Manufacturing Hub
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    14.5+ Acre Campus
                   </a>
                 </li>
                 <li>
-                  <a href="#facilities" className="hover:text-emerald-300 transition-colors block">
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
                     18,500 MT Output Capacity
                   </a>
                 </li>
                 <li>
-                  <a href="#facilities" className="hover:text-emerald-300 transition-colors block">
-                    Class 100k Cleanroom Lines
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Class 100k Cleanrooms
                   </a>
                 </li>
                 <li>
-                  <a href="#facilities" className="hover:text-emerald-300 transition-colors block">
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
                     Automated Packing Lines
                   </a>
                 </li>
                 <li>
-                  <a href="#facilities" className="hover:text-emerald-300 transition-colors block">
-                    Cold-Chain Storage Logistics
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Cold-Chain Storage Fleet
                   </a>
                 </li>
                 <li>
-                  <a href="#facilities" className="hover:text-emerald-300 transition-colors block">
-                    In-House Microbiological Lab
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    In-House QC &amp; Micro Lab
                   </a>
                 </li>
                 <li>
-                  <a href="#facilities" className="hover:text-emerald-300 transition-colors block">
+                  <a href="#facilities" className="hover:text-[#143e2b] hover:underline transition-colors block">
                     Batch COA Verification
                   </a>
                 </li>
               </ul>
             </div>
 
-            {/* COLUMN 4: Corporate Governance & Legal (Col 2) */}
+            {/* GOVERNANCE & STATUTORY (2 Cols) */}
             <div className="lg:col-span-2 space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                <Scale className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Governance</span>
+              <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                Governance
               </h4>
-              <ul className="space-y-2 text-xs text-neutral-300">
+              <ul className="space-y-2 text-xs text-neutral-600">
                 <li>
                   <button 
                     onClick={() => setLegalModalTab('terms')}
-                    className="hover:text-emerald-300 transition-colors cursor-pointer text-left"
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
                   >
                     Terms of Supply
                   </button>
@@ -1453,7 +1387,7 @@ export default function App() {
                 <li>
                   <button 
                     onClick={() => setLegalModalTab('privacy')}
-                    className="hover:text-emerald-300 transition-colors cursor-pointer text-left"
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
                   >
                     Privacy Policy (DPDP)
                   </button>
@@ -1461,148 +1395,107 @@ export default function App() {
                 <li>
                   <button 
                     onClick={() => setLegalModalTab('statutory')}
-                    className="hover:text-emerald-300 transition-colors cursor-pointer text-left"
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
                   >
-                    Statutory Company Details
+                    Statutory Details
                   </button>
                 </li>
                 <li>
-                  <a href="#inquiry-desk" className="hover:text-emerald-300 transition-colors block">
-                    Commercial RFQ Process
+                  <a href="#inquiry-desk" className="hover:text-[#143e2b] hover:underline transition-colors block">
+                    Commercial RFQ
                   </a>
                 </li>
                 <li>
                   <button 
                     onClick={() => setLegalModalTab('terms')}
-                    className="hover:text-emerald-300 transition-colors cursor-pointer text-left"
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
                   >
-                    Quality Assurances &amp; COA
+                    Quality Guarantees
                   </button>
                 </li>
                 <li>
                   <button 
                     onClick={() => setLegalModalTab('statutory')}
-                    className="hover:text-emerald-300 transition-colors cursor-pointer text-left"
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left"
                   >
-                    MCA Filing Information
+                    MCA Filing Info
                   </button>
                 </li>
               </ul>
             </div>
 
-            {/* COLUMN 5: Commercial Contact & Operations (Col 2) */}
+            {/* COMMERCIAL TRADE DESK (2 Cols) */}
             <div className="lg:col-span-2 space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                <Building className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Trade Desk</span>
+              <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                Trade Desk
               </h4>
-              
-              <div className="space-y-2.5 text-xs">
+              <div className="space-y-2.5 text-xs text-neutral-600">
                 <div>
-                  <div className="text-[10px] text-neutral-400 font-mono uppercase">WhatsApp Commercial Hotline</div>
+                  <div className="text-[10px] text-neutral-500 uppercase font-medium">Commercial WhatsApp</div>
                   <a 
                     href="https://wa.me/919411268879" 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="font-bold text-white hover:text-emerald-300 transition-colors flex items-center gap-1 mt-0.5"
+                    className="font-bold text-[#143e2b] hover:underline block mt-0.5"
                   >
-                    <MessageSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>+91 9411268879</span>
+                    +91 9411268879
                   </a>
                 </div>
 
                 <div>
-                  <div className="text-[10px] text-neutral-400 font-mono uppercase">Corporate Inquiries</div>
+                  <div className="text-[10px] text-neutral-500 uppercase font-medium">Corporate Email</div>
                   <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="font-mono text-[11px] text-neutral-800">contact@drsonsinternational.com</span>
                     <button
-                      onClick={() => handleCopyEmail('trade@drsonsinternational.com')}
-                      className="text-neutral-200 hover:text-white transition-colors flex items-center gap-1 cursor-pointer font-mono text-[11px]"
-                      title="Click to copy email address"
+                      onClick={() => handleCopyEmail('contact@drsonsinternational.com')}
+                      className="p-1 border border-neutral-300 text-neutral-600 hover:bg-neutral-100 transition-colors cursor-pointer"
+                      title="Copy Email"
                     >
-                      <Mail className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>trade@drsonsinternational.com</span>
-                      <Copy className="w-3 h-3 text-neutral-400 hover:text-white ml-0.5" />
+                      {copiedEmail ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
                     </button>
                   </div>
                 </div>
 
                 <div>
-                  <div className="text-[10px] text-neutral-400 font-mono uppercase">Operational Hours</div>
-                  <div className="flex items-center gap-1 text-neutral-300 mt-0.5 text-[11px]">
-                    <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>Mon – Sat: 08:30 – 19:00 IST</span>
+                  <div className="text-[10px] text-neutral-500 uppercase font-medium">Working Hours</div>
+                  <div className="text-neutral-700 text-[11px] mt-0.5">
+                    Mon – Sat: 08:30 – 19:00 IST
                   </div>
                 </div>
 
-                <div className="pt-1">
-                  <div className="text-[10px] text-neutral-400 font-mono uppercase">Logistics &amp; Dispatch</div>
-                  <div className="text-neutral-300 mt-0.5 text-[11px]">
-                    Domestic &amp; Export Ports · Temperature-Controlled Freight
+                <div>
+                  <div className="text-[10px] text-neutral-500 uppercase font-medium">Scope</div>
+                  <div className="text-neutral-700 text-[11px] mt-0.5">
+                    Commercial B2B Supply &amp; Institutional Contracting
                   </div>
                 </div>
               </div>
             </div>
 
           </div>
-        </div>
 
-        {/* 3. STATUTORY NOTICE & CITATION BAR */}
-        <div className="border-t border-[#0e3322] bg-[#05170f] py-4">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-neutral-400">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>
-                DrSons International Private Limited is an incorporated private limited enterprise registered with the Ministry of Corporate Affairs (MCA), Government of India.
-              </span>
-            </div>
-
-            <div className="flex items-center gap-4 text-neutral-400 shrink-0 font-mono text-[10px]">
-              <span>SSL 256-Bit Encrypted</span>
-              <span>•</span>
-              <span>FSSAI Compliant</span>
-              <span>•</span>
-              <span>B2B Commercial Supply Only</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 4. BOTTOM COPYRIGHT & BACK TO TOP BAR */}
-        <div className="border-t border-[#0b281b] bg-[#04120c] py-4">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-400">
+          {/* BOTTOM COPYRIGHT & LEGAL BAR */}
+          <div className="mt-12 pt-6 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-neutral-500">
             <div>
               &copy; {new Date().getFullYear()} DrSons International Private Limited. All rights reserved.
             </div>
 
-            <div className="flex items-center gap-6">
-              <button 
-                onClick={() => setLegalModalTab('terms')}
-                className="hover:text-emerald-300 transition-colors cursor-pointer"
-              >
-                Terms of Supply
-              </button>
-              <button 
-                onClick={() => setLegalModalTab('privacy')}
-                className="hover:text-emerald-300 transition-colors cursor-pointer"
-              >
-                Privacy Policy
-              </button>
-              <button 
-                onClick={() => setLegalModalTab('statutory')}
-                className="hover:text-emerald-300 transition-colors cursor-pointer"
-              >
-                Statutory Register
-              </button>
-
+            <div className="flex flex-wrap items-center gap-4">
+              <span>Incorporated under Companies Act, 2013</span>
+              <span className="hidden sm:inline">·</span>
+              <span>MCA India</span>
+              <span className="hidden sm:inline">·</span>
+              <span>FSSAI Compliant</span>
+              <span className="hidden sm:inline">·</span>
               <button 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="flex items-center gap-1.5 py-1 px-2.5 bg-[#092217] hover:bg-[#143e2b] text-neutral-300 hover:text-white border border-emerald-900/60 rounded-xs transition-colors cursor-pointer text-[11px]"
-                aria-label="Back to top"
+                className="hover:text-neutral-900 transition-colors cursor-pointer"
               >
-                <ArrowUp className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Top</span>
+                Back to top ↑
               </button>
             </div>
           </div>
+
         </div>
       </footer>
 
