@@ -35,7 +35,8 @@ import {
   CheckCircle2,
   Workflow,
   Layers,
-  Sliders
+  Sliders,
+  Maximize2
 } from 'lucide-react';
 import MaintenancePage from './MaintenancePage';
 
@@ -101,6 +102,19 @@ export default function App() {
 
   // Interactive Production Infrastructure & Stacked Cards State
   const [selectedFacilityLine, setSelectedFacilityLine] = useState<number>(0);
+
+  // Active Stage Image / Specimen Lightbox Modal State
+  const [activeStageSpecimen, setActiveStageSpecimen] = useState<{
+    title: string;
+    phase: string;
+    stepNumber: string;
+    image: string;
+    lineTitle: string;
+    cleanroomClass: string;
+    summary: string;
+    telemetry: { label: string; value: string }[];
+    qaStandard?: string;
+  } | null>(null);
 
   const handleFacilityInquiry = (divisionName: string) => {
     setInquiryForm((prev) => ({ ...prev, division: divisionName }));
@@ -292,6 +306,7 @@ export default function App() {
           phase: 'PHASE 01 · RAW HARVEST INGESTION & COLD WASH',
           title: 'Farm-Gate Harvest Sorting & Sugar Brix Calibration',
           summary: 'Direct contracted harvest intake is subjected to dual-stage optical grading, debris elimination, sanitizing wash baths below 12°C, and digital refractometer testing to establish baseline natural sugar and dry-matter ratios before batch acceptance.',
+          image: '/assets/factory/stages/line1_stage1_harvest_sorting.webp',
           telemetry: [
             { label: 'Thermal Window', value: '< 12°C Cold Wash Bath' },
             { label: 'Brix Grading', value: '10.5° – 14.5° Refractometer' },
@@ -307,6 +322,7 @@ export default function App() {
           phase: 'PHASE 02 · ASEPTIC PUREEING & FLASH ENZYME BLUNTING',
           title: 'Flash Thermal Deactivation & Viscosity Homogenization',
           summary: 'Produce is milled through sanitary 316L stainless steel blade suites followed by an 82°C brief thermal flash. This permanently deactivates polyphenol oxidases, preserving natural pigments and biological nutrients without caramelization.',
+          image: '/assets/factory/stages/line1_stage2_thermal_pureeing.webp',
           telemetry: [
             { label: 'Flash Temperature', value: '82°C for 6 Seconds' },
             { label: 'Milling Caliper', value: 'Micro-Homogenized Slurry' },
@@ -322,6 +338,7 @@ export default function App() {
           phase: 'PHASE 03 · NEGATIVE-PRESSURE MOLECULAR EVAPORATION',
           title: 'Low-Temperature Evaporative Pre-Concentration',
           summary: 'Slurry enters a falling-film vacuum chamber at 48°C–52°C. Under negative atmospheric pressure (-0.08 MPa), moisture is removed gently without exposing the ingredients to high heat, preserving volatile aromatic esters and essential solids.',
+          image: '/assets/factory/stages/line1_stage3_vacuum_evaporator.webp',
           telemetry: [
             { label: 'Vacuum Pressure', value: '-0.08 MPa Negative Chamber' },
             { label: 'Operating Heat', value: '48°C – 52°C Gentle Extraction' },
@@ -337,6 +354,7 @@ export default function App() {
           phase: 'PHASE 04 · HIGH-TORQUE CENTRIFUGAL SPRAY DRYING',
           title: 'Vortex Atomization & Instantaneous 1.2s Desiccation',
           summary: 'Concentrated slurry is pumped into a 12,000 RPM rotary centrifugal atomizer head inside the drying tower. Dispersed into micron-sized droplets, it meets a vortex of clean dry air, desiccating into dry micro-spheres in 1.2 seconds flat.',
+          image: '/assets/factory/stages/line1_stage4_spray_atomization.webp',
           telemetry: [
             { label: 'Atomizer Speed', value: '12,000 RPM Centrifugal Disc' },
             { label: 'Residence Time', value: '1.2 Seconds Desiccation' },
@@ -352,6 +370,7 @@ export default function App() {
           phase: 'PHASE 05 · CYCLONE SCREENING & HERMETIC PACKING',
           title: '100-Mesh Vibratory Sifting & Nitrogen-Flushed Barrier Packaging',
           summary: 'Cooled powder passes through a rotary cyclone separator and 100-mesh vibratory sieve. It is automatically packaged in cleanroom conditions into 4-ply aluminum foil moisture-barrier kraft liners under a food-grade nitrogen blanket.',
+          image: '/assets/factory/stages/line1_stage5_vibratory_packing.webp',
           telemetry: [
             { label: 'Screening Mesh', value: '80 – 120 Mesh Calibration' },
             { label: 'Residual Oxygen', value: '< 0.5% Nitrogen Blanket' },
@@ -1467,13 +1486,36 @@ export default function App() {
                     </div>
 
                     {/* Right Photo in Card (5 cols) */}
-                    <div className="lg:col-span-5 border border-neutral-200 bg-neutral-900 overflow-hidden relative min-h-[260px] sm:min-h-[300px]">
+                    <div 
+                      onClick={() => {
+                        const activeImg = (stg as any).image || facilitiesData[selectedFacilityLine].image;
+                        setActiveStageSpecimen({
+                          title: stg.title,
+                          phase: stg.phase,
+                          stepNumber: stg.stepNumber,
+                          image: activeImg,
+                          lineTitle: facilitiesData[selectedFacilityLine].title,
+                          cleanroomClass: facilitiesData[selectedFacilityLine].cleanroomClass,
+                          summary: stg.summary,
+                          telemetry: stg.telemetry,
+                          qaStandard: stg.qaStandard
+                        });
+                      }}
+                      className="group cursor-pointer lg:col-span-5 border border-neutral-200 bg-neutral-900 overflow-hidden relative min-h-[260px] sm:min-h-[300px]"
+                    >
                       <img 
-                        src={facilitiesData[selectedFacilityLine].image} 
+                        src={(stg as any).image || facilitiesData[selectedFacilityLine].image} 
                         alt={stg.title}
-                        className="absolute inset-0 w-full h-full object-cover object-center"
+                        className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent transition-opacity group-hover:opacity-90" />
+                      
+                      {/* Zoom badge indicator (sharp rectangular, strictly NO pills) */}
+                      <div className="absolute top-3 right-3 opacity-90 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity bg-black/75 backdrop-blur-xs text-white text-[10px] font-mono px-2.5 py-1 border border-white/20 flex items-center gap-1.5 shadow-sm">
+                        <Maximize2 className="w-3 h-3 text-emerald-400" />
+                        <span>INSPECT SPEC</span>
+                      </div>
+
                       <div className="absolute bottom-4 left-4 right-4 text-white font-mono text-[11px] space-y-1">
                         <div className="text-emerald-400 font-bold uppercase">{facilitiesData[selectedFacilityLine].cleanroomClass}</div>
                         <div className="text-neutral-200 font-light truncate">{facilitiesData[selectedFacilityLine].equipment}</div>
@@ -1906,6 +1948,105 @@ export default function App() {
 
         </div>
       </footer>
+
+      {/* STAGE PROCESS SPECIMEN LIGHTBOX MODAL */}
+      <AnimatePresence>
+        {activeStageSpecimen && (
+          <div 
+            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+            onClick={() => setActiveStageSpecimen(null)}
+          >
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.96, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 12 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-neutral-950 border border-neutral-800 w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden text-white"
+            >
+              {/* Header */}
+              <div className="p-3.5 sm:p-4 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/90">
+                <div className="flex items-center gap-2.5">
+                  <span className="px-2 py-0.5 bg-emerald-600 text-white font-mono text-[11px] font-bold tracking-wider">
+                    STAGE {activeStageSpecimen.stepNumber} / 05
+                  </span>
+                  <span className="text-xs font-mono text-neutral-300 font-semibold tracking-wide uppercase truncate max-w-[200px] sm:max-w-md">
+                    {activeStageSpecimen.lineTitle}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setActiveStageSpecimen(null)}
+                  className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+                  title="Close Specimen View"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* High-Res Image View */}
+              <div className="relative bg-black flex items-center justify-center overflow-hidden min-h-[220px] max-h-[48vh] sm:max-h-[52vh] border-b border-neutral-800">
+                <img 
+                  src={activeStageSpecimen.image} 
+                  alt={activeStageSpecimen.title} 
+                  className="w-full h-full object-contain max-h-[48vh] sm:max-h-[52vh]"
+                />
+                <div className="absolute top-3 left-3 bg-black/75 backdrop-blur-xs px-2.5 py-1 border border-white/15 text-[10px] font-mono text-emerald-400 uppercase tracking-widest">
+                  {activeStageSpecimen.phase}
+                </div>
+              </div>
+
+              {/* Specimen Telemetry & Action Footer */}
+              <div className="p-4 sm:p-5 bg-neutral-950 space-y-3.5 overflow-y-auto">
+                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                  <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                    {activeStageSpecimen.title}
+                  </h3>
+                  <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider shrink-0">
+                    {activeStageSpecimen.cleanroomClass}
+                  </span>
+                </div>
+
+                <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
+                  {activeStageSpecimen.summary}
+                </p>
+
+                {/* Telemetry Chips (sharp rectangular) */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                  {activeStageSpecimen.telemetry.map((t, idx) => (
+                    <div key={`modal-tel-${idx}`} className="p-2.5 bg-neutral-900 border border-neutral-800">
+                      <span className="text-[9px] font-mono uppercase text-neutral-400 block tracking-wider">
+                        {t.label}
+                      </span>
+                      <span className="text-xs font-mono font-bold text-neutral-100 block mt-0.5">
+                        {t.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Actions & QA Standard */}
+                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-neutral-800">
+                  <span className="text-[11px] font-mono text-neutral-400 flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>QA Standard: <strong className="text-neutral-200">{activeStageSpecimen.qaStandard || 'ISO 22000 / HACCP Verification'}</strong></span>
+                  </span>
+                  <button
+                    onClick={() => {
+                      const divName = facilitiesData[selectedFacilityLine].division;
+                      setActiveStageSpecimen(null);
+                      handleFacilityInquiry(divName);
+                    }}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-colors"
+                  >
+                    <span>Inquire for Stage {activeStageSpecimen.stepNumber}</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* LEGAL TERMS MODAL (FOR PRIVATE LIMITED COMPANY) */}
       <AnimatePresence>
