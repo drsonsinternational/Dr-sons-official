@@ -29,6 +29,7 @@ import {
   Award,
   Factory
 } from 'lucide-react';
+import MaintenancePage from './MaintenancePage';
 
 interface NotificationState {
   type: 'success' | null;
@@ -36,6 +37,47 @@ interface NotificationState {
 }
 
 export default function App() {
+  // Secret Preview Mode State (default: false for public visitors)
+  const [isPreviewMode, setIsPreviewMode] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      // 1. Check URL parameters: e.g. ?preview=drsons or ?preview=drsons2026 or ?dev=true
+      const params = new URLSearchParams(window.location.search);
+      const previewKey = params.get('preview') || params.get('dev') || params.get('key');
+      if (previewKey && ['drsons', 'drsons2026', 'true', 'dev', 'admin', 'preview', 'secret'].includes(previewKey.toLowerCase())) {
+        try {
+          localStorage.setItem('drsons_preview_access', 'granted');
+        } catch (e) {}
+        return true;
+      }
+      // 2. Check persistent localStorage
+      try {
+        return localStorage.getItem('drsons_preview_access') === 'granted';
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
+  });
+
+  const unlockPreview = () => {
+    try {
+      localStorage.setItem('drsons_preview_access', 'granted');
+    } catch (e) {}
+    setIsPreviewMode(true);
+  };
+
+  const lockPreview = () => {
+    try {
+      localStorage.removeItem('drsons_preview_access');
+    } catch (e) {}
+    const url = new URL(window.location.href);
+    url.searchParams.delete('preview');
+    url.searchParams.delete('dev');
+    url.searchParams.delete('key');
+    window.history.replaceState({}, '', url.pathname + (url.search ? url.search : '') + url.hash);
+    setIsPreviewMode(false);
+  };
+
   const [activeDivision, setActiveDivision] = useState<number>(0);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
@@ -254,6 +296,10 @@ export default function App() {
       icon: Coffee
     }
   ];
+
+  if (!isPreviewMode) {
+    return <MaintenancePage onUnlock={unlockPreview} />;
+  }
 
   return (
     <div className="min-h-screen w-full bg-[#fbfdfb] text-[#122218] flex flex-col font-sans selection:bg-[#143e2b] selection:text-white relative">
@@ -1029,20 +1075,20 @@ export default function App() {
         <div className="w-full max-w-7xl mx-auto">
           
           {/* Main Visual Container with Rounded Frame & Background Image */}
-          <div className="relative w-full rounded-[28px] sm:rounded-[36px] overflow-hidden min-h-[640px] sm:min-h-[700px] flex items-center shadow-xl border border-neutral-200/80 bg-neutral-900">
+          <div className="relative w-full rounded-[28px] sm:rounded-[36px] overflow-hidden min-h-[640px] sm:min-h-[700px] flex items-center justify-end shadow-xl border border-neutral-200/80 bg-neutral-900">
             
             {/* Background Facility Bottling Line Image */}
             <img 
-              src="/assets/factory/bottling_line.webp" 
-              alt="D R & Sons Commercial Bottling and Processing Facility" 
-              className="absolute inset-0 w-full h-full object-cover object-right sm:object-center"
+              src="/assets/factory/aamrit_bottling_line.webp" 
+              alt="D R & Sons Commercial Aamrit Mango Drink Bottling and Packaging Facility" 
+              className="absolute inset-0 w-full h-full object-cover object-left sm:object-center"
             />
             
             {/* Subtle Gradient Scrim for Readability & Contrast */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-black/10 md:from-black/40 md:via-transparent md:to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-l from-black/60 via-black/30 to-black/10 md:from-black/40 md:via-transparent md:to-black/20" />
 
-            {/* Desktop Top-Right Status Badge */}
-            <div className="hidden lg:flex items-center gap-2.5 absolute top-8 right-8 z-10 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-white/50 shadow-lg text-xs">
+            {/* Desktop Top-Left Status Badge */}
+            <div className="hidden lg:flex items-center gap-2.5 absolute top-8 left-8 z-10 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-white/50 shadow-lg text-xs">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="font-semibold text-neutral-900">Commercial Trade Desk Active</span>
               <span className="text-neutral-300">·</span>
@@ -1057,8 +1103,8 @@ export default function App() {
               </a>
             </div>
 
-            {/* Desktop Bottom-Right Quick Email Card */}
-            <div className="hidden lg:flex items-center gap-3 absolute bottom-8 right-8 z-10 bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/50 shadow-lg text-xs text-neutral-800">
+            {/* Desktop Bottom-Left Quick Email Card */}
+            <div className="hidden lg:flex items-center gap-3 absolute bottom-8 left-8 z-10 bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/50 shadow-lg text-xs text-neutral-800">
               <div>
                 <span className="text-[10px] uppercase font-mono text-neutral-500 block leading-tight">Direct Inquiries</span>
                 <span className="font-mono text-xs font-bold text-neutral-900">contact@drsonsinternational.com</span>
@@ -1072,8 +1118,8 @@ export default function App() {
               </button>
             </div>
 
-            {/* Floating Minimalist Form Card on the Left */}
-            <div className="relative z-10 w-full md:max-w-[490px] lg:max-w-[510px] m-4 sm:m-8 lg:m-12 bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-10 shadow-2xl space-y-6">
+            {/* Floating Minimalist Form Card on the Right */}
+            <div className="relative z-10 w-full md:max-w-[490px] lg:max-w-[510px] m-4 sm:m-8 lg:m-12 md:ml-auto bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-10 shadow-2xl space-y-6">
               
               <div>
                 <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 leading-tight">
@@ -1668,6 +1714,20 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Floating Preview Mode Indicator for Client & Developers */}
+      <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 bg-[#0a2318]/95 backdrop-blur-md text-white text-xs px-4 py-2.5 rounded-full shadow-2xl border border-emerald-500/40 select-none">
+        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+        <span className="font-semibold text-neutral-100">Client Preview Active</span>
+        <span className="text-white/40">·</span>
+        <button
+          onClick={lockPreview}
+          className="text-emerald-300 hover:text-white underline cursor-pointer font-medium transition-colors"
+          title="Return to Public Under-Construction Page"
+        >
+          Exit to Maintenance
+        </button>
+      </div>
 
     </div>
   );
