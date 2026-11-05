@@ -594,6 +594,7 @@ export default function App() {
           phase: 'PHASE 01 · VACUUM REACTOR BATCH FORMULATION',
           title: 'High-Shear Dispersion & Cold Homogenization',
           summary: 'Natural fruit purees, botanical extracts, and dairy bases are blended in 5,000-liter sanitary 316L reactors under vacuum deaeration to eliminate micro air bubbles, followed by high-pressure two-stage homogenization at 200 Bar.',
+          image: '/assets/factory/stages/line4_stage1_shear_dispersion.webp',
           telemetry: [
             { label: 'Reactor Capacity', value: '5,000 Litres Sanitary 316L' },
             { label: 'Homogenizer Pressure', value: '200 Bar Two-Stage Impact' },
@@ -609,6 +610,7 @@ export default function App() {
           phase: 'PHASE 02 · CONTINUOUS THERMAL STERILIZATION',
           title: 'Ultra-High Temperature Continuous Flow Pasteurization',
           summary: 'Formulations pass through a regenerative plate heat exchanger, heated to 108°C for 4 seconds, then rapidly chilled to 4°C using glycol loops. This guarantees a commercial 6-log pathogen reduction with zero scorched flavor notes.',
+          image: '/assets/factory/stages/line4_stage2_uht_pasteurization.webp',
           telemetry: [
             { label: 'Pasteurization Temp', value: '108°C Flash Sterilization' },
             { label: 'Holding Period', value: '4 Seconds Continuous Flow' },
@@ -624,6 +626,7 @@ export default function App() {
           phase: 'PHASE 03 · 16-HEAD ROTARY FILLING & AUTO-CAPPING',
           title: 'Cleanroom Touch-Free Beverage Bottling Line',
           summary: 'Sterile beverage stream flows into an enclosed 16-head rotary filling carousel. Bottles receive nitrogen headspace dosing, automatic cap torque fastening, and tamper-evident shrink sleeve application at speeds up to 100+ BPM.',
+          image: '/assets/factory/stages/line4_stage3_sterile_cold_filling.webp',
           telemetry: [
             { label: 'Filling Architecture', value: '16-Head Isobaric Rotary' },
             { label: 'HEPA Air Velocity', value: '0.45 m/s Laminar Airflow' },
@@ -639,6 +642,7 @@ export default function App() {
           phase: 'PHASE 04 · SCRAPED-SURFACE CHURN FREEZING',
           title: 'Micro-Overrun Churning & Ice Crystal Optimization',
           summary: 'For ice creams and frozen desserts, dairy mix enters a continuous scraped-surface cylinder freezer at -5.5°C. Micro-filtered sterile air is metered in to achieve exact overrun (40%–80%) while scraper blades keep ice crystals microscopic (<15µ).',
+          image: '/assets/factory/stages/line4_stage4_continuous_churning.webp',
           telemetry: [
             { label: 'Extrusion Temp', value: '-5.5°C Semi-Solid State' },
             { label: 'Overrun Range', value: '40% – 85% Precision Metered' },
@@ -654,6 +658,7 @@ export default function App() {
           phase: 'PHASE 05 · -35°C CRYOGENIC SPIRAL HARDENING',
           title: 'Blast Hardening & Sub-Zero Temperature-Logged Dispatch',
           summary: 'Filled containers pass through a -35°C forced-air cryogenic blast tunnel, reaching a core temperature of -18°C within 35 minutes. Products are palletized and transferred directly into cold-chain refrigerated dispatch reefers.',
+          image: '/assets/factory/stages/line4_stage5_blast_hardening.webp',
           telemetry: [
             { label: 'Blast Tunnel Heat', value: '-35°C High-Velocity Air' },
             { label: 'Core Hardening Time', value: '35 Minutes to -18°C Core' },
