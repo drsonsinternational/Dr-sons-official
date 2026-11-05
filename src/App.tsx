@@ -27,7 +27,12 @@ import {
   Clock,
   ArrowUp,
   Award,
-  Factory
+  Factory,
+  Settings2,
+  Play,
+  Pause,
+  RotateCcw,
+  CheckCircle2
 } from 'lucide-react';
 import MaintenancePage from './MaintenancePage';
 
@@ -91,8 +96,27 @@ export default function App() {
   // Mobile Dashboard Drawer State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Horizontal scroll container ref for facilities
-  const facilitiesScrollRef = useRef<HTMLDivElement>(null);
+  // Interactive Production Infrastructure & Workflow Explorer States
+  const [selectedFacilityLine, setSelectedFacilityLine] = useState<number>(0);
+  const [selectedFacilityStep, setSelectedFacilityStep] = useState<number>(0);
+  const [isAutoTourActive, setIsAutoTourActive] = useState<boolean>(false);
+
+  // Auto-tour timer for production workflow
+  useEffect(() => {
+    if (!isAutoTourActive) return;
+    const interval = setInterval(() => {
+      setSelectedFacilityStep((prev) => (prev + 1) % 5);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [isAutoTourActive]);
+
+  const handleFacilityInquiry = (divisionName: string) => {
+    setInquiryForm((prev) => ({ ...prev, division: divisionName }));
+    const desk = document.getElementById('inquiry-desk');
+    if (desk) {
+      desk.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   // Inquiry Form State
   const [inquiryForm, setInquiryForm] = useState({
@@ -188,13 +212,6 @@ export default function App() {
     setActiveDivision(idx);
   };
 
-  const scrollFacilities = (direction: 'left' | 'right') => {
-    if (facilitiesScrollRef.current) {
-      const offset = direction === 'left' ? -320 : 320;
-      facilitiesScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-    }
-  };
-
   const tickerItems = [
     'D R & Sons International Private Limited · Incorporated Enterprise (Since 2026)',
     'Fruits, Vegetables Powder and starch',
@@ -264,36 +281,368 @@ export default function App() {
 
   const facilitiesData = [
     {
+      id: 'powders-starch',
       number: '01',
       division: 'Fruits, Vegetables Powder and starch',
-      title: 'Spray Drying & Starch Micro-Milling',
-      desc: 'Low-temperature evaporators, starch processing suites & micro-milling lines producing free-flowing, nutrient-intact powders.',
-      tags: ['Spray Towers', 'Starch Refining', 'Vacuum Evaporation'],
-      icon: Apple
+      title: 'Spray Drying & Starch Micro-Milling Suite',
+      shortTitle: 'Powders & Starch Line',
+      desc: 'Continuous low-temperature evaporators, high-torque atomization spray towers, and micro-milling lines producing nutrient-dense, free-flowing commercial food powders and starches.',
+      image: '/assets/aistudio/file_000000007504820892cf49a02d280275_ad4da5f2.webp',
+      icon: Apple,
+      cleanroomClass: 'Class 10,000 / ISO 7 Cleanroom',
+      capacity: '1,200 kg / Hour Output',
+      equipment: 'Vacuum Evaporator, Centrifugal Atomizer & Fluid Bed Cooler',
+      tags: ['Spray Towers', 'Starch Refining', 'Vacuum Evaporation', 'Micro-Milling'],
+      stages: [
+        {
+          stepNumber: '01',
+          stepLabel: 'Farm Ingestion',
+          phase: 'PHASE 01 · RAW HARVEST INGESTION & COLD WASH',
+          title: 'Farm-Gate Harvest Sorting & Sugar Brix Calibration',
+          summary: 'Direct contracted harvest intake is subjected to dual-stage optical grading, debris elimination, sanitizing wash baths below 12°C, and digital refractometer testing to establish baseline natural sugar and dry-matter ratios before batch acceptance.',
+          telemetry: [
+            { label: 'Thermal Window', value: '< 12°C Cold Wash Bath' },
+            { label: 'Brix Grading', value: '10.5° – 14.5° Refractometer' },
+            { label: 'Sorting Tolerance', value: '99.8% Optical Clearance' },
+            { label: 'Ingestion Rate', value: '3,500 kg / Hr Intake' }
+          ],
+          qaStandard: 'HACCP Critical Control Point 1 · Optical Foreign Object Clearance',
+          highlight: 'Gentle wash protocols prevent surface bruising and early enzymatic breakdown.'
+        },
+        {
+          stepNumber: '02',
+          stepLabel: 'Puree & Inactivation',
+          phase: 'PHASE 02 · ASEPTIC PUREEING & FLASH ENZYME BLUNTING',
+          title: 'Flash Thermal Deactivation & Viscosity Homogenization',
+          summary: 'Produce is milled through sanitary 316L stainless steel blade suites followed by an 82°C brief thermal flash. This permanently deactivates polyphenol oxidases, preserving natural pigments and biological nutrients without caramelization.',
+          telemetry: [
+            { label: 'Flash Temperature', value: '82°C for 6 Seconds' },
+            { label: 'Milling Caliper', value: 'Micro-Homogenized Slurry' },
+            { label: 'Nutrient Retention', value: '> 95.4% Vitamin C & Phytos' },
+            { label: 'Aseptic Line', value: 'Sanitary 316L Stainless Steel' }
+          ],
+          qaStandard: 'Enzyme Activity Index: 0.0 U/g · Zero Thermal Color Degradation',
+          highlight: 'Stops oxidation immediately, locking in original harvest flavor and color.'
+        },
+        {
+          stepNumber: '03',
+          stepLabel: 'Vacuum Concentration',
+          phase: 'PHASE 03 · NEGATIVE-PRESSURE MOLECULAR EVAPORATION',
+          title: 'Low-Temperature Evaporative Pre-Concentration',
+          summary: 'Slurry enters a falling-film vacuum chamber at 48°C–52°C. Under negative atmospheric pressure (-0.08 MPa), moisture is removed gently without exposing the ingredients to high heat, preserving volatile aromatic esters and essential solids.',
+          telemetry: [
+            { label: 'Vacuum Pressure', value: '-0.08 MPa Negative Chamber' },
+            { label: 'Operating Heat', value: '48°C – 52°C Gentle Extraction' },
+            { label: 'Concentration Factor', value: '32% Total Solids Target' },
+            { label: 'Evaporation Flow', value: '2,400 Litres / Hour' }
+          ],
+          qaStandard: 'Inline Refractometry & Solids Density Sensor Verification',
+          highlight: 'Maintains heat-sensitive aromatics that conventional boiling destroys.'
+        },
+        {
+          stepNumber: '04',
+          stepLabel: 'Spray Atomization',
+          phase: 'PHASE 04 · HIGH-TORQUE CENTRIFUGAL SPRAY DRYING',
+          title: 'Vortex Atomization & Instantaneous 1.2s Desiccation',
+          summary: 'Concentrated slurry is pumped into a 12,000 RPM rotary centrifugal atomizer head inside the drying tower. Dispersed into micron-sized droplets, it meets a vortex of clean dry air, desiccating into dry micro-spheres in 1.2 seconds flat.',
+          telemetry: [
+            { label: 'Atomizer Speed', value: '12,000 RPM Centrifugal Disc' },
+            { label: 'Residence Time', value: '1.2 Seconds Desiccation' },
+            { label: 'Final Moisture', value: '< 3.8% Controlled Bound Water' },
+            { label: 'Particle Morphology', value: 'Free-Flowing Micro-Spheres' }
+          ],
+          qaStandard: 'Karl Fischer Coulometric Titration · Residual Moisture <4.0%',
+          highlight: 'Ultra-fast desiccation ensures instant water solubility with zero clumping.'
+        },
+        {
+          stepNumber: '05',
+          stepLabel: 'Milling & Packing',
+          phase: 'PHASE 05 · CYCLONE SCREENING & HERMETIC PACKING',
+          title: '100-Mesh Vibratory Sifting & Nitrogen-Flushed Barrier Packaging',
+          summary: 'Cooled powder passes through a rotary cyclone separator and 100-mesh vibratory sieve. It is automatically packaged in cleanroom conditions into 4-ply aluminum foil moisture-barrier kraft liners under a food-grade nitrogen blanket.',
+          telemetry: [
+            { label: 'Screening Mesh', value: '80 – 120 Mesh Calibration' },
+            { label: 'Residual Oxygen', value: '< 0.5% Nitrogen Blanket' },
+            { label: 'Packaging Liner', value: '4-Ply Aluminum Hermetic Foil' },
+            { label: 'Standard Bulk Units', value: '20kg & 25kg Net Weight Drums' }
+          ],
+          qaStandard: 'Continuous In-line Metal Detection & Sealed Microbial Swab Protocol',
+          highlight: '24-month ambient shelf life with 100% protection against atmospheric moisture.'
+        }
+      ]
     },
     {
+      id: 'flakes-dehydration',
       number: '02',
       division: 'Fruits and Vegetables Flakes',
-      title: 'Drum Drying & Dehydration',
-      desc: 'Continuous drum dryers producing crispy inclusions and culinary flakes with instant rehydration.',
-      tags: ['Drum Rollers', 'Flake Calibration', 'Nitrogen Seal'],
-      icon: PackageCheck
+      title: 'Double-Drum Dehydration & Flake Calibration Suite',
+      shortTitle: 'Crispy Flakes Line',
+      desc: 'Precision counter-rotating steam-heated drum dryers paired with cryogenic nitrogen cooling flakers, yielding crispy inclusions with rapid rehydration kinetics and vivid natural hues.',
+      image: '/assets/aistudio/image_449cc89f.webp',
+      icon: PackageCheck,
+      cleanroomClass: 'Class 10,000 Clean Room',
+      capacity: '800 kg / Hour Output',
+      equipment: 'Counter-Rotating Steam Drums, Precision Doctor Blades & Rotary Calibrators',
+      tags: ['Drum Rollers', 'Flake Calibration', 'Nitrogen Seal', 'Rapid Rehydration'],
+      stages: [
+        {
+          stepNumber: '01',
+          stepLabel: 'Harvest Intake',
+          phase: 'PHASE 01 · OPTICAL SORTING & SLICING',
+          title: 'Calibrated Slicing & Fiber Integrity Screening',
+          summary: 'Raw fruits and vegetables are inspected on dual optical sorting belts to reject imperfect specimens, then precision-sliced to calibrated 1.2mm profiles to guarantee uniform drying kinetics across the entire batch.',
+          telemetry: [
+            { label: 'Slicing Caliper', value: '1.2mm ± 0.1mm Precision' },
+            { label: 'Inspection Protocol', value: 'Dual-Spectrum Optical Sensor' },
+            { label: 'Cold Intake', value: 'Insulated Refrigerated Transport' },
+            { label: 'Sorting Efficiency', value: '99.9% Defect Rejection' }
+          ],
+          qaStandard: 'Visual Color Consistency Check & Geometry Calibration Tolerance',
+          highlight: 'Uniform slice thickness ensures zero burnt or under-dried edges.'
+        },
+        {
+          stepNumber: '02',
+          stepLabel: 'Steam Pre-Treatment',
+          phase: 'PHASE 02 · MILD ATMOSPHERIC BLANCHING',
+          title: 'Steam-Conditioned Starch Gelatinization',
+          summary: 'Slices travel through a 92°C saturated steam chamber for 18 seconds. This mild treatment gelatinizes surface starches, stabilizes cellular carotenoids, and primes the cellular walls for rapid subsequent moisture desorption.',
+          telemetry: [
+            { label: 'Steam Temperature', value: '92°C Atmospheric Chamber' },
+            { label: 'Exposure Period', value: '18 Seconds Continuous' },
+            { label: 'Enzyme Suppression', value: 'Peroxidase Negative Tested' },
+            { label: 'Color Retention', value: 'Delta-E < 1.2 Spectro' }
+          ],
+          qaStandard: 'Spectrophotometric Chroma Analysis & Peroxidase Negative Titration',
+          highlight: 'Locks in bright harvest color without requiring artificial colorants.'
+        },
+        {
+          stepNumber: '03',
+          stepLabel: 'Drum Dehydration',
+          phase: 'PHASE 03 · TWIN-DRUM THERMAL FILM DEHYDRATION',
+          title: 'Sub-Millimeter Film Transfer & Continuous Drying',
+          summary: 'Conditioned produce is applied as an ultra-thin 0.18mm film onto twin counter-rotating cast-iron drums heated internally with dry steam at 118°C. In 8.5 seconds, moisture is removed and a flexible dehydrated sheet forms.',
+          telemetry: [
+            { label: 'Drum Surface Heat', value: '118°C Superheated Steam' },
+            { label: 'Film Thickness', value: '0.18mm Micrometric Spread' },
+            { label: 'Rotation Speed', value: '4.2 RPM Continuous' },
+            { label: 'Contact Duration', value: '8.5 Seconds Complete Cycle' }
+          ],
+          qaStandard: 'Infrared Pyrometer Continuous Drum Surface Temperature Log',
+          highlight: 'Rapid contact drying gives flakes a delicate, crispy cellular structure.'
+        },
+        {
+          stepNumber: '04',
+          stepLabel: 'Chamber Cooling',
+          phase: 'PHASE 04 · DEHUMIDIFIED NITROGEN CHILLING',
+          title: 'Micro-Doctor Blade Shearing & Dry Cooling',
+          summary: 'Hardened surgical stainless steel doctor blades shear the dried film from drum rollers. The sheet is instantly conveyed into a 14°C dehumidified positive-pressure tunnel where rotary flakers calibrate flake size to 3mm–8mm.',
+          telemetry: [
+            { label: 'Chill Temperature', value: '14°C Controlled Atmosphere' },
+            { label: 'Relative Humidity', value: '< 20% RH Positive Pressure' },
+            { label: 'Flake Sizing', value: '3mm – 8mm Calibrated Sieve' },
+            { label: 'Crispness Index', value: '4.8 N Peak Rupture Force' }
+          ],
+          qaStandard: 'Texture Analyzer Rupture Force & Rehydration Speed Verification',
+          highlight: 'Rehydrates in hot water or liquid in under 45 seconds.'
+        },
+        {
+          stepNumber: '05',
+          stepLabel: 'Nitrogen Sealing',
+          phase: 'PHASE 05 · AROMA-SEALED CONTAINERIZATION',
+          title: 'Hermetic Nitrogen Packing for Cereal & Ready-Meal Inclusions',
+          summary: 'Calibrated flakes are weighed in multi-head automated scale hoppers and sealed in high-barrier metallized pouches under positive nitrogen flush, providing 24 months of ambient storage stability without softening.',
+          telemetry: [
+            { label: 'Residual Oxygen', value: '< 0.8% Modified Atmosphere' },
+            { label: 'Water Activity (aw)', value: '0.22 aw Highly Stable' },
+            { label: 'Rehydration Rate', value: '< 45s Instant Moisture Uptake' },
+            { label: 'Shelf Integrity', value: '24 Months Ambient Barrier' }
+          ],
+          qaStandard: 'Hermetic Leak Decay Testing & Gas Chromatograph Headspace Oxygen Check',
+          highlight: 'Ideal for breakfast cereals, soup mixes, seasoning blends, and snack formulations.'
+        }
+      ]
     },
     {
+      id: 'mineral-water',
       number: '03',
       division: 'Drinking Mineral Water',
-      title: 'Automated Mineral Water Purification & Bottling',
-      desc: 'Multi-stage RO, micron filtration, ozonation, and automated touch-free bottling lines for packaged drinking water.',
-      tags: ['RO & Ozonation', 'Cleanroom Bottling', 'Mineral Balance'],
-      icon: Droplets
+      title: 'Double-Pass RO & Automated Cleanroom Bottling',
+      shortTitle: 'Mineral Water Suite',
+      desc: 'Multi-stage quartz and activated carbon filtration, dual thin-film composite reverse osmosis, calibrated remineralization, and high-speed touch-free Class 100 cleanroom rotary bottling.',
+      image: '/assets/aistudio/drinking_water_packaging.webp',
+      icon: Droplets,
+      cleanroomClass: 'Class 100 / ISO 5 Cleanroom Enclosure',
+      capacity: '10,000 Litres / Hour Purification',
+      equipment: 'Double-Pass RO Skid, Ozonator, 254nm UV Chamber & Monoblock Bottling',
+      tags: ['RO & Ozonation', 'Cleanroom Bottling', 'Mineral Balance', 'Class 100'],
+      stages: [
+        {
+          stepNumber: '01',
+          stepLabel: 'Pre-Filtration',
+          phase: 'PHASE 01 · MULTI-BED PHYSICAL PURIFICATION',
+          title: 'Graded Quartz & High-Iodine Activated Carbon Filtration',
+          summary: 'Raw spring intake passes through dual-gradient quartz sand filters (down to 10 microns) followed by 1050-iodine activated carbon beds to eliminate suspended matter, organic contaminants, odor, and chlorine precursors.',
+          telemetry: [
+            { label: 'Filtration Depth', value: '10 Micron Quartz Media' },
+            { label: 'Carbon Iodine Value', value: '1050 mg/g High Adsorption' },
+            { label: 'Inlet Turbidity', value: '< 0.1 NTU Pure Clarity' },
+            { label: 'Throughput Flow', value: '14,000 Litres / Hour' }
+          ],
+          qaStandard: 'Digital Turbidimeter Logging & Silt Density Index (SDI < 3.0)',
+          highlight: 'Eliminates 99.9% of suspended solids before reverse osmosis membranes.'
+        },
+        {
+          stepNumber: '02',
+          stepLabel: 'Double-Pass RO',
+          phase: 'PHASE 02 · THIN-FILM COMPOSITE OSMOSIS',
+          title: 'Double-Pass Reverse Osmosis (0.0001 Micron)',
+          summary: 'High-pressure multi-stage pumps push water through thin-film composite polyamide spiral membranes at 14.5 Bar. Over 99.4% of total dissolved solids, heavy metals, pesticides, and microbial pathogens are rejected.',
+          telemetry: [
+            { label: 'Operating Pressure', value: '14.5 Bar Multi-Stage Pump' },
+            { label: 'Pore Rating', value: '0.0001 Micron Polyamide' },
+            { label: 'TDS Rejection', value: '99.4% Total Ion Removal' },
+            { label: 'Permeate Quality', value: '< 5 ppm Pure Base Stream' }
+          ],
+          qaStandard: 'Continuous Inline Conductivity & Permeate TDS Sensors',
+          highlight: 'Delivers an ultra-pure, crystal-clear water baseline free of chemical impurities.'
+        },
+        {
+          stepNumber: '03',
+          stepLabel: 'Remineralization',
+          phase: 'PHASE 03 · CALIBRATED MINERAL ENRICHMENT',
+          title: 'Precision Electrolyte & Mineral Re-Balancing',
+          summary: 'Pure permeate is dosed with pharmaceutical food-grade calcium, magnesium, and potassium ions at a strict 3:1 ratio. Water passes through an inline static mixer to stabilize pH between 7.2 and 7.5, creating a crisp, refreshing mineral profile.',
+          telemetry: [
+            { label: 'Target TDS', value: '95 – 120 ppm Optimal Mineral' },
+            { label: 'pH Balance', value: '7.2 – 7.5 Alkaline-Neutral' },
+            { label: 'Electrolyte Balance', value: 'Calcium : Magnesium 3:1' },
+            { label: 'Sensory Score', value: 'Crisp & Refreshing Finish' }
+          ],
+          qaStandard: 'ICP Spectrometry Mineral Profiling & Automated Online pH Controller',
+          highlight: 'Produces the exact mineral composition required for premier taste and hydration.'
+        },
+        {
+          stepNumber: '04',
+          stepLabel: 'UV & Ozonation',
+          phase: 'PHASE 04 · DUAL BIOLOGICAL SANITIZATION',
+          title: '254nm Ultraviolet Chamber & Dissolved O3 Barrier',
+          summary: 'Water is exposed to high-intensity germicidal ultraviolet light (254nm UV-C) followed by micro-bubble ozone injection (0.2–0.4 ppm). Ozone provides residual sanitization inside the bottle before reverting cleanly to pure oxygen.',
+          telemetry: [
+            { label: 'UV-C Wavelength', value: '254nm High-Dose Chamber' },
+            { label: 'Dissolved Ozone', value: '0.2 – 0.4 ppm In-Bottle Active' },
+            { label: 'Microbial Count', value: '0 CFU / 100ml Pure Sterile' },
+            { label: 'Byproduct Residue', value: 'Zero Chemical Residue' }
+          ],
+          qaStandard: 'Online Dissolved Ozone Analyzer & Daily Membrane Micro-Culture Swabs',
+          highlight: 'Guarantees 100% biological purity without boiling or chemical taste.'
+        },
+        {
+          stepNumber: '05',
+          stepLabel: 'Rotary Bottling',
+          phase: 'PHASE 05 · CLASS 100 MONOBLOCK PACKAGING',
+          title: 'Touch-Free Rinser-Filler-Capper & Tamper Induction Sealing',
+          summary: 'Bottling occurs within a laminar HEPA-filtered Class 100 cleanroom enclosure. Bottles are air-rinsed with sterile ionized air, filled under gravity-flow isobaric nozzles, and capped with tamper-evident collar closures at 120 bottles/min.',
+          telemetry: [
+            { label: 'Bottling Velocity', value: '120 Bottles / Minute Rotary' },
+            { label: 'Cleanroom Enclosure', value: 'Class 100 / ISO 5 Positive' },
+            { label: 'Volumetric Accuracy', value: '± 0.5 ml Laser Calibrated' },
+            { label: 'Container Types', value: '500ml, 1L PET & Bulk Jars' }
+          ],
+          qaStandard: 'Automated High-Speed Machine-Vision Fill-Level & Torque Inspection',
+          highlight: '100% recyclable virgin food-grade PET with tamper-evident security collar.'
+        }
+      ]
     },
     {
+      id: 'beverages-churn',
       number: '04',
-      division: 'Drinks & Ice Creams',
-      title: 'Automated Bottling & Freezing Suites',
-      desc: 'Cleanroom UHT bottling lines and commercial continuous churn freeze suites for packaged retail goods.',
-      tags: ['UHT Pasteurization', 'Auto-Capping', 'Cold-Chain Dispatch'],
-      icon: Coffee
+      division: 'Non-Alcoholic Drinks and Ice Creams',
+      title: 'Aseptic Bottling & Continuous Churn Freeze Suites',
+      shortTitle: 'Drinks & Ice Cream Line',
+      desc: 'Sanitary jacketed 316L blending reactors, continuous plate UHT pasteurization suites, high-speed automated bottling lines, and sub-zero continuous churn ice cream freezers.',
+      image: '/assets/factory/aamrit_bottling_line.webp',
+      icon: Coffee,
+      cleanroomClass: 'Class 1,000 Cleanroom Bottling Suite',
+      capacity: '7,500 Bottles / Hour & 1,500 L / Hr Churn',
+      equipment: '16-Head Rotary Bottler, Continuous Scraped Freezer & Blast Hardening Tunnel',
+      tags: ['UHT Pasteurization', 'Auto-Capping', 'Cold-Chain Dispatch', 'Churn Freezers'],
+      stages: [
+        {
+          stepNumber: '01',
+          stepLabel: 'Sterile Blending',
+          phase: 'PHASE 01 · VACUUM REACTOR BATCH FORMULATION',
+          title: 'High-Shear Dispersion & Cold Homogenization',
+          summary: 'Natural fruit purees, botanical extracts, and dairy bases are blended in 5,000-liter sanitary 316L reactors under vacuum deaeration to eliminate micro air bubbles, followed by high-pressure two-stage homogenization at 200 Bar.',
+          telemetry: [
+            { label: 'Reactor Capacity', value: '5,000 Litres Sanitary 316L' },
+            { label: 'Homogenizer Pressure', value: '200 Bar Two-Stage Impact' },
+            { label: 'Deaeration Vacuum', value: '-0.06 MPa Bubble Removal' },
+            { label: 'Brix Target Margin', value: '± 0.2° Automated Dosing' }
+          ],
+          qaStandard: 'Online Refractometer, Densitometer & Particle Size Distribution Check',
+          highlight: 'Micro-homogenization prevents fat separation and ensures silky-smooth mouthfeel.'
+        },
+        {
+          stepNumber: '02',
+          stepLabel: 'UHT Pasteurization',
+          phase: 'PHASE 02 · CONTINUOUS THERMAL STERILIZATION',
+          title: 'Ultra-High Temperature Continuous Flow Pasteurization',
+          summary: 'Formulations pass through a regenerative plate heat exchanger, heated to 108°C for 4 seconds, then rapidly chilled to 4°C using glycol loops. This guarantees a commercial 6-log pathogen reduction with zero scorched flavor notes.',
+          telemetry: [
+            { label: 'Pasteurization Temp', value: '108°C Flash Sterilization' },
+            { label: 'Holding Period', value: '4 Seconds Continuous Flow' },
+            { label: 'Rapid Chill Loop', value: '4°C Glycol Heat Exchanger' },
+            { label: 'Energy Regeneration', value: '88% Thermal Recovery' }
+          ],
+          qaStandard: 'Automated Fail-Safe Divert Valve System & Continuous Thermocouple Log',
+          highlight: 'Preserves the authentic fresh fruit aroma while guaranteeing commercial shelf stability.'
+        },
+        {
+          stepNumber: '03',
+          stepLabel: 'Automated Bottling',
+          phase: 'PHASE 03 · 16-HEAD ROTARY FILLING & AUTO-CAPPING',
+          title: 'Cleanroom Touch-Free Beverage Bottling Line',
+          summary: 'Sterile beverage stream flows into an enclosed 16-head rotary filling carousel. Bottles receive nitrogen headspace dosing, automatic cap torque fastening, and tamper-evident shrink sleeve application at speeds up to 100+ BPM.',
+          telemetry: [
+            { label: 'Filling Architecture', value: '16-Head Isobaric Rotary' },
+            { label: 'HEPA Air Velocity', value: '0.45 m/s Laminar Airflow' },
+            { label: 'Bottling Velocity', value: '100+ Bottles / Minute' },
+            { label: 'Nitrogen Dosing', value: 'Headspace Inert Gas Seal' }
+          ],
+          qaStandard: 'Camera Vision Capper Torque & Fill Height Verification Gate',
+          highlight: 'High-speed cleanroom filling ensures pristine product integrity without chemical preservatives.'
+        },
+        {
+          stepNumber: '04',
+          stepLabel: 'Continuous Freezing',
+          phase: 'PHASE 04 · SCRAPED-SURFACE CHURN FREEZING',
+          title: 'Micro-Overrun Churning & Ice Crystal Optimization',
+          summary: 'For ice creams and frozen desserts, dairy mix enters a continuous scraped-surface cylinder freezer at -5.5°C. Micro-filtered sterile air is metered in to achieve exact overrun (40%–80%) while scraper blades keep ice crystals microscopic (<15µ).',
+          telemetry: [
+            { label: 'Extrusion Temp', value: '-5.5°C Semi-Solid State' },
+            { label: 'Overrun Range', value: '40% – 85% Precision Metered' },
+            { label: 'Scraper Velocity', value: '450 RPM Stainless Blades' },
+            { label: 'Crystal Size Target', value: '< 15 Micron Velvety Body' }
+          ],
+          qaStandard: 'Mass Flow Overrun Sensor & Texture Penetrometer Body Check',
+          highlight: 'Microscopic ice crystals deliver ultra-creamy, velvety scoop texture.'
+        },
+        {
+          stepNumber: '05',
+          stepLabel: 'Blast Tunnel & Cold Chain',
+          phase: 'PHASE 05 · -35°C CRYOGENIC SPIRAL HARDENING',
+          title: 'Blast Hardening & Sub-Zero Temperature-Logged Dispatch',
+          summary: 'Filled containers pass through a -35°C forced-air cryogenic blast tunnel, reaching a core temperature of -18°C within 35 minutes. Products are palletized and transferred directly into cold-chain refrigerated dispatch reefers.',
+          telemetry: [
+            { label: 'Blast Tunnel Heat', value: '-35°C High-Velocity Air' },
+            { label: 'Core Hardening Time', value: '35 Minutes to -18°C Core' },
+            { label: 'Cold-Chain Dispatch', value: '-20°C Reefer Fleet Storage' },
+            { label: 'Thermal Tracking', value: 'Real-Time GPS Thermologgers' }
+          ],
+          qaStandard: 'Continuous Cold-Chain Temperature Data Logging to Final Destination',
+          highlight: 'Locks in structural stability and overrun for long-distance commercial distribution.'
+        }
+      ]
     }
   ];
 
@@ -984,87 +1333,320 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECTION: PRODUCTION FACILITIES & INFRASTRUCTURE (Horizontal Scroll Track on Mobile) */}
-      <section id="facilities" className="w-full py-10 sm:py-16 px-3 sm:px-6 lg:px-12 bg-[#fafbfa] border-b border-neutral-200">
-        <div className="w-full max-w-7xl mx-auto space-y-6">
+      {/* SECTION: PRODUCTION FACILITIES & INTERACTIVE WORKFLOW EXPLORER */}
+      <section id="facilities" className="w-full py-12 sm:py-20 px-3 sm:px-6 lg:px-12 bg-[#fafbfa] border-b border-neutral-200">
+        <div className="w-full max-w-7xl mx-auto space-y-8">
           
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-neutral-200 pb-4">
-            <div className="space-y-1">
-              <div className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
-                Facility &amp; Technical Suites
+          {/* Header & Controls Bar */}
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-neutral-200 pb-6">
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
+                <Settings2 className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Industrial Workflow &amp; Technical Architecture</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900">
-                Production <span className="font-serif-brand italic text-emerald-900 font-normal">Infrastructure</span>
+              <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-neutral-900">
+                Production <span className="font-serif-brand italic text-emerald-900 font-normal">Infrastructure &amp; Process Pipeline</span>
               </h2>
+              <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-light">
+                Explore our commercial manufacturing workflow across 4 industrial processing lines. Select any line to trace raw intake through precision thermal/mechanical transformation to sealed, certified commercial goods.
+              </p>
             </div>
             
-            <div className="flex items-center justify-between sm:justify-end gap-2">
-              <span className="text-[11px] font-mono text-neutral-500 bg-white px-2 py-1 border border-neutral-200">
-                ← Swipe Facilities →
-              </span>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => scrollFacilities('left')}
-                  className="w-7 h-7 flex items-center justify-center border border-neutral-200 bg-white hover:bg-neutral-100 cursor-pointer"
-                  title="Scroll Left"
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => scrollFacilities('right')}
-                  className="w-7 h-7 flex items-center justify-center border border-neutral-200 bg-white hover:bg-neutral-100 cursor-pointer"
-                  title="Scroll Right"
-                >
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
+            {/* Interactive Tour & Stepper Tools */}
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => setIsAutoTourActive(!isAutoTourActive)}
+                className={`px-4 py-2 border text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-all ${
+                  isAutoTourActive 
+                    ? 'bg-emerald-900 text-white border-emerald-950 shadow-xs' 
+                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-emerald-800 hover:text-emerald-950 shadow-xs'
+                }`}
+                title="Toggle Automated Stage Tour"
+              >
+                {isAutoTourActive ? (
+                  <>
+                    <Pause className="w-3.5 h-3.5 text-emerald-300" />
+                    <span>Pause Tour</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Auto-Play Tour</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={() => { setSelectedFacilityStep(0); setIsAutoTourActive(false); }}
+                className="p-2 border border-neutral-300 bg-white hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-colors cursor-pointer"
+                title="Reset to Stage 01"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
             </div>
           </div>
 
-          {/* Horizontal Facilities Rail (Compact, responsive, zero excessive scrolling) */}
-          <div 
-            ref={facilitiesScrollRef}
-            className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 no-scrollbar"
-          >
-            {facilitiesData.map((fac, idx) => {
-              const FacIcon = fac.icon;
+          {/* 4 Line Selector Tabs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+            {facilitiesData.map((line, idx) => {
+              const LineIcon = line.icon;
+              const isSelected = selectedFacilityLine === idx;
               return (
-                <div 
-                  key={idx}
-                  className="snap-start shrink-0 w-[85vw] sm:w-[360px] lg:w-[390px] border border-neutral-200 bg-white p-5 space-y-3 shadow-2xs hover:border-emerald-800/40 transition-all"
+                <button
+                  key={line.id}
+                  onClick={() => {
+                    setSelectedFacilityLine(idx);
+                    setSelectedFacilityStep(0);
+                    setIsAutoTourActive(false);
+                  }}
+                  className={`p-4 border text-left transition-all cursor-pointer relative ${
+                    isSelected 
+                      ? 'bg-[#0a2318] text-white border-[#0a2318] shadow-md' 
+                      : 'bg-white text-neutral-800 border-neutral-200 hover:border-emerald-800/40 hover:bg-[#f6f9f7]'
+                  }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="w-9 h-9 bg-emerald-50 text-emerald-900 border border-emerald-900/15 flex items-center justify-center">
-                      <FacIcon className="w-4 h-4 stroke-[1.5]" />
+                  {/* Active Indicator Top Stripe */}
+                  {isSelected && (
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-400" />
+                  )}
+                  
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className={`text-[10px] font-mono font-bold tracking-wider ${
+                      isSelected ? 'text-emerald-300' : 'text-emerald-800'
+                    }`}>
+                      LINE {line.number}
+                    </span>
+                    <div className={`w-7 h-7 flex items-center justify-center ${
+                      isSelected ? 'bg-white/10 text-white' : 'bg-emerald-50 text-emerald-900 border border-emerald-900/10'
+                    }`}>
+                      <LineIcon className="w-3.5 h-3.5 stroke-[1.75]" />
                     </div>
-                    <span className="text-[11px] font-mono font-bold text-emerald-800">
-                      LINE {fac.number}
-                    </span>
                   </div>
 
-                  <div>
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block">
-                      {fac.division}
-                    </span>
-                    <h3 className="text-base font-bold text-neutral-900 mt-0.5">
-                      {fac.title}
-                    </h3>
-                  </div>
-
-                  <p className="text-xs text-neutral-600 leading-relaxed">
-                    {fac.desc}
+                  <h3 className={`text-xs sm:text-sm font-bold tracking-tight line-clamp-1 ${
+                    isSelected ? 'text-white' : 'text-neutral-900'
+                  }`}>
+                    {line.shortTitle}
+                  </h3>
+                  <p className={`text-[11px] mt-1 line-clamp-1 font-mono ${
+                    isSelected ? 'text-neutral-300' : 'text-neutral-500'
+                  }`}>
+                    {line.division}
                   </p>
-
-                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-neutral-100">
-                    {fac.tags.map((t, i) => (
-                      <span key={i} className="text-[10px] font-mono px-2 py-0.5 bg-neutral-100 text-neutral-700">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                </button>
               );
             })}
+          </div>
+
+          {/* 5-Step Process Timeline Scrubber */}
+          <div className="border border-neutral-200 bg-white p-3 sm:p-5 space-y-3">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-neutral-500 uppercase tracking-wider text-[11px]">
+                LINE {facilitiesData[selectedFacilityLine].number} WORKFLOW TIMELINE
+              </span>
+              <span className="text-emerald-900 font-bold text-[11px]">
+                STAGE {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].stepNumber} OF 05
+              </span>
+            </div>
+
+            <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
+              {facilitiesData[selectedFacilityLine].stages.map((stg, sIdx) => {
+                const isStepActive = selectedFacilityStep === sIdx;
+                const isPast = selectedFacilityStep > sIdx;
+                return (
+                  <button
+                    key={`step-btn-${sIdx}`}
+                    onClick={() => {
+                      setSelectedFacilityStep(sIdx);
+                      setIsAutoTourActive(false);
+                    }}
+                    className={`py-2 px-1.5 sm:px-3 text-left border transition-all cursor-pointer ${
+                      isStepActive 
+                        ? 'border-emerald-800 bg-[#0a2318] text-white' 
+                        : isPast 
+                          ? 'border-neutral-300 bg-emerald-50/40 text-neutral-800 hover:bg-emerald-50' 
+                          : 'border-neutral-200 bg-neutral-50 text-neutral-500 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between text-[10px] font-mono mb-0.5">
+                      <span className={isStepActive ? 'text-emerald-300 font-bold' : isPast ? 'text-emerald-800' : 'text-neutral-400'}>
+                        {stg.stepNumber}
+                      </span>
+                      {isStepActive && <span className="w-1.5 h-1.5 bg-emerald-400 animate-pulse hidden sm:inline-block" />}
+                    </div>
+                    <div className={`text-[11px] sm:text-xs font-bold truncate ${
+                      isStepActive ? 'text-white' : 'text-neutral-900'
+                    }`}>
+                      {stg.stepLabel}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Interactive Stage Showcase: Engineering Telemetry + Facility Photo */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+            
+            {/* Left Column: Stage Detail & Telemetry Specs (7 cols) */}
+            <div className="lg:col-span-7 border border-neutral-200 bg-white p-6 sm:p-8 flex flex-col justify-between space-y-6">
+              
+              <div className="space-y-4">
+                {/* Stage Header Info */}
+                <div className="space-y-1">
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
+                    {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].phase}
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
+                    {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].title}
+                  </h3>
+                </div>
+
+                {/* Explanatory Narrative */}
+                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
+                  {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].summary}
+                </p>
+
+                {/* Technical Highlight Notice */}
+                <div className="p-3 bg-emerald-50/70 border-l-3 border-emerald-800 text-[11px] text-neutral-800 flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-800 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-emerald-950 font-semibold">Engineering Protocol: </strong>
+                    <span>{facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].highlight}</span>
+                  </div>
+                </div>
+
+                {/* 4 Telemetry Metrics Cards */}
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].telemetry.map((t, tIdx) => (
+                    <div key={`telemetry-${tIdx}`} className="p-3 border border-neutral-200 bg-neutral-50/60">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block">
+                        {t.label}
+                      </span>
+                      <span className="text-xs sm:text-sm font-mono font-bold text-neutral-900 block mt-0.5">
+                        {t.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Certified Quality Standard */}
+                <div className="pt-2 text-[11px] text-neutral-500 font-mono flex items-center gap-2">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  <span>Quality Clearance: <strong className="text-neutral-800">{facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].qaStandard}</strong></span>
+                </div>
+              </div>
+
+              {/* Bottom Action & Navigation Bar */}
+              <div className="pt-6 border-t border-neutral-200 flex flex-wrap items-center justify-between gap-4">
+                
+                {/* Stepper Buttons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={selectedFacilityStep === 0}
+                    onClick={() => {
+                      setSelectedFacilityStep((prev) => Math.max(0, prev - 1));
+                      setIsAutoTourActive(false);
+                    }}
+                    className={`px-3 py-2 border text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors ${
+                      selectedFacilityStep === 0 
+                        ? 'opacity-40 cursor-not-allowed border-neutral-200 text-neutral-400' 
+                        : 'border-neutral-300 hover:border-neutral-900 text-neutral-800 cursor-pointer bg-white'
+                    }`}
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                    <span>Previous</span>
+                  </button>
+
+                  <button
+                    disabled={selectedFacilityStep === 4}
+                    onClick={() => {
+                      setSelectedFacilityStep((prev) => Math.min(4, prev + 1));
+                      setIsAutoTourActive(false);
+                    }}
+                    className={`px-3 py-2 border text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors ${
+                      selectedFacilityStep === 4 
+                        ? 'opacity-40 cursor-not-allowed border-neutral-200 text-neutral-400' 
+                        : 'border-neutral-300 hover:border-neutral-900 text-neutral-800 cursor-pointer bg-white'
+                    }`}
+                  >
+                    <span>Next Stage</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {/* Pre-fill Inquiry Button */}
+                <button
+                  onClick={() => handleFacilityInquiry(facilitiesData[selectedFacilityLine].division)}
+                  className="px-5 py-2.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-colors"
+                >
+                  <span>Inquire for Line {facilitiesData[selectedFacilityLine].number} Specifications</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+            </div>
+
+            {/* Right Column: High-Resolution Facility Photography & Telemetry HUD (5 cols) */}
+            <div className="lg:col-span-5 border border-neutral-200 bg-neutral-900 flex flex-col justify-between overflow-hidden relative min-h-[380px] sm:min-h-[460px]">
+              
+              {/* Background Photo */}
+              <img 
+                src={facilitiesData[selectedFacilityLine].image} 
+                alt={facilitiesData[selectedFacilityLine].title}
+                className="absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-105"
+              />
+              
+              {/* Dark Gradient Overlay for Contrast */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
+
+              {/* Top HUD Badges */}
+              <div className="relative z-10 p-5 flex items-center justify-between text-xs">
+                <div className="bg-black/70 backdrop-blur-md px-3 py-1.5 border border-white/20 text-white font-mono text-[10px] flex items-center gap-2">
+                  <span className="w-2 h-2 bg-emerald-400 animate-pulse" />
+                  <span>LINE {facilitiesData[selectedFacilityLine].number} ACTIVE</span>
+                </div>
+                <div className="bg-black/70 backdrop-blur-md px-2.5 py-1.5 border border-white/20 text-neutral-300 font-mono text-[10px]">
+                  {facilitiesData[selectedFacilityLine].cleanroomClass}
+                </div>
+              </div>
+
+              {/* Bottom HUD Information Box */}
+              <div className="relative z-10 p-5 sm:p-6 space-y-3 text-white">
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 block font-semibold">
+                    SUITE ARCHITECTURE
+                  </span>
+                  <h4 className="text-base sm:text-lg font-bold tracking-tight text-white mt-0.5">
+                    {facilitiesData[selectedFacilityLine].title}
+                  </h4>
+                </div>
+
+                <div className="space-y-1.5 text-xs text-neutral-300 font-light border-t border-white/15 pt-3">
+                  <div className="flex justify-between font-mono text-[11px]">
+                    <span className="text-neutral-400">Continuous Capacity:</span>
+                    <span className="text-white font-medium">{facilitiesData[selectedFacilityLine].capacity}</span>
+                  </div>
+                  <div className="flex justify-between font-mono text-[11px]">
+                    <span className="text-neutral-400">Primary Suites:</span>
+                    <span className="text-white font-medium truncate max-w-[200px]" title={facilitiesData[selectedFacilityLine].equipment}>
+                      {facilitiesData[selectedFacilityLine].equipment}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Line Tags */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {facilitiesData[selectedFacilityLine].tags.map((tg, tgIdx) => (
+                    <span key={`line-tag-${tgIdx}`} className="text-[10px] font-mono px-2 py-0.5 bg-white/10 text-neutral-200 border border-white/20">
+                      {tg}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
           </div>
 
         </div>
