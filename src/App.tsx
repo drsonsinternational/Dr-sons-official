@@ -402,6 +402,7 @@ export default function App() {
           phase: 'PHASE 01 · OPTICAL SORTING & SLICING',
           title: 'Calibrated Slicing & Fiber Integrity Screening',
           summary: 'Raw fruits and vegetables are inspected on dual optical sorting belts to reject imperfect specimens, then precision-sliced to calibrated 1.2mm profiles to guarantee uniform drying kinetics across the entire batch.',
+          image: '/assets/factory/stages/line2_stage1_calibrated_slicing.webp',
           telemetry: [
             { label: 'Slicing Caliper', value: '1.2mm ± 0.1mm Precision' },
             { label: 'Inspection Protocol', value: 'Dual-Spectrum Optical Sensor' },
@@ -417,6 +418,7 @@ export default function App() {
           phase: 'PHASE 02 · MILD ATMOSPHERIC BLANCHING',
           title: 'Steam-Conditioned Starch Gelatinization',
           summary: 'Slices travel through a 92°C saturated steam chamber for 18 seconds. This mild treatment gelatinizes surface starches, stabilizes cellular carotenoids, and primes the cellular walls for rapid subsequent moisture desorption.',
+          image: '/assets/factory/stages/line2_stage2_steam_blanching.webp',
           telemetry: [
             { label: 'Steam Temperature', value: '92°C Atmospheric Chamber' },
             { label: 'Exposure Period', value: '18 Seconds Continuous' },
@@ -432,6 +434,7 @@ export default function App() {
           phase: 'PHASE 03 · TWIN-DRUM THERMAL FILM DEHYDRATION',
           title: 'Sub-Millimeter Film Transfer & Continuous Drying',
           summary: 'Conditioned produce is applied as an ultra-thin 0.18mm film onto twin counter-rotating cast-iron drums heated internally with dry steam at 118°C. In 8.5 seconds, moisture is removed and a flexible dehydrated sheet forms.',
+          image: '/assets/factory/stages/line2_stage3_drum_dehydration.webp',
           telemetry: [
             { label: 'Drum Surface Heat', value: '118°C Superheated Steam' },
             { label: 'Film Thickness', value: '0.18mm Micrometric Spread' },
@@ -447,6 +450,7 @@ export default function App() {
           phase: 'PHASE 04 · DEHUMIDIFIED NITROGEN CHILLING',
           title: 'Micro-Doctor Blade Shearing & Dry Cooling',
           summary: 'Hardened surgical stainless steel doctor blades shear the dried film from drum rollers. The sheet is instantly conveyed into a 14°C dehumidified positive-pressure tunnel where rotary flakers calibrate flake size to 3mm–8mm.',
+          image: '/assets/factory/stages/line2_stage4_cooling_flaking.webp',
           telemetry: [
             { label: 'Chill Temperature', value: '14°C Controlled Atmosphere' },
             { label: 'Relative Humidity', value: '< 20% RH Positive Pressure' },
@@ -462,6 +466,7 @@ export default function App() {
           phase: 'PHASE 05 · AROMA-SEALED CONTAINERIZATION',
           title: 'Hermetic Nitrogen Packing for Cereal & Ready-Meal Inclusions',
           summary: 'Calibrated flakes are weighed in multi-head automated scale hoppers and sealed in high-barrier metallized pouches under positive nitrogen flush, providing 24 months of ambient storage stability without softening.',
+          image: '/assets/factory/stages/line2_stage5_nitrogen_pouches.webp',
           telemetry: [
             { label: 'Residual Oxygen', value: '< 0.8% Modified Atmosphere' },
             { label: 'Water Activity (aw)', value: '0.22 aw Highly Stable' },
