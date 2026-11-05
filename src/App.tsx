@@ -1024,249 +1024,220 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECTION: COMMERCIAL QUOTATION & WHATSAPP ROUTING DESK (Streamlined, concise) */}
-      <section id="inquiry-desk" className="w-full py-10 sm:py-16 px-3 sm:px-6 lg:px-12 bg-white">
-        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* SECTION: COMMERCIAL QUOTATION & WHATSAPP ROUTING DESK (Modern Floating Card on Factory Facility) */}
+      <section id="inquiry-desk" className="w-full py-12 sm:py-20 px-3 sm:px-6 lg:px-12 bg-[#f4f7f5]">
+        <div className="w-full max-w-7xl mx-auto">
           
-          {/* Inquiry Form */}
-          <div className="lg:col-span-7 bg-[#fafbfa] border border-neutral-200 p-5 sm:p-8 space-y-4 shadow-xs">
-            <div>
-              <div className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold flex items-center gap-1.5">
+          {/* Main Visual Container with Rounded Frame & Background Image */}
+          <div className="relative w-full rounded-[28px] sm:rounded-[36px] overflow-hidden min-h-[640px] sm:min-h-[700px] flex items-center shadow-xl border border-neutral-200/80 bg-neutral-900">
+            
+            {/* Background Facility Bottling Line Image */}
+            <img 
+              src="/assets/factory/bottling_line.webp" 
+              alt="D R & Sons Commercial Bottling and Processing Facility" 
+              className="absolute inset-0 w-full h-full object-cover object-right sm:object-center"
+            />
+            
+            {/* Subtle Gradient Scrim for Readability & Contrast */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-black/10 md:from-black/40 md:via-transparent md:to-transparent" />
+
+            {/* Desktop Top-Right Status Badge */}
+            <div className="hidden lg:flex items-center gap-2.5 absolute top-8 right-8 z-10 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-white/50 shadow-lg text-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-semibold text-neutral-900">Commercial Trade Desk Active</span>
+              <span className="text-neutral-300">·</span>
+              <a 
+                href="https://wa.me/919411268879" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="font-mono font-bold text-emerald-900 hover:underline flex items-center gap-1"
+              >
                 <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
-                <span>WhatsApp Trade Desk · Direct Routing</span>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 mt-1">
-                Commercial Supply Inquiry
-              </h3>
-              <p className="text-xs text-neutral-600 mt-0.5">
-                Quick quote routing directly to WhatsApp: <strong className="font-semibold text-neutral-900">+91 9411268879</strong>
-              </p>
+                <span>+91 9411268879</span>
+              </a>
             </div>
 
-            {!inquirySubmitted ? (
-              <form onSubmit={handleInquirySubmit} className="space-y-3.5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Desktop Bottom-Right Quick Email Card */}
+            <div className="hidden lg:flex items-center gap-3 absolute bottom-8 right-8 z-10 bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/50 shadow-lg text-xs text-neutral-800">
+              <div>
+                <span className="text-[10px] uppercase font-mono text-neutral-500 block leading-tight">Direct Inquiries</span>
+                <span className="font-mono text-xs font-bold text-neutral-900">contact@drsonsinternational.com</span>
+              </div>
+              <button
+                onClick={() => handleCopyEmail('contact@drsonsinternational.com')}
+                className="p-1.5 border border-neutral-200 rounded-lg bg-white hover:bg-neutral-50 text-neutral-700 cursor-pointer transition-colors"
+                title="Copy Email"
+              >
+                {copiedEmail ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+
+            {/* Floating Minimalist Form Card on the Left */}
+            <div className="relative z-10 w-full md:max-w-[490px] lg:max-w-[510px] m-4 sm:m-8 lg:m-12 bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-10 shadow-2xl space-y-6">
+              
+              <div>
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 leading-tight">
+                  Start your production journey today
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-500 mt-2 leading-relaxed">
+                  Complete the form and get a dedicated commercial specification &amp; quotation within 24 hours.
+                </p>
+              </div>
+
+              {!inquirySubmitted ? (
+                <form onSubmit={handleInquirySubmit} className="space-y-4">
+                  
+                  {/* Your name */}
                   <div>
-                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
-                      Full Name *
-                    </label>
                     <input
                       type="text"
                       required
                       value={inquiryForm.name}
                       onChange={(e) => setInquiryForm({...inquiryForm, name: e.target.value})}
-                      placeholder="David Richardson"
-                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                      placeholder="Your name"
+                      className="w-full py-2.5 border-b border-neutral-200 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent"
                     />
                   </div>
-                  <div>
-                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
-                      Company
-                    </label>
-                    <input
-                      type="text"
-                      value={inquiryForm.company}
-                      onChange={(e) => setInquiryForm({...inquiryForm, company: e.target.value})}
-                      placeholder="Apex Global Foods"
-                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Email */}
                   <div>
-                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
-                      Corporate Email *
-                    </label>
                     <input
                       type="email"
                       required
                       value={inquiryForm.email}
                       onChange={(e) => setInquiryForm({...inquiryForm, email: e.target.value})}
-                      placeholder="corporate@domain.com"
-                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                      placeholder="Email"
+                      className="w-full py-2.5 border-b border-neutral-200 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent"
                     />
                   </div>
+
+                  {/* Phone number */}
                   <div>
-                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
-                      Phone / Mobile
-                    </label>
                     <input
                       type="tel"
                       value={inquiryForm.phone}
                       onChange={(e) => setInquiryForm({...inquiryForm, phone: e.target.value})}
-                      placeholder="+91 / International"
-                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                      placeholder="Phone number"
+                      className="w-full py-2.5 border-b border-neutral-200 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent"
                     />
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
-                      Division
-                    </label>
+                  {/* Division Selection (Underline Styled Select) */}
+                  <div className="relative">
                     <select
                       value={inquiryForm.division}
                       onChange={(e) => setInquiryForm({...inquiryForm, division: e.target.value})}
-                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                      className="w-full py-2.5 border-b border-neutral-200 text-xs sm:text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent appearance-none cursor-pointer pr-6"
                     >
                       <option value="Fruits, Vegetables Powder and starch">Fruits, Vegetables Powder and starch</option>
                       <option value="Fruits and Vegetables Flakes">Fruits and Vegetables Flakes</option>
                       <option value="Drinking Mineral Water">Drinking Mineral Water</option>
                       <option value="Non-Alcoholic Drinks and Ice Creams">Non-Alcoholic Drinks and Ice Creams</option>
                     </select>
+                    <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
+
+                  {/* How can we help? */}
                   <div>
-                    <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
-                      Target Volume
-                    </label>
-                    <select
-                      value={inquiryForm.volume}
-                      onChange={(e) => setInquiryForm({...inquiryForm, volume: e.target.value})}
-                      className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
+                    <input
+                      type="text"
+                      value={inquiryForm.message}
+                      onChange={(e) => setInquiryForm({...inquiryForm, message: e.target.value})}
+                      placeholder="How can we help? (e.g. order volume, custom requirements)"
+                      className="w-full py-2.5 border-b border-neutral-200 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent"
+                    />
+                  </div>
+
+                  {/* Privacy Agreement Checkbox */}
+                  <label className="flex items-start gap-2.5 cursor-pointer pt-2 select-none">
+                    <input
+                      type="checkbox"
+                      defaultChecked
+                      required
+                      className="mt-0.5 w-3.5 h-3.5 rounded-xs accent-[#0a2318] border-neutral-300 text-neutral-900 focus:ring-neutral-800"
+                    />
+                    <span className="text-[11px] text-neutral-500 leading-snug">
+                      By submitting this form, you agree to the processing of your personal data in accordance with our{' '}
+                      <button
+                        type="button"
+                        onClick={() => setLegalModalTab('privacy')}
+                        className="text-neutral-900 underline font-medium cursor-pointer hover:text-emerald-900"
+                      >
+                        Privacy Policy
+                      </button>
+                      .
+                    </span>
+                  </label>
+
+                  {/* Send Message Button (Pill Button with Arrow) */}
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      className="inline-flex items-center gap-3 px-8 py-3.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold rounded-full tracking-wide shadow-md hover:shadow-lg transition-all cursor-pointer group"
                     >
-                      <option value="Commercial Bulk Supply">Commercial Wholesale / Bulk</option>
-                      <option value="Semi-Bulk Regular Supply">Semi-Bulk Regular</option>
-                      <option value="Sample Run">Trial Batch / Sample Run</option>
-                    </select>
+                      <span>Send message</span>
+                      <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                        <ArrowRight className="w-3 h-3 text-white" />
+                      </div>
+                    </button>
+                  </div>
+
+                </form>
+              ) : (
+                <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-800/30 text-neutral-900 space-y-3">
+                  <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
+                    <Check className="w-4 h-4" />
+                    <span>Inquiry Prepared</span>
+                  </div>
+                  <p className="text-xs text-neutral-700 leading-relaxed">
+                    Routing your inquiry directly to our WhatsApp Trade Desk (<strong className="font-mono">9411268879</strong>){redirectCountdown !== null && redirectCountdown > 0 ? ` in ${redirectCountdown}s...` : ' now.'}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                    <a
+                      href={whatsappRedirectUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0a2318] text-white text-xs font-semibold rounded-full hover:bg-[#143e2b] transition-colors"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>Open WhatsApp Now</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                    <button
+                      onClick={() => {
+                        setInquirySubmitted(false);
+                        setRedirectCountdown(null);
+                        setInquiryForm({ name: '', company: '', email: '', phone: '', division: 'Fruits, Vegetables Powder and starch', volume: 'Commercial Bulk Supply', message: '' });
+                      }}
+                      className="text-xs text-neutral-600 underline cursor-pointer"
+                    >
+                      Reset Form
+                    </button>
                   </div>
                 </div>
+              )}
 
-                <div>
-                  <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
-                    Requirements (Optional)
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={inquiryForm.message}
-                    onChange={(e) => setInquiryForm({...inquiryForm, message: e.target.value})}
-                    placeholder="Product specifics, custom packaging, or delivery timeline."
-                    className="w-full px-3 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800"
-                  />
-                </div>
-
-                <div className="pt-1">
-                  <button
-                    type="submit"
-                    className="w-full sm:w-auto px-6 py-2.5 bg-[#143e2b] hover:bg-[#0c271b] text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <span>Submit &amp; Open WhatsApp</span>
-                    <Send className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className="p-6 bg-emerald-50 border border-emerald-800/40 text-neutral-900 space-y-3">
-                <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
-                  <Check className="w-4 h-4" />
-                  <span>Inquiry Prepared</span>
-                </div>
-                <p className="text-xs text-neutral-700 leading-relaxed">
-                  Redirecting to WhatsApp (<strong className="font-mono">9411268879</strong>){redirectCountdown !== null && redirectCountdown > 0 ? ` in ${redirectCountdown}s...` : ' now.'}
-                </p>
-                <div className="flex flex-wrap items-center gap-3 pt-1">
-                  <a
-                    href={whatsappRedirectUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#143e2b] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#0c271b]"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>Open WhatsApp (9411268879)</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                  <button
-                    onClick={() => {
-                      setInquirySubmitted(false);
-                      setRedirectCountdown(null);
-                      setInquiryForm({ name: '', company: '', email: '', phone: '', division: 'Fruits, Vegetables Powder and starch', volume: 'Commercial Bulk Supply', message: '' });
-                    }}
-                    className="text-xs text-neutral-600 underline cursor-pointer"
-                  >
-                    Reset
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Corporate Information Desk with Private Limited Identity */}
-          <div className="lg:col-span-5 bg-white border border-neutral-200 p-5 sm:p-8 space-y-5 shadow-xs">
-            <div className="space-y-2.5">
-              <div className="h-10 w-auto flex items-center">
-                <img 
-                  src="/assets/brand/drsons_logo.webp" 
-                  alt="D R & SONS INTERNATIONAL" 
-                  className="h-10 w-auto object-contain mix-blend-multiply"
-                />
-              </div>
-              <div>
-                <h4 className="text-lg font-bold text-neutral-900">
-                  D R &amp; Sons International Private Limited
-                </h4>
-                <p className="text-xs text-neutral-500 font-mono">
-                  Incorporated Pvt. Ltd. · Since 2026 · Companies Act, 2013
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
-                <span className="text-neutral-500">Trade WhatsApp:</span>
-                <a
-                  href="https://wa.me/919411268879"
-                  target="_blank"
+              {/* Mobile Quick Trade Desk Details */}
+              <div className="pt-3 border-t border-neutral-100 flex sm:hidden items-center justify-between text-[11px] text-neutral-500">
+                <a 
+                  href="https://wa.me/919411268879" 
+                  target="_blank" 
                   rel="noopener noreferrer"
-                  className="font-mono text-emerald-900 font-bold hover:underline flex items-center gap-1"
+                  className="font-mono font-semibold text-emerald-900 flex items-center gap-1"
                 >
                   <MessageSquare className="w-3 h-3 text-emerald-700" />
-                  <span>+91 9411268879</span>
+                  <span>WhatsApp: 9411268879</span>
                 </a>
-              </div>
-
-              <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
-                <span className="text-neutral-500">Corporate Email:</span>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-[11px] text-neutral-800">contact@drsonsinternational.com</span>
-                  <button
-                    onClick={() => handleCopyEmail('contact@drsonsinternational.com')}
-                    className="p-1 border border-neutral-300 text-neutral-600 hover:bg-neutral-50 cursor-pointer"
-                    title="Copy Email"
-                  >
-                    {copiedEmail ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
-                <span className="text-neutral-500">Statutory Status:</span>
-                <span className="font-medium text-neutral-800">Private Limited · MCA India</span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-500">Compliance Terms:</span>
                 <button
-                  onClick={() => setLegalModalTab('terms')}
-                  className="font-medium text-emerald-900 underline cursor-pointer text-xs"
+                  onClick={() => setLegalModalTab('statutory')}
+                  className="underline text-neutral-700"
                 >
-                  View Legal Terms
+                  MCA Info
                 </button>
               </div>
+
             </div>
 
-            <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5 text-emerald-950 font-semibold">
-                <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
-                <span>Incorporated Pvt Ltd</span>
-              </div>
-              <button
-                onClick={() => setLegalModalTab('statutory')}
-                className="text-xs font-semibold text-emerald-900 hover:text-emerald-950 underline cursor-pointer"
-              >
-                Statutory View
-              </button>
-            </div>
           </div>
 
         </div>
