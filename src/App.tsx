@@ -1087,37 +1087,6 @@ export default function App() {
             {/* Subtle Gradient Scrim for Readability & Contrast */}
             <div className="absolute inset-0 bg-gradient-to-l from-black/60 via-black/30 to-black/10 md:from-black/40 md:via-transparent md:to-black/20" />
 
-            {/* Desktop Top-Left Status Badge */}
-            <div className="hidden lg:flex items-center gap-2.5 absolute top-8 left-8 z-10 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-white/50 shadow-lg text-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-semibold text-neutral-900">Commercial Trade Desk Active</span>
-              <span className="text-neutral-300">·</span>
-              <a 
-                href="https://wa.me/919411268879" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="font-mono font-bold text-emerald-900 hover:underline flex items-center gap-1"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
-                <span>+91 9411268879</span>
-              </a>
-            </div>
-
-            {/* Desktop Bottom-Left Quick Email Card */}
-            <div className="hidden lg:flex items-center gap-3 absolute bottom-8 left-8 z-10 bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/50 shadow-lg text-xs text-neutral-800">
-              <div>
-                <span className="text-[10px] uppercase font-mono text-neutral-500 block leading-tight">Direct Inquiries</span>
-                <span className="font-mono text-xs font-bold text-neutral-900">contact@drsonsinternational.com</span>
-              </div>
-              <button
-                onClick={() => handleCopyEmail('contact@drsonsinternational.com')}
-                className="p-1.5 border border-neutral-200 rounded-lg bg-white hover:bg-neutral-50 text-neutral-700 cursor-pointer transition-colors"
-                title="Copy Email"
-              >
-                {copiedEmail ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
-              </button>
-            </div>
-
             {/* Floating Minimalist Form Card on the Right */}
             <div className="relative z-10 w-full md:max-w-[490px] lg:max-w-[510px] m-4 sm:m-8 lg:m-12 md:ml-auto bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-10 shadow-2xl space-y-6">
               
@@ -1215,22 +1184,20 @@ export default function App() {
                     </span>
                   </label>
 
-                  {/* Send Message Button (Pill Button with Arrow) */}
+                  {/* Send Message Button (Sharp Professional Button) */}
                   <div className="pt-2">
                     <button
                       type="submit"
-                      className="inline-flex items-center gap-3 px-8 py-3.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold rounded-full tracking-wide shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                      className="inline-flex items-center gap-3 px-8 py-3.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold tracking-wider uppercase shadow-md hover:shadow-lg transition-all cursor-pointer group"
                     >
                       <span>Send message</span>
-                      <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:translate-x-1 transition-transform">
-                        <ArrowRight className="w-3 h-3 text-white" />
-                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-white group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>
 
                 </form>
               ) : (
-                <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-800/30 text-neutral-900 space-y-3">
+                <div className="p-6 bg-emerald-50 border border-emerald-800/30 text-neutral-900 space-y-3">
                   <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
                     <Check className="w-4 h-4" />
                     <span>Inquiry Prepared</span>
@@ -1243,7 +1210,7 @@ export default function App() {
                       href={whatsappRedirectUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0a2318] text-white text-xs font-semibold rounded-full hover:bg-[#143e2b] transition-colors"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0a2318] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#143e2b] transition-colors"
                     >
                       <MessageSquare className="w-3.5 h-3.5" />
                       <span>Open WhatsApp Now</span>
@@ -1716,8 +1683,8 @@ export default function App() {
       </AnimatePresence>
 
       {/* Floating Preview Mode Indicator for Client & Developers */}
-      <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 bg-[#0a2318]/95 backdrop-blur-md text-white text-xs px-4 py-2.5 rounded-full shadow-2xl border border-emerald-500/40 select-none">
-        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+      <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 bg-[#0a2318]/95 backdrop-blur-md text-white text-xs px-4 py-2.5 shadow-2xl border border-emerald-500/40 select-none border-l-2 border-l-emerald-400">
+        <span className="w-2 h-2 bg-emerald-400 animate-pulse" />
         <span className="font-semibold text-neutral-100">Client Preview Active</span>
         <span className="text-white/40">·</span>
         <button

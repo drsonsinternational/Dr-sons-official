@@ -215,10 +215,6 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
           
           {/* Big Bold Headline */}
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-full text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Official Corporate Portal Under Construction</span>
-            </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#081f14] leading-[1.08]">
               We are tidying up!
             </h1>
