@@ -498,6 +498,7 @@ export default function App() {
           phase: 'PHASE 01 · MULTI-BED PHYSICAL PURIFICATION',
           title: 'Graded Quartz & High-Iodine Activated Carbon Filtration',
           summary: 'Raw spring intake passes through dual-gradient quartz sand filters (down to 10 microns) followed by 1050-iodine activated carbon beds to eliminate suspended matter, organic contaminants, odor, and chlorine precursors.',
+          image: '/assets/factory/stages/line3_stage1_quartz_carbon_filtration.webp',
           telemetry: [
             { label: 'Filtration Depth', value: '10 Micron Quartz Media' },
             { label: 'Carbon Iodine Value', value: '1050 mg/g High Adsorption' },
@@ -513,6 +514,7 @@ export default function App() {
           phase: 'PHASE 02 · THIN-FILM COMPOSITE OSMOSIS',
           title: 'Double-Pass Reverse Osmosis (0.0001 Micron)',
           summary: 'High-pressure multi-stage pumps push water through thin-film composite polyamide spiral membranes at 14.5 Bar. Over 99.4% of total dissolved solids, heavy metals, pesticides, and microbial pathogens are rejected.',
+          image: '/assets/factory/stages/line3_stage2_double_pass_ro.webp',
           telemetry: [
             { label: 'Operating Pressure', value: '14.5 Bar Multi-Stage Pump' },
             { label: 'Pore Rating', value: '0.0001 Micron Polyamide' },
@@ -528,6 +530,7 @@ export default function App() {
           phase: 'PHASE 03 · CALIBRATED MINERAL ENRICHMENT',
           title: 'Precision Electrolyte & Mineral Re-Balancing',
           summary: 'Pure permeate is dosed with pharmaceutical food-grade calcium, magnesium, and potassium ions at a strict 3:1 ratio. Water passes through an inline static mixer to stabilize pH between 7.2 and 7.5, creating a crisp, refreshing mineral profile.',
+          image: '/assets/factory/stages/line3_stage3_mineral_rebalancing.webp',
           telemetry: [
             { label: 'Target TDS', value: '95 – 120 ppm Optimal Mineral' },
             { label: 'pH Balance', value: '7.2 – 7.5 Alkaline-Neutral' },
@@ -543,6 +546,7 @@ export default function App() {
           phase: 'PHASE 04 · DUAL BIOLOGICAL SANITIZATION',
           title: '254nm Ultraviolet Chamber & Dissolved O3 Barrier',
           summary: 'Water is exposed to high-intensity germicidal ultraviolet light (254nm UV-C) followed by micro-bubble ozone injection (0.2–0.4 ppm). Ozone provides residual sanitization inside the bottle before reverting cleanly to pure oxygen.',
+          image: '/assets/factory/stages/line3_stage4_uv_ozone_barrier.webp',
           telemetry: [
             { label: 'UV-C Wavelength', value: '254nm High-Dose Chamber' },
             { label: 'Dissolved Ozone', value: '0.2 – 0.4 ppm In-Bottle Active' },
@@ -558,6 +562,7 @@ export default function App() {
           phase: 'PHASE 05 · CLASS 100 MONOBLOCK PACKAGING',
           title: 'Touch-Free Rinser-Filler-Capper & Tamper Induction Sealing',
           summary: 'Bottling occurs within a laminar HEPA-filtered Class 100 cleanroom enclosure. Bottles are air-rinsed with sterile ionized air, filled under gravity-flow isobaric nozzles, and capped with tamper-evident collar closures at 120 bottles/min.',
+          image: '/assets/factory/stages/line3_stage5_rinser_filler_capper.webp',
           telemetry: [
             { label: 'Bottling Velocity', value: '120 Bottles / Minute Rotary' },
             { label: 'Cleanroom Enclosure', value: 'Class 100 / ISO 5 Positive' },
