@@ -32,7 +32,10 @@ import {
   Play,
   Pause,
   RotateCcw,
-  CheckCircle2
+  CheckCircle2,
+  Workflow,
+  Layers,
+  Sliders
 } from 'lucide-react';
 import MaintenancePage from './MaintenancePage';
 
@@ -100,6 +103,17 @@ export default function App() {
   const [selectedFacilityLine, setSelectedFacilityLine] = useState<number>(0);
   const [selectedFacilityStep, setSelectedFacilityStep] = useState<number>(0);
   const [isAutoTourActive, setIsAutoTourActive] = useState<boolean>(false);
+
+  // Concept switcher state: 'sticky' | 'cards' | 'conveyor'
+  const [infrastructureConcept, setInfrastructureConcept] = useState<'sticky' | 'cards' | 'conveyor'>('sticky');
+  const conveyorScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollConveyor = (direction: 'left' | 'right') => {
+    if (conveyorScrollRef.current) {
+      const offset = direction === 'left' ? -480 : 480;
+      conveyorScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  };
 
   // Auto-tour timer for production workflow
   useEffect(() => {
@@ -1333,7 +1347,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECTION: PRODUCTION FACILITIES & INTERACTIVE WORKFLOW EXPLORER */}
+      {/* SECTION: PRODUCTION FACILITIES & INTERACTIVE WORKFLOW EXPLORER (With 3 Live Scrollytelling Concepts) */}
       <section id="facilities" className="w-full py-12 sm:py-20 px-3 sm:px-6 lg:px-12 bg-[#fafbfa] border-b border-neutral-200">
         <div className="w-full max-w-7xl mx-auto space-y-8">
           
@@ -1386,7 +1400,63 @@ export default function App() {
             </div>
           </div>
 
-          {/* 4 Line Selector Tabs */}
+          {/* Interactive Concept Switcher Toolbar (Test All 3 Live on the Page) */}
+          <div className="bg-[#0a2318] p-4 text-white border border-emerald-900/50 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Workflow className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span className="text-xs font-mono font-bold tracking-wider uppercase text-emerald-300">
+                  Scroll Experience Concept:
+                </span>
+                <span className="text-[11px] text-neutral-300 hidden md:inline">
+                  (Test all 3 live on this page to compare scroll animations)
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => setInfrastructureConcept('sticky')}
+                  className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                    infrastructureConcept === 'sticky'
+                      ? 'bg-emerald-500 text-[#0a2318] font-bold shadow-xs'
+                      : 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20'
+                  }`}
+                >
+                  Concept 1: Sticky Cockpit
+                </button>
+
+                <button
+                  onClick={() => setInfrastructureConcept('cards')}
+                  className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                    infrastructureConcept === 'cards'
+                      ? 'bg-emerald-500 text-[#0a2318] font-bold shadow-xs'
+                      : 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20'
+                  }`}
+                >
+                  Concept 2: Stacked Cards
+                </button>
+
+                <button
+                  onClick={() => setInfrastructureConcept('conveyor')}
+                  className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                    infrastructureConcept === 'conveyor'
+                      ? 'bg-emerald-500 text-[#0a2318] font-bold shadow-xs'
+                      : 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20'
+                  }`}
+                >
+                  Concept 3: Virtual Conveyor
+                </button>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-neutral-300 font-light border-t border-emerald-900/60 pt-2 leading-relaxed">
+              {infrastructureConcept === 'sticky' && 'Concept 1 (Sticky Cockpit & Live Telemetry): Left stages scroll naturally in sequence while the right machinery HUD pins to the viewport, live-updating telemetry readings (temp, pressure, flow) per stage.'}
+              {infrastructureConcept === 'cards' && 'Concept 2 (Stacked Sticky Cards): Each production stage is a full card that stacks directly on top of the previous card as you scroll down, creating a tactile Apple-style card elevation effect.'}
+              {infrastructureConcept === 'conveyor' && 'Concept 3 (Virtual Conveyor Scrubbing): The workflow is arranged as an automated horizontal assembly line. Scroll or drag across stations to follow the ingredient stream from raw intake to packaging.'}
+            </p>
+          </div>
+
+          {/* 4 Line Selector Tabs (Available across all 3 concepts) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
             {facilitiesData.map((line, idx) => {
               const LineIcon = line.icon;
@@ -1438,216 +1508,402 @@ export default function App() {
             })}
           </div>
 
-          {/* 5-Step Process Timeline Scrubber */}
-          <div className="border border-neutral-200 bg-white p-3 sm:p-5 space-y-3">
-            <div className="flex items-center justify-between text-xs font-mono">
-              <span className="text-neutral-500 uppercase tracking-wider text-[11px]">
-                LINE {facilitiesData[selectedFacilityLine].number} WORKFLOW TIMELINE
-              </span>
-              <span className="text-emerald-900 font-bold text-[11px]">
-                STAGE {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].stepNumber} OF 05
-              </span>
-            </div>
-
-            <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
-              {facilitiesData[selectedFacilityLine].stages.map((stg, sIdx) => {
-                const isStepActive = selectedFacilityStep === sIdx;
-                const isPast = selectedFacilityStep > sIdx;
-                return (
-                  <button
-                    key={`step-btn-${sIdx}`}
-                    onClick={() => {
-                      setSelectedFacilityStep(sIdx);
-                      setIsAutoTourActive(false);
-                    }}
-                    className={`py-2 px-1.5 sm:px-3 text-left border transition-all cursor-pointer ${
-                      isStepActive 
-                        ? 'border-emerald-800 bg-[#0a2318] text-white' 
-                        : isPast 
-                          ? 'border-neutral-300 bg-emerald-50/40 text-neutral-800 hover:bg-emerald-50' 
-                          : 'border-neutral-200 bg-neutral-50 text-neutral-500 hover:bg-neutral-100'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-[10px] font-mono mb-0.5">
-                      <span className={isStepActive ? 'text-emerald-300 font-bold' : isPast ? 'text-emerald-800' : 'text-neutral-400'}>
-                        {stg.stepNumber}
-                      </span>
-                      {isStepActive && <span className="w-1.5 h-1.5 bg-emerald-400 animate-pulse hidden sm:inline-block" />}
-                    </div>
-                    <div className={`text-[11px] sm:text-xs font-bold truncate ${
-                      isStepActive ? 'text-white' : 'text-neutral-900'
-                    }`}>
-                      {stg.stepLabel}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Interactive Stage Showcase: Engineering Telemetry + Facility Photo */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-            
-            {/* Left Column: Stage Detail & Telemetry Specs (7 cols) */}
-            <div className="lg:col-span-7 border border-neutral-200 bg-white p-6 sm:p-8 flex flex-col justify-between space-y-6">
+          {/* ============================================================== */}
+          {/* CONCEPT 1: STICKY COCKPIT & LIVE TELEMETRY                     */}
+          {/* ============================================================== */}
+          {infrastructureConcept === 'sticky' && (
+            <div className="space-y-6">
               
-              <div className="space-y-4">
-                {/* Stage Header Info */}
-                <div className="space-y-1">
-                  <div className="text-[10px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
-                    {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].phase}
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
-                    {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].title}
-                  </h3>
-                </div>
-
-                {/* Explanatory Narrative */}
-                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
-                  {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].summary}
-                </p>
-
-                {/* Technical Highlight Notice */}
-                <div className="p-3 bg-emerald-50/70 border-l-3 border-emerald-800 text-[11px] text-neutral-800 flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-800 shrink-0 mt-0.5" />
-                  <div>
-                    <strong className="text-emerald-950 font-semibold">Engineering Protocol: </strong>
-                    <span>{facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].highlight}</span>
-                  </div>
-                </div>
-
-                {/* 4 Telemetry Metrics Cards */}
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].telemetry.map((t, tIdx) => (
-                    <div key={`telemetry-${tIdx}`} className="p-3 border border-neutral-200 bg-neutral-50/60">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block">
-                        {t.label}
-                      </span>
-                      <span className="text-xs sm:text-sm font-mono font-bold text-neutral-900 block mt-0.5">
-                        {t.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Certified Quality Standard */}
-                <div className="pt-2 text-[11px] text-neutral-500 font-mono flex items-center gap-2">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                  <span>Quality Clearance: <strong className="text-neutral-800">{facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].qaStandard}</strong></span>
-                </div>
+              {/* Stepper Progress Bar */}
+              <div className="border border-neutral-200 bg-white p-3 sm:p-4 flex items-center justify-between text-xs font-mono">
+                <span className="text-neutral-500 uppercase tracking-wider text-[11px]">
+                  LINE {facilitiesData[selectedFacilityLine].number} · STICKY COCKPIT MODE
+                </span>
+                <span className="text-emerald-900 font-bold text-[11px]">
+                  STAGE {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].stepNumber} OF 05
+                </span>
               </div>
 
-              {/* Bottom Action & Navigation Bar */}
-              <div className="pt-6 border-t border-neutral-200 flex flex-wrap items-center justify-between gap-4">
+              {/* Two Column Layout: Scrolling Stages on Left, Sticky HUD on Right */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
                 
-                {/* Stepper Buttons */}
+                {/* Left Column: 5 Sequential Stages that Scroll Naturally (7 cols) */}
+                <div className="lg:col-span-7 space-y-6">
+                  {facilitiesData[selectedFacilityLine].stages.map((stg, sIdx) => {
+                    const isStepActive = selectedFacilityStep === sIdx;
+                    return (
+                      <div
+                        key={`sticky-stage-${sIdx}`}
+                        onClick={() => { setSelectedFacilityStep(sIdx); setIsAutoTourActive(false); }}
+                        onMouseEnter={() => setSelectedFacilityStep(sIdx)}
+                        className={`border transition-all p-6 sm:p-7 space-y-4 cursor-pointer relative ${
+                          isStepActive 
+                            ? 'bg-white border-emerald-800 shadow-lg border-l-4 border-l-emerald-700' 
+                            : 'bg-white/80 border-neutral-200 hover:border-neutral-400 hover:bg-white shadow-2xs'
+                        }`}
+                      >
+                        {/* Stage Phase Header */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
+                            {stg.phase}
+                          </span>
+                          <span className={`text-[11px] font-mono font-bold px-2 py-0.5 border ${
+                            isStepActive 
+                              ? 'bg-[#0a2318] text-emerald-300 border-[#0a2318]' 
+                              : 'bg-neutral-100 text-neutral-600 border-neutral-200'
+                          }`}>
+                            STAGE {stg.stepNumber}
+                          </span>
+                        </div>
+
+                        {/* Title */}
+                        <h4 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900">
+                          {stg.title}
+                        </h4>
+
+                        {/* Narrative */}
+                        <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-light">
+                          {stg.summary}
+                        </p>
+
+                        {/* Highlight */}
+                        <div className="p-3 bg-emerald-50/70 border-l-3 border-emerald-800 text-[11px] text-neutral-800 flex items-start gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-800 shrink-0 mt-0.5" />
+                          <div>
+                            <strong className="text-emerald-950 font-semibold">Process Note: </strong>
+                            <span>{stg.highlight}</span>
+                          </div>
+                        </div>
+
+                        {/* 4 Telemetry Metrics */}
+                        <div className="grid grid-cols-2 gap-2.5 pt-1">
+                          {stg.telemetry.map((t, tIdx) => (
+                            <div key={`stg-tel-${tIdx}`} className="p-2.5 border border-neutral-200 bg-neutral-50/70">
+                              <span className="text-[10px] font-mono uppercase text-neutral-500 block">
+                                {t.label}
+                              </span>
+                              <span className="text-xs font-mono font-bold text-neutral-900 block mt-0.5">
+                                {t.value}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* QA & Inquire Row */}
+                        <div className="pt-3 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+                          <span className="text-[11px] font-mono text-neutral-500 flex items-center gap-1.5">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                            <span>Gate: <strong className="text-neutral-800">{stg.qaStandard}</strong></span>
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFacilityInquiry(facilitiesData[selectedFacilityLine].division);
+                            }}
+                            className="text-xs font-semibold text-emerald-900 hover:text-emerald-950 underline uppercase tracking-wider flex items-center gap-1 cursor-pointer"
+                          >
+                            <span>Inquire Line {facilitiesData[selectedFacilityLine].number}</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Right Column: Sticky Machinery Visual & Real-Time Cockpit HUD (5 cols) */}
+                <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
+                  <div className="border border-neutral-200 bg-neutral-900 overflow-hidden relative min-h-[460px] flex flex-col justify-between shadow-xl">
+                    
+                    {/* Facility Photo */}
+                    <img 
+                      src={facilitiesData[selectedFacilityLine].image} 
+                      alt={facilitiesData[selectedFacilityLine].title}
+                      className="absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-105 transition-all duration-700"
+                    />
+                    
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/30" />
+
+                    {/* Top HUD Line Status */}
+                    <div className="relative z-10 p-5 flex items-center justify-between text-xs">
+                      <div className="bg-black/75 backdrop-blur-md px-3 py-1.5 border border-white/20 text-white font-mono text-[10px] flex items-center gap-2">
+                        <span className="w-2 h-2 bg-emerald-400 animate-pulse" />
+                        <span>LIVE COCKPIT · STAGE {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].stepNumber}</span>
+                      </div>
+                      <div className="bg-black/75 backdrop-blur-md px-2.5 py-1.5 border border-white/20 text-neutral-300 font-mono text-[10px]">
+                        {facilitiesData[selectedFacilityLine].cleanroomClass}
+                      </div>
+                    </div>
+
+                    {/* Bottom HUD Active Stage Telemetry */}
+                    <div className="relative z-10 p-6 space-y-4 text-white">
+                      <div>
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-semibold block">
+                          ACTIVE STAGE TELEMETRY
+                        </span>
+                        <h4 className="text-base sm:text-lg font-bold tracking-tight text-white mt-0.5">
+                          {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].title}
+                        </h4>
+                      </div>
+
+                      {/* Live Telemetry Display */}
+                      <div className="grid grid-cols-2 gap-2 border-t border-white/15 pt-3">
+                        {facilitiesData[selectedFacilityLine].stages[selectedFacilityStep].telemetry.map((t, idx) => (
+                          <div key={`hud-t-${idx}`} className="bg-white/10 backdrop-blur-xs p-2.5 border border-white/10">
+                            <span className="text-[9px] font-mono uppercase text-neutral-300 block">
+                              {t.label}
+                            </span>
+                            <span className="text-xs font-mono font-bold text-white block mt-0.5 truncate">
+                              {t.value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* CTA in HUD */}
+                      <div className="pt-2">
+                        <button
+                          onClick={() => handleFacilityInquiry(facilitiesData[selectedFacilityLine].division)}
+                          className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <span>Request Line {facilitiesData[selectedFacilityLine].number} Commercial Specs</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          )}
+
+          {/* ============================================================== */}
+          {/* CONCEPT 2: STACKED STICKY CARDS (Apple-Style Layering)          */}
+          {/* ============================================================== */}
+          {infrastructureConcept === 'cards' && (
+            <div className="space-y-6">
+              
+              <div className="border border-neutral-200 bg-white p-3 sm:p-4 flex items-center justify-between text-xs font-mono">
+                <span className="text-neutral-500 uppercase tracking-wider text-[11px]">
+                  LINE {facilitiesData[selectedFacilityLine].number} · STACKED STICKY CARDS
+                </span>
+                <span className="text-emerald-900 font-bold text-[11px]">
+                  SCROLL DOWN TO REVEAL EACH STAGE CARD OVER THE PREVIOUS
+                </span>
+              </div>
+
+              {/* Stacked Cards Track */}
+              <div className="space-y-8 pb-12">
+                {facilitiesData[selectedFacilityLine].stages.map((stg, sIdx) => {
+                  return (
+                    <div
+                      key={`stacked-card-${sIdx}`}
+                      className="sticky bg-white border border-neutral-300 shadow-2xl p-6 sm:p-8 space-y-6 transition-transform"
+                      style={{
+                        top: `${80 + sIdx * 18}px`,
+                        zIndex: 10 + sIdx,
+                        marginBottom: `${(4 - sIdx) * 12}px`
+                      }}
+                    >
+                      {/* Top Bar on Stacked Card */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200 pb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="px-2.5 py-1 bg-[#0a2318] text-white font-mono text-xs font-bold">
+                            STAGE {stg.stepNumber} / 05
+                          </span>
+                          <span className="text-xs font-mono font-bold text-emerald-900 uppercase">
+                            LINE {facilitiesData[selectedFacilityLine].number} · {facilitiesData[selectedFacilityLine].shortTitle}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono text-neutral-500 uppercase">
+                          {stg.phase}
+                        </span>
+                      </div>
+
+                      {/* Card Content Grid */}
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                        
+                        {/* Narrative & Metrics (7 cols) */}
+                        <div className="lg:col-span-7 space-y-4">
+                          <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
+                            {stg.title}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-light">
+                            {stg.summary}
+                          </p>
+
+                          <div className="grid grid-cols-2 gap-2.5 pt-1">
+                            {stg.telemetry.map((t, tIdx) => (
+                              <div key={`stacked-tel-${tIdx}`} className="p-3 border border-neutral-200 bg-neutral-50">
+                                <span className="text-[10px] font-mono uppercase text-neutral-500 block">
+                                  {t.label}
+                                </span>
+                                <span className="text-xs font-mono font-bold text-neutral-900 block mt-0.5">
+                                  {t.value}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
+                            <span className="text-[11px] font-mono text-neutral-600 flex items-center gap-1.5">
+                              <ShieldCheck className="w-4 h-4 text-emerald-800" />
+                              <span>QA: <strong className="text-neutral-900">{stg.qaStandard}</strong></span>
+                            </span>
+                            <button
+                              onClick={() => handleFacilityInquiry(facilitiesData[selectedFacilityLine].division)}
+                              className="px-4 py-2 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-colors"
+                            >
+                              <span>Inquire for Stage {stg.stepNumber}</span>
+                              <ArrowRight className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Right Photo in Card (5 cols) */}
+                        <div className="lg:col-span-5 border border-neutral-200 bg-neutral-900 overflow-hidden relative min-h-[260px] sm:min-h-[300px]">
+                          <img 
+                            src={facilitiesData[selectedFacilityLine].image} 
+                            alt={stg.title}
+                            className="absolute inset-0 w-full h-full object-cover object-center"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                          <div className="absolute bottom-4 left-4 right-4 text-white font-mono text-[11px] space-y-1">
+                            <div className="text-emerald-400 font-bold uppercase">{facilitiesData[selectedFacilityLine].cleanroomClass}</div>
+                            <div className="text-neutral-200 font-light truncate">{facilitiesData[selectedFacilityLine].equipment}</div>
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  );
+                })}
+              </div>
+
+            </div>
+          )}
+
+          {/* ============================================================== */}
+          {/* CONCEPT 3: VIRTUAL CONVEYOR SCRUBBING (Horizontal Assembly)     */}
+          {/* ============================================================== */}
+          {infrastructureConcept === 'conveyor' && (
+            <div className="space-y-6">
+              
+              {/* Conveyor Controls & Direction HUD */}
+              <div className="border border-neutral-200 bg-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 font-mono text-xs">
+                  <span className="w-2 h-2 bg-emerald-500 animate-ping" />
+                  <span className="font-bold text-neutral-900 uppercase">
+                    Continuous Sanitary Conveyor Stream:
+                  </span>
+                  <span className="text-neutral-500 text-[11px]">
+                    Scroll or drag horizontally across workstation pods
+                  </span>
+                </div>
+
                 <div className="flex items-center gap-2">
                   <button
-                    disabled={selectedFacilityStep === 0}
-                    onClick={() => {
-                      setSelectedFacilityStep((prev) => Math.max(0, prev - 1));
-                      setIsAutoTourActive(false);
-                    }}
-                    className={`px-3 py-2 border text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors ${
-                      selectedFacilityStep === 0 
-                        ? 'opacity-40 cursor-not-allowed border-neutral-200 text-neutral-400' 
-                        : 'border-neutral-300 hover:border-neutral-900 text-neutral-800 cursor-pointer bg-white'
-                    }`}
+                    onClick={() => scrollConveyor('left')}
+                    className="p-2 border border-neutral-300 hover:border-neutral-900 bg-white hover:bg-neutral-50 text-neutral-800 transition-colors cursor-pointer"
+                    title="Scroll Conveyor Left"
                   >
-                    <ChevronLeft className="w-3.5 h-3.5" />
-                    <span>Previous</span>
+                    <ChevronLeft className="w-4 h-4" />
                   </button>
-
                   <button
-                    disabled={selectedFacilityStep === 4}
-                    onClick={() => {
-                      setSelectedFacilityStep((prev) => Math.min(4, prev + 1));
-                      setIsAutoTourActive(false);
-                    }}
-                    className={`px-3 py-2 border text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors ${
-                      selectedFacilityStep === 4 
-                        ? 'opacity-40 cursor-not-allowed border-neutral-200 text-neutral-400' 
-                        : 'border-neutral-300 hover:border-neutral-900 text-neutral-800 cursor-pointer bg-white'
-                    }`}
+                    onClick={() => scrollConveyor('right')}
+                    className="p-2 border border-neutral-300 hover:border-neutral-900 bg-white hover:bg-neutral-50 text-neutral-800 transition-colors cursor-pointer"
+                    title="Scroll Conveyor Right"
                   >
-                    <span>Next Stage</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
+                    <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
+              </div>
 
-                {/* Pre-fill Inquiry Button */}
-                <button
-                  onClick={() => handleFacilityInquiry(facilitiesData[selectedFacilityLine].division)}
-                  className="px-5 py-2.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-colors"
-                >
-                  <span>Inquire for Line {facilitiesData[selectedFacilityLine].number} Specifications</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+              {/* Animated Top Roller Belt Line */}
+              <div className="bg-[#0a2318] py-2 px-4 text-white text-[11px] font-mono flex items-center justify-between border-b-2 border-emerald-500 overflow-hidden select-none">
+                <span className="text-emerald-400 font-bold uppercase tracking-wider shrink-0">
+                  FLOW DIRECTION &gt;&gt;&gt;
+                </span>
+                <span className="text-neutral-300 truncate mx-4 font-light hidden sm:inline">
+                  RAW HARVEST INTAKE ──► THERMAL BLUNTING ──► CORE TRANSFORMATION ──► LAB QA ──► CONTAINERIZATION
+                </span>
+                <span className="text-neutral-400 font-bold uppercase tracking-wider shrink-0">
+                  SPEED: 120 BPM
+                </span>
+              </div>
+
+              {/* Horizontal Conveyor Track */}
+              <div 
+                ref={conveyorScrollRef}
+                className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-6 pt-2 no-scrollbar"
+              >
+                {facilitiesData[selectedFacilityLine].stages.map((stg, sIdx) => {
+                  return (
+                    <div
+                      key={`conveyor-station-${sIdx}`}
+                      className="snap-start shrink-0 w-[88vw] sm:w-[460px] lg:w-[490px] border border-neutral-200 bg-white p-6 space-y-4 shadow-sm hover:border-emerald-800 transition-all flex flex-col justify-between"
+                    >
+                      <div className="space-y-3">
+                        {/* Station Number Header */}
+                        <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                          <span className="px-2 py-0.5 bg-emerald-50 text-emerald-950 font-mono text-[11px] font-bold border border-emerald-800/20">
+                            STATION {stg.stepNumber} OF 05
+                          </span>
+                          <span className="text-[10px] font-mono text-neutral-500 uppercase">
+                            {stg.phase}
+                          </span>
+                        </div>
+
+                        {/* Title */}
+                        <h4 className="text-lg font-bold text-neutral-900">
+                          {stg.title}
+                        </h4>
+
+                        {/* Narrative */}
+                        <p className="text-xs text-neutral-600 leading-relaxed font-light">
+                          {stg.summary}
+                        </p>
+
+                        {/* Telemetry Grid */}
+                        <div className="grid grid-cols-2 gap-2 pt-1">
+                          {stg.telemetry.map((t, tIdx) => (
+                            <div key={`conv-tel-${tIdx}`} className="p-2.5 border border-neutral-200 bg-neutral-50">
+                              <span className="text-[9px] font-mono uppercase text-neutral-500 block">
+                                {t.label}
+                              </span>
+                              <span className="text-xs font-mono font-bold text-neutral-900 block mt-0.5">
+                                {t.value}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Bottom Footer */}
+                      <div className="pt-3 border-t border-neutral-100 flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-mono text-neutral-500 truncate max-w-[220px]" title={stg.qaStandard}>
+                          {stg.qaStandard}
+                        </span>
+                        <button
+                          onClick={() => handleFacilityInquiry(facilitiesData[selectedFacilityLine].division)}
+                          className="px-3 py-1.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors"
+                        >
+                          <span>Inquire</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
+
+                    </div>
+                  );
+                })}
               </div>
 
             </div>
-
-            {/* Right Column: High-Resolution Facility Photography & Telemetry HUD (5 cols) */}
-            <div className="lg:col-span-5 border border-neutral-200 bg-neutral-900 flex flex-col justify-between overflow-hidden relative min-h-[380px] sm:min-h-[460px]">
-              
-              {/* Background Photo */}
-              <img 
-                src={facilitiesData[selectedFacilityLine].image} 
-                alt={facilitiesData[selectedFacilityLine].title}
-                className="absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-105"
-              />
-              
-              {/* Dark Gradient Overlay for Contrast */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
-
-              {/* Top HUD Badges */}
-              <div className="relative z-10 p-5 flex items-center justify-between text-xs">
-                <div className="bg-black/70 backdrop-blur-md px-3 py-1.5 border border-white/20 text-white font-mono text-[10px] flex items-center gap-2">
-                  <span className="w-2 h-2 bg-emerald-400 animate-pulse" />
-                  <span>LINE {facilitiesData[selectedFacilityLine].number} ACTIVE</span>
-                </div>
-                <div className="bg-black/70 backdrop-blur-md px-2.5 py-1.5 border border-white/20 text-neutral-300 font-mono text-[10px]">
-                  {facilitiesData[selectedFacilityLine].cleanroomClass}
-                </div>
-              </div>
-
-              {/* Bottom HUD Information Box */}
-              <div className="relative z-10 p-5 sm:p-6 space-y-3 text-white">
-                <div>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 block font-semibold">
-                    SUITE ARCHITECTURE
-                  </span>
-                  <h4 className="text-base sm:text-lg font-bold tracking-tight text-white mt-0.5">
-                    {facilitiesData[selectedFacilityLine].title}
-                  </h4>
-                </div>
-
-                <div className="space-y-1.5 text-xs text-neutral-300 font-light border-t border-white/15 pt-3">
-                  <div className="flex justify-between font-mono text-[11px]">
-                    <span className="text-neutral-400">Continuous Capacity:</span>
-                    <span className="text-white font-medium">{facilitiesData[selectedFacilityLine].capacity}</span>
-                  </div>
-                  <div className="flex justify-between font-mono text-[11px]">
-                    <span className="text-neutral-400">Primary Suites:</span>
-                    <span className="text-white font-medium truncate max-w-[200px]" title={facilitiesData[selectedFacilityLine].equipment}>
-                      {facilitiesData[selectedFacilityLine].equipment}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Line Tags */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {facilitiesData[selectedFacilityLine].tags.map((tg, tgIdx) => (
-                    <span key={`line-tag-${tgIdx}`} className="text-[10px] font-mono px-2 py-0.5 bg-white/10 text-neutral-200 border border-white/20">
-                      {tg}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-
-          </div>
+          )}
 
         </div>
       </section>
