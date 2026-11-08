@@ -189,11 +189,11 @@ export default function App() {
     'D R & Sons International Private Limited · Incorporated Enterprise (Since 2026)',
     'Fruits, Vegetables Powder and starch',
     'Fruit & Vegetable Flakes',
-    'Drinking Mineral Water',
+    'Drinking Mineral Water (250ml, 300ml, 500ml & 1L)',
     'Non-Alcoholic Drinks & Ice Creams',
     'Advanced Spray & Drum Drying',
-    'Cleanroom Bottling & Water Purification',
-    'FSSAI Certified Commercial Supply',
+    'Class 100 Cleanroom Bottling & RO Ozonation',
+    'BIS IS 14543:2004 & FSSAI Certified Supply',
     'Direct WhatsApp: 9411268879'
   ];
 
@@ -1094,34 +1094,34 @@ export default function App() {
 
         </div>
 
-        {/* Subtle Scroll Indicator at Bottom of Hero */}
+        {/* Subtle Scroll Indicator Above Marquee */}
         <a 
           href="#divisions" 
           aria-label="Scroll down to divisions"
-          className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 text-white/70 hover:text-white transition-colors group cursor-pointer"
+          className="absolute bottom-13 sm:bottom-15 left-1/2 -translate-x-1/2 z-20 hidden xs:flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors group cursor-pointer"
         >
-          <span className="text-[10px] font-mono tracking-widest uppercase text-emerald-300/80 group-hover:text-emerald-200">
+          <span className="text-[9px] sm:text-[10px] font-mono tracking-widest uppercase text-emerald-300/80 group-hover:text-emerald-200">
             Scroll
           </span>
-          <ChevronDown className="w-4 h-4 animate-bounce text-emerald-400 group-hover:text-emerald-300" />
+          <ChevronDown className="w-3.5 h-3.5 animate-bounce text-emerald-400 group-hover:text-emerald-300" />
         </a>
-      </section>
 
-      {/* CONTINUOUS LOOPING OPERATIONAL MARQUEE */}
-      <section className="w-full border-y border-neutral-200 bg-[#143e2b] text-white py-2.5 overflow-hidden select-none">
-        <div className="animate-marquee flex items-center gap-6 text-[11px] font-medium uppercase tracking-widest">
-          {tickerItems.map((item, idx) => (
-            <div key={`ticker-1-${idx}`} className="flex items-center gap-6 shrink-0">
-              <span className="text-emerald-100">{item}</span>
-              <span className="text-emerald-400/60" aria-hidden="true">◆</span>
-            </div>
-          ))}
-          {tickerItems.map((item, idx) => (
-            <div key={`ticker-2-${idx}`} className="flex items-center gap-6 shrink-0">
-              <span className="text-emerald-100">{item}</span>
-              <span className="text-emerald-400/60" aria-hidden="true">◆</span>
-            </div>
-          ))}
+        {/* Continuous Looping Operational Marquee (Integrated inside Hero Section) */}
+        <div className="absolute bottom-0 left-0 right-0 z-20 w-full border-t border-emerald-500/25 bg-[#071911]/90 backdrop-blur-md text-white py-2.5 sm:py-3 overflow-hidden select-none shadow-2xl">
+          <div className="animate-marquee flex items-center gap-6 text-[10px] sm:text-[11px] font-medium uppercase tracking-widest font-mono">
+            {tickerItems.map((item, idx) => (
+              <div key={`hero-ticker-1-${idx}`} className="flex items-center gap-6 shrink-0">
+                <span className="text-emerald-100">{item}</span>
+                <span className="text-emerald-400 font-bold" aria-hidden="true">◆</span>
+              </div>
+            ))}
+            {tickerItems.map((item, idx) => (
+              <div key={`hero-ticker-2-${idx}`} className="flex items-center gap-6 shrink-0">
+                <span className="text-emerald-100">{item}</span>
+                <span className="text-emerald-400 font-bold" aria-hidden="true">◆</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
