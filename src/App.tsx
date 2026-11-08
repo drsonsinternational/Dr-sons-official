@@ -40,6 +40,7 @@ import {
   Minus,
   Newspaper,
   ChevronUp,
+  ArrowDown,
   Sparkles
 } from 'lucide-react';
 import MaintenancePage from './MaintenancePage';
@@ -101,61 +102,78 @@ export default function App() {
   const [rotaryAutoPlay, setRotaryAutoPlay] = useState<boolean>(false);
   const [desktopDivisionView, setDesktopDivisionView] = useState<'rotary' | 'classic'>('rotary');
   const rotarySectionRef = useRef<HTMLElement | null>(null);
+  const arcDragStartY = useRef<number | null>(null);
 
-  // Non-passive wheel event listener with e.preventDefault() so page does NOT scroll down while rotating
+  // Mouse drag handlers on the semi-circle arc for physical dial interaction
+  const handleArcMouseDown = (e: React.MouseEvent) => {
+    arcDragStartY.current = e.clientY;
+  };
+
+  const handleArcMouseMove = (e: React.MouseEvent) => {
+    if (arcDragStartY.current === null) return;
+    const delta = e.clientY - arcDragStartY.current;
+    if (Math.abs(delta) > 36) {
+      if (delta > 0) {
+        setRotaryDivision((prev) => (prev + 1) % 4);
+      } else {
+        setRotaryDivision((prev) => (prev - 1 + 4) % 4);
+      }
+      arcDragStartY.current = e.clientY;
+    }
+  };
+
+  const handleArcMouseUp = () => {
+    arcDragStartY.current = null;
+  };
+
+  // Rock-solid non-passive wheel listener:
+  // 1. UNCONDITIONALLY calls e.preventDefault() & stopPropagation() immediately on EVERY wheel tick so the window NEVER scrolls away.
+  // 2. Uses accumulated delta tracking and debounce for a clean, mechanical click-wheel feel.
+  // 3. Loops through all 4 divisions continuously so user never hits a jarring boundary wall.
   useEffect(() => {
     const el = rotarySectionRef.current;
     if (!el) return;
 
-    let lastWheelTime = 0;
-    let boundaryHitTime = 0;
+    let accumulatedDelta = 0;
+    let lastStepTime = 0;
+    let decayTimer: ReturnType<typeof setTimeout> | null = null;
     const TOTAL_DIVISIONS = 4;
+    const THRESHOLD = 35; // Sensitive, responsive threshold for both notched wheels & trackpads
+    const COOLDOWN_MS = 220; // Crisp notch mechanical spacing
 
     const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) < 15) return;
+      // Unconditionally lock window scrolling whenever the cursor is over the rotary dial
+      e.preventDefault();
+      e.stopPropagation();
 
-      const now = Date.now();
-      const isScrollingDown = e.deltaY > 0;
-      const currentDiv = rotaryDivisionRef.current;
+      accumulatedDelta += e.deltaY;
+      const now = performance.now();
 
-      if (isScrollingDown) {
-        if (currentDiv < TOTAL_DIVISIONS - 1) {
-          // Prevent window scroll and advance to next category
-          e.preventDefault();
-          if (now - lastWheelTime > 320) {
-            lastWheelTime = now;
-            boundaryHitTime = now;
-            setRotaryDivision(currentDiv + 1);
-          }
+      if (Math.abs(accumulatedDelta) >= THRESHOLD && now - lastStepTime > COOLDOWN_MS) {
+        if (accumulatedDelta > 0) {
+          // Scroll Down -> Rotate forward to next category (loops 01 -> 02 -> 03 -> 04 -> 01)
+          setRotaryDivision((prev) => (prev + 1) % TOTAL_DIVISIONS);
         } else {
-          // At last division (04): absorb quick follow-up wheel ticks for 450ms so user can inspect it
-          if (now - boundaryHitTime < 450) {
-            e.preventDefault();
-          }
+          // Scroll Up -> Rotate backward to previous category (loops 01 -> 04 -> 03 -> 02 -> 01)
+          setRotaryDivision((prev) => (prev - 1 + TOTAL_DIVISIONS) % TOTAL_DIVISIONS);
         }
-      } else {
-        if (currentDiv > 0) {
-          // Prevent window scroll and rotate back to previous category
-          e.preventDefault();
-          if (now - lastWheelTime > 320) {
-            lastWheelTime = now;
-            boundaryHitTime = now;
-            setRotaryDivision(currentDiv - 1);
-          }
-        } else {
-          // At first division (01): absorb quick follow-up wheel ticks for 450ms so user can inspect it
-          if (now - boundaryHitTime < 450) {
-            e.preventDefault();
-          }
-        }
+        lastStepTime = now;
+        accumulatedDelta = 0;
       }
+
+      // Clear accumulated momentum after user stops scrolling
+      if (decayTimer) clearTimeout(decayTimer);
+      decayTimer = setTimeout(() => {
+        accumulatedDelta = 0;
+      }, 160);
     };
 
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => {
       el.removeEventListener('wheel', onWheel);
+      if (decayTimer) clearTimeout(decayTimer);
     };
-  }, []);
+  }, [desktopDivisionView]);
 
   // Inquiry Form State
   const [inquiryForm, setInquiryForm] = useState({
@@ -1536,9 +1554,8 @@ export default function App() {
               <div className="flex items-center gap-1 border border-neutral-300 p-0.5 bg-white">
                 <button
                   type="button"
-                  onClick={() => setRotaryDivision((prev) => Math.max(0, prev - 1))}
-                  disabled={rotaryDivision === 0}
-                  className="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-30 disabled:pointer-events-none text-neutral-800 cursor-pointer transition-colors"
+                  onClick={() => setRotaryDivision((prev) => (prev - 1 + divisionsData.length) % divisionsData.length)}
+                  className="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 text-neutral-800 cursor-pointer transition-colors"
                   title="Previous Category (Rotate Up)"
                 >
                   <ChevronUp className="w-4 h-4" />
@@ -1548,9 +1565,8 @@ export default function App() {
                 </span>
                 <button
                   type="button"
-                  onClick={() => setRotaryDivision((prev) => Math.min(divisionsData.length - 1, prev + 1))}
-                  disabled={rotaryDivision === divisionsData.length - 1}
-                  className="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-30 disabled:pointer-events-none text-neutral-800 cursor-pointer transition-colors"
+                  onClick={() => setRotaryDivision((prev) => (prev + 1) % divisionsData.length)}
+                  className="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 text-neutral-800 cursor-pointer transition-colors"
                   title="Next Category (Rotate Down)"
                 >
                   <ChevronDown className="w-4 h-4" />
@@ -1562,8 +1578,14 @@ export default function App() {
           {/* MAIN ROTARY DIAL WORKSPACE: Left Arc Anchored to Screen Edge + Attached Detail Box */}
           <div className="grid grid-cols-12 gap-8 items-center min-h-[560px]">
 
-            {/* LEFT COLUMN: THE SEMI-CIRCLE ROTARY ARC (Flush with Left Side of Screen) */}
-            <div className="col-span-5 relative w-full h-[540px] flex items-center justify-start overflow-visible">
+            {/* LEFT COLUMN: THE SEMI-CIRCLE ROTARY ARC (Flush with Left Side of Screen - Draggable) */}
+            <div 
+              className="col-span-5 relative w-full h-[540px] flex items-center justify-start overflow-visible cursor-grab active:cursor-grabbing select-none"
+              onMouseDown={handleArcMouseDown}
+              onMouseMove={handleArcMouseMove}
+              onMouseUp={handleArcMouseUp}
+              onMouseLeave={handleArcMouseUp}
+            >
               
               {/* Semi-Circle SVG Track on Left Side of Screen */}
               <svg 
@@ -1859,6 +1881,21 @@ export default function App() {
               </AnimatePresence>
             </div>
 
+          </div>
+
+          {/* Bottom Navigation & Interaction Affordance */}
+          <div className="pt-4 mt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-neutral-200 text-xs text-neutral-600 font-mono">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+              <span>Scroll wheel or drag left arc to spin categories (Continuous 360° Loop)</span>
+            </div>
+            <a
+              href="#facilities"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#0a2318] hover:bg-emerald-800 text-white text-xs font-mono font-medium tracking-wider uppercase transition-colors shadow-xs"
+            >
+              <span>Scroll to Facilities Pipeline</span>
+              <ArrowDown className="w-3.5 h-3.5" />
+            </a>
           </div>
 
         </div>
