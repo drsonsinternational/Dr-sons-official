@@ -101,10 +101,15 @@ export default function App() {
 
   const [rotaryAutoPlay, setRotaryAutoPlay] = useState<boolean>(false);
   const [desktopDivisionView, setDesktopDivisionView] = useState<'rotary' | 'classic'>('rotary');
+  
+  // Section Navigation Refs
+  const heroSectionRef = useRef<HTMLElement | null>(null);
   const rotarySectionRef = useRef<HTMLElement | null>(null);
+  const facilitiesSectionRef = useRef<HTMLElement | null>(null);
+  const isSectionTransitioningRef = useRef<boolean>(false);
   const arcDragStartY = useRef<number | null>(null);
 
-  // Mouse drag handlers on the semi-circle arc for physical dial interaction
+  // Mouse drag handlers on the semi-circle arc for physical dial interaction (bounded 0 to 3, no loop)
   const handleArcMouseDown = (e: React.MouseEvent) => {
     arcDragStartY.current = e.clientY;
   };
@@ -114,9 +119,9 @@ export default function App() {
     const delta = e.clientY - arcDragStartY.current;
     if (Math.abs(delta) > 36) {
       if (delta > 0) {
-        setRotaryDivision((prev) => (prev + 1) % 4);
+        setRotaryDivision((prev) => Math.min(3, prev + 1));
       } else {
-        setRotaryDivision((prev) => (prev - 1 + 4) % 4);
+        setRotaryDivision((prev) => Math.max(0, prev - 1));
       }
       arcDragStartY.current = e.clientY;
     }
@@ -126,10 +131,65 @@ export default function App() {
     arcDragStartY.current = null;
   };
 
-  // Rock-solid non-passive wheel listener:
-  // 1. UNCONDITIONALLY calls e.preventDefault() & stopPropagation() immediately on EVERY wheel tick so the window NEVER scrolls away.
-  // 2. Uses accumulated delta tracking and debounce for a clean, mechanical click-wheel feel.
-  // 3. Loops through all 4 divisions continuously so user never hits a jarring boundary wall.
+  // 1. HERO SECTION WHEEL LISTENER (Desktop):
+  // When scrolling down from Hero, glides directly to the Manufacturing Divisions section at Division 01
+  useEffect(() => {
+    const heroEl = heroSectionRef.current;
+    if (!heroEl) return;
+
+    let heroWheelDelta = 0;
+    let decayTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const onHeroWheel = (e: WheelEvent) => {
+      if (window.innerWidth < 1024) return;
+      if (isSectionTransitioningRef.current) {
+        e.preventDefault();
+        return;
+      }
+
+      if (e.deltaY > 0) {
+        heroWheelDelta += e.deltaY;
+        if (heroWheelDelta >= 30) {
+          e.preventDefault();
+          e.stopPropagation();
+          isSectionTransitioningRef.current = true;
+          heroWheelDelta = 0;
+
+          // Always initialize rotary dial at Division 01 (index 0)
+          setRotaryDivision(0);
+
+          const target = document.getElementById(
+            desktopDivisionView === 'rotary' ? 'divisions-rotary-concept' : 'divisions'
+          );
+          if (target) {
+            const navOffset = 64;
+            const targetY = target.getBoundingClientRect().top + window.scrollY - navOffset;
+            window.scrollTo({ top: targetY, behavior: 'smooth' });
+          }
+
+          setTimeout(() => {
+            isSectionTransitioningRef.current = false;
+          }, 850);
+        }
+      }
+
+      if (decayTimer) clearTimeout(decayTimer);
+      decayTimer = setTimeout(() => {
+        heroWheelDelta = 0;
+      }, 180);
+    };
+
+    heroEl.addEventListener('wheel', onHeroWheel, { passive: false });
+    return () => {
+      heroEl.removeEventListener('wheel', onHeroWheel);
+      if (decayTimer) clearTimeout(decayTimer);
+    };
+  }, [desktopDivisionView]);
+
+  // 2. ROTARY DIAL SECTION WHEEL LISTENER (Desktop):
+  // - Step 1: Scroll down through 01 -> 02 -> 03 -> 04 (NO loop)
+  // - Step 2: Once at Division 04, scrolling down smoothly advances to the next section (#facilities)
+  // - Step 3: Scrolling up steps 04 -> 03 -> 02 -> 01, and scrolling up from 01 smoothly returns to Hero
   useEffect(() => {
     const el = rotarySectionRef.current;
     if (!el) return;
@@ -138,30 +198,70 @@ export default function App() {
     let lastStepTime = 0;
     let decayTimer: ReturnType<typeof setTimeout> | null = null;
     const TOTAL_DIVISIONS = 4;
-    const THRESHOLD = 35; // Sensitive, responsive threshold for both notched wheels & trackpads
-    const COOLDOWN_MS = 220; // Crisp notch mechanical spacing
+    const THRESHOLD = 35; // Sensitive, responsive threshold
+    const COOLDOWN_MS = 240; // Crisp notch spacing
 
     const onWheel = (e: WheelEvent) => {
-      // Unconditionally lock window scrolling whenever the cursor is over the rotary dial
-      e.preventDefault();
-      e.stopPropagation();
+      if (window.innerWidth < 1024) return;
+      if (isSectionTransitioningRef.current) {
+        e.preventDefault();
+        return;
+      }
 
       accumulatedDelta += e.deltaY;
       const now = performance.now();
 
-      if (Math.abs(accumulatedDelta) >= THRESHOLD && now - lastStepTime > COOLDOWN_MS) {
-        if (accumulatedDelta > 0) {
-          // Scroll Down -> Rotate forward to next category (loops 01 -> 02 -> 03 -> 04 -> 01)
-          setRotaryDivision((prev) => (prev + 1) % TOTAL_DIVISIONS);
+      // SCROLL DOWN
+      if (accumulatedDelta >= THRESHOLD && now - lastStepTime > COOLDOWN_MS) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const current = rotaryDivisionRef.current;
+        if (current < TOTAL_DIVISIONS - 1) {
+          // Advance to next division: 0 -> 1 -> 2 -> 3
+          setRotaryDivision(current + 1);
+          lastStepTime = now;
+          accumulatedDelta = 0;
         } else {
-          // Scroll Up -> Rotate backward to previous category (loops 01 -> 04 -> 03 -> 02 -> 01)
-          setRotaryDivision((prev) => (prev - 1 + TOTAL_DIVISIONS) % TOTAL_DIVISIONS);
+          // At Division 04 (last category) -> smoothly glide to next section (#facilities)
+          isSectionTransitioningRef.current = true;
+          accumulatedDelta = 0;
+          const facilitiesEl = document.getElementById('facilities');
+          if (facilitiesEl) {
+            const navOffset = 64;
+            const targetY = facilitiesEl.getBoundingClientRect().top + window.scrollY - navOffset;
+            window.scrollTo({ top: targetY, behavior: 'smooth' });
+          }
+          setTimeout(() => {
+            isSectionTransitioningRef.current = false;
+          }, 850);
         }
-        lastStepTime = now;
-        accumulatedDelta = 0;
+      } 
+      // SCROLL UP
+      else if (accumulatedDelta <= -THRESHOLD && now - lastStepTime > COOLDOWN_MS) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const current = rotaryDivisionRef.current;
+        if (current > 0) {
+          // Step back to previous division: 3 -> 2 -> 1 -> 0
+          setRotaryDivision(current - 1);
+          lastStepTime = now;
+          accumulatedDelta = 0;
+        } else {
+          // At Division 01 (first category) -> return smoothly to Hero banner
+          isSectionTransitioningRef.current = true;
+          accumulatedDelta = 0;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(() => {
+            isSectionTransitioningRef.current = false;
+          }, 850);
+        }
+      } else {
+        // Prevent default on all sub-threshold ticks so window does not jitter
+        e.preventDefault();
       }
 
-      // Clear accumulated momentum after user stops scrolling
       if (decayTimer) clearTimeout(decayTimer);
       decayTimer = setTimeout(() => {
         accumulatedDelta = 0;
@@ -171,6 +271,61 @@ export default function App() {
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => {
       el.removeEventListener('wheel', onWheel);
+      if (decayTimer) clearTimeout(decayTimer);
+    };
+  }, [desktopDivisionView]);
+
+  // 3. FACILITIES SECTION WHEEL LISTENER (Desktop):
+  // When user is at the top of Facilities and scrolls UP, smoothly glides back up into Manufacturing Divisions at Division 04
+  useEffect(() => {
+    const facEl = facilitiesSectionRef.current;
+    if (!facEl) return;
+
+    let facWheelDelta = 0;
+    let decayTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const onFacilitiesWheel = (e: WheelEvent) => {
+      if (window.innerWidth < 1024) return;
+      if (isSectionTransitioningRef.current) return;
+
+      const rect = facEl.getBoundingClientRect();
+      const isAtTopOfFacilities = rect.top >= 55 && rect.top <= 90;
+
+      if (isAtTopOfFacilities && e.deltaY < 0) {
+        facWheelDelta += e.deltaY;
+        if (facWheelDelta <= -35) {
+          e.preventDefault();
+          e.stopPropagation();
+          isSectionTransitioningRef.current = true;
+          facWheelDelta = 0;
+
+          // Set rotary to Division 04 (index 3) when scrolling back up
+          setRotaryDivision(3);
+
+          const rotaryEl = document.getElementById(
+            desktopDivisionView === 'rotary' ? 'divisions-rotary-concept' : 'divisions'
+          );
+          if (rotaryEl) {
+            const navOffset = 64;
+            const targetY = rotaryEl.getBoundingClientRect().top + window.scrollY - navOffset;
+            window.scrollTo({ top: targetY, behavior: 'smooth' });
+          }
+
+          setTimeout(() => {
+            isSectionTransitioningRef.current = false;
+          }, 850);
+        }
+      }
+
+      if (decayTimer) clearTimeout(decayTimer);
+      decayTimer = setTimeout(() => {
+        facWheelDelta = 0;
+      }, 180);
+    };
+
+    facEl.addEventListener('wheel', onFacilitiesWheel, { passive: false });
+    return () => {
+      facEl.removeEventListener('wheel', onFacilitiesWheel);
       if (decayTimer) clearTimeout(decayTimer);
     };
   }, [desktopDivisionView]);
@@ -806,7 +961,23 @@ export default function App() {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-5 text-xs font-semibold text-neutral-700">
-            <a href="#divisions" className="hover:text-emerald-900 transition-colors">4 Divisions</a>
+            <a 
+              href={desktopDivisionView === 'rotary' ? '#divisions-rotary-concept' : '#divisions'}
+              onClick={(e) => {
+                if (desktopDivisionView === 'rotary') {
+                  e.preventDefault();
+                  setRotaryDivision(0);
+                  const target = document.getElementById('divisions-rotary-concept');
+                  if (target) {
+                    const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
+                    window.scrollTo({ top: targetY, behavior: 'smooth' });
+                  }
+                }
+              }}
+              className="hover:text-emerald-900 transition-colors cursor-pointer"
+            >
+              4 Divisions
+            </a>
             <a href="#facilities" className="hover:text-emerald-900 transition-colors">Facilities</a>
             <button 
               onClick={() => setLegalModalTab('regulatory')}
@@ -1095,7 +1266,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* HERO SECTION: Fullscreen Ambient Industrial Video Banner */}
-      <section className="relative w-full h-[calc(100dvh-56px)] sm:h-[calc(100dvh-73px)] min-h-[580px] flex items-center justify-center overflow-hidden bg-[#0c2117]">
+      <section id="hero" ref={heroSectionRef} className="relative w-full h-[calc(100dvh-56px)] sm:h-[calc(100dvh-73px)] min-h-[580px] flex items-center justify-center overflow-hidden bg-[#0c2117]">
         
         {/* Background Ambient Industrial Video */}
         <video 
@@ -1167,8 +1338,19 @@ export default function App() {
             className="flex flex-wrap items-center justify-center gap-3 pt-1"
           >
             <a
-              href="#divisions"
-              className="px-5 sm:px-7 py-2.5 sm:py-3 bg-[#22c55e] hover:bg-[#16a34a] text-[#071f14] text-xs font-bold uppercase tracking-wider transition-all hover:shadow-lg flex items-center gap-1.5"
+              href={desktopDivisionView === 'rotary' ? '#divisions-rotary-concept' : '#divisions'}
+              onClick={(e) => {
+                if (desktopDivisionView === 'rotary') {
+                  e.preventDefault();
+                  setRotaryDivision(0);
+                  const target = document.getElementById('divisions-rotary-concept');
+                  if (target) {
+                    const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
+                    window.scrollTo({ top: targetY, behavior: 'smooth' });
+                  }
+                }
+              }}
+              className="px-5 sm:px-7 py-2.5 sm:py-3 bg-[#22c55e] hover:bg-[#16a34a] text-[#071f14] text-xs font-bold uppercase tracking-wider transition-all hover:shadow-lg flex items-center gap-1.5 cursor-pointer"
             >
               <span>Explore Divisions</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -1189,8 +1371,19 @@ export default function App() {
 
         {/* Subtle Scroll Indicator Above Marquee */}
         <a 
-          href="#divisions" 
+          href={desktopDivisionView === 'rotary' ? '#divisions-rotary-concept' : '#divisions'} 
           aria-label="Scroll down to divisions"
+          onClick={(e) => {
+            if (desktopDivisionView === 'rotary') {
+              e.preventDefault();
+              setRotaryDivision(0);
+              const target = document.getElementById('divisions-rotary-concept');
+              if (target) {
+                const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
+                window.scrollTo({ top: targetY, behavior: 'smooth' });
+              }
+            }
+          }}
           className="absolute bottom-13 sm:bottom-15 left-1/2 -translate-x-1/2 z-20 hidden xs:flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors group cursor-pointer"
         >
           <span className="text-[9px] sm:text-[10px] font-mono tracking-widest uppercase text-emerald-300/80 group-hover:text-emerald-200">
@@ -1487,8 +1680,9 @@ export default function App() {
       <section 
         id="divisions-rotary-concept" 
         ref={rotarySectionRef}
-        className={`w-full py-10 sm:py-16 bg-white border-b border-neutral-200 relative overflow-hidden select-none ${
-          desktopDivisionView === 'rotary' ? 'hidden lg:block' : 'hidden'
+        style={{ scrollMarginTop: '64px' }}
+        className={`w-full py-8 lg:py-12 bg-white border-b border-neutral-200 relative overflow-hidden select-none min-h-[calc(100vh-64px)] flex flex-col justify-between ${
+          desktopDivisionView === 'rotary' ? 'hidden lg:flex' : 'hidden'
         }`}
       >
         {/* Subtle Background Engineering Grid */}
@@ -1508,7 +1702,7 @@ export default function App() {
                 Manufacturing <span className="font-serif-brand italic text-emerald-950 font-normal">Divisions</span>
               </h2>
               <p className="text-xs text-neutral-600 max-w-2xl leading-relaxed">
-                Scroll with mouse wheel or click any circular category on the left semi-circle arc. The arc rotates dynamically and keeps the specifications detail box pinned to the active division.
+                Scroll down to cycle through our 4 core manufacturing divisions. After inspecting Division 04, scrolling continues smoothly into the Production Facilities Pipeline.
               </p>
             </div>
 
@@ -1534,7 +1728,7 @@ export default function App() {
               </div>
 
               <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-900/15 text-[11px] font-mono text-emerald-900">
-                <span>🖱️ Scroll Wheel Changes Division</span>
+                <span>🖱️ Scroll Wheel Advances Divisions</span>
               </span>
 
               <button
@@ -1554,9 +1748,15 @@ export default function App() {
               <div className="flex items-center gap-1 border border-neutral-300 p-0.5 bg-white">
                 <button
                   type="button"
-                  onClick={() => setRotaryDivision((prev) => (prev - 1 + divisionsData.length) % divisionsData.length)}
+                  onClick={() => {
+                    if (rotaryDivision > 0) {
+                      setRotaryDivision((prev) => prev - 1);
+                    } else {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }}
                   className="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 text-neutral-800 cursor-pointer transition-colors"
-                  title="Previous Category (Rotate Up)"
+                  title={rotaryDivision === 0 ? "Return to Hero" : "Previous Category (Rotate Up)"}
                 >
                   <ChevronUp className="w-4 h-4" />
                 </button>
@@ -1565,9 +1765,19 @@ export default function App() {
                 </span>
                 <button
                   type="button"
-                  onClick={() => setRotaryDivision((prev) => (prev + 1) % divisionsData.length)}
+                  onClick={() => {
+                    if (rotaryDivision < divisionsData.length - 1) {
+                      setRotaryDivision((prev) => prev + 1);
+                    } else {
+                      const facilitiesEl = document.getElementById('facilities');
+                      if (facilitiesEl) {
+                        const targetY = facilitiesEl.getBoundingClientRect().top + window.scrollY - 64;
+                        window.scrollTo({ top: targetY, behavior: 'smooth' });
+                      }
+                    }
+                  }}
                   className="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 text-neutral-800 cursor-pointer transition-colors"
-                  title="Next Category (Rotate Down)"
+                  title={rotaryDivision === divisionsData.length - 1 ? "Next Section: Facilities Pipeline" : "Next Category (Rotate Down)"}
                 >
                   <ChevronDown className="w-4 h-4" />
                 </button>
@@ -1887,13 +2097,21 @@ export default function App() {
           <div className="pt-4 mt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-neutral-200 text-xs text-neutral-600 font-mono">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
-              <span>Scroll wheel or drag left arc to spin categories (Continuous 360° Loop)</span>
+              <span>Scroll down through all 4 divisions, then continue to Facilities Pipeline</span>
             </div>
             <a
               href="#facilities"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#0a2318] hover:bg-emerald-800 text-white text-xs font-mono font-medium tracking-wider uppercase transition-colors shadow-xs"
+              onClick={(e) => {
+                e.preventDefault();
+                const facilitiesEl = document.getElementById('facilities');
+                if (facilitiesEl) {
+                  const targetY = facilitiesEl.getBoundingClientRect().top + window.scrollY - 64;
+                  window.scrollTo({ top: targetY, behavior: 'smooth' });
+                }
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#0a2318] hover:bg-emerald-800 text-white text-xs font-mono font-medium tracking-wider uppercase transition-colors shadow-xs cursor-pointer"
             >
-              <span>Scroll to Facilities Pipeline</span>
+              <span>Next Section: Facilities Pipeline</span>
               <ArrowDown className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -1902,7 +2120,12 @@ export default function App() {
       </section>
 
       {/* SECTION: PRODUCTION FACILITIES & STACKED STICKY CARDS WORKFLOW */}
-      <section id="facilities" className="w-full py-12 sm:py-20 px-3 sm:px-6 lg:px-12 bg-[#fafbfa] border-b border-neutral-200">
+      <section 
+        id="facilities" 
+        ref={facilitiesSectionRef}
+        style={{ scrollMarginTop: '64px' }}
+        className="w-full py-12 sm:py-20 px-3 sm:px-6 lg:px-12 bg-[#fafbfa] border-b border-neutral-200"
+      >
         <div className="w-full max-w-7xl mx-auto space-y-8">
           
           {/* Header */}
