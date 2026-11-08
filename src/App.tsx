@@ -38,7 +38,9 @@ import {
   Sliders,
   Plus,
   Minus,
-  Newspaper
+  Newspaper,
+  ChevronUp,
+  Sparkles
 } from 'lucide-react';
 import MaintenancePage from './MaintenancePage';
 
@@ -88,6 +90,24 @@ export default function App() {
     const desk = document.getElementById('inquiry-desk');
     if (desk) {
       desk.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Concept Lab: Semi-Circle Rotary Divisions State
+  const [rotaryDivision, setRotaryDivision] = useState<number>(0);
+  const [rotaryAutoPlay, setRotaryAutoPlay] = useState<boolean>(false);
+  const lastRotaryWheelTime = useRef<number>(0);
+
+  const handleRotaryWheel = (e: React.WheelEvent) => {
+    const now = Date.now();
+    if (now - lastRotaryWheelTime.current < 280) return;
+    if (Math.abs(e.deltaY) > 20) {
+      if (e.deltaY > 0) {
+        setRotaryDivision((prev) => Math.min(divisionsData.length - 1, prev + 1));
+      } else {
+        setRotaryDivision((prev) => Math.max(0, prev - 1));
+      }
+      lastRotaryWheelTime.current = now;
     }
   };
 
@@ -152,6 +172,15 @@ export default function App() {
     }, 1000);
     return () => clearTimeout(timer);
   }, [redirectCountdown]);
+
+  // Rotary Dial Auto-Rotate timer
+  useEffect(() => {
+    if (!rotaryAutoPlay) return;
+    const interval = setInterval(() => {
+      setRotaryDivision((prev) => (prev + 1) % divisionsData.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [rotaryAutoPlay]);
 
   // Touch swipe handling for buttery-smooth division sliding
   const touchStartX = useRef<number | null>(null);
@@ -1361,6 +1390,385 @@ export default function App() {
                 aria-label={`Go to Division ${div.number}`}
               />
             ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* SECTION: [CONCEPT PREVIEW] ROTARY SEMI-CIRCLE DIVISION DIAL (Desktop Interactive Arc with Attached Detail Box) */}
+      <section 
+        id="divisions-rotary-concept" 
+        onWheel={handleRotaryWheel}
+        className="w-full py-12 sm:py-20 px-3 sm:px-6 lg:px-12 bg-[#061810] text-white border-b border-neutral-200 relative overflow-hidden select-none"
+      >
+        {/* Subtle Background Glow & Engineering Grid */}
+        <div className="absolute inset-0 bg-[radial-gradient(#15803d_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none" />
+        <div className="absolute -left-48 top-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="w-full max-w-7xl mx-auto space-y-8 relative z-10">
+
+          {/* Section Header with Concept Badge & Interactive Hint */}
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-white/10 pb-5">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 uppercase tracking-widest font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Concept Test Lab · Desktop Rotary Semi-Circle Architecture</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+                Rotary Semi-Circle <span className="font-serif-brand italic text-[#86efac] font-normal">Division Dial</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-neutral-300 max-w-2xl leading-relaxed">
+                Scroll with mouse wheel or click any circular category on the left semi-circle arc. The arc rotates dynamically and keeps the specifications detail box pinned to the active division.
+              </p>
+            </div>
+
+            {/* Quick Interactive Controls (Wheel hint, Prev/Next, Auto-Rotate) */}
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-[11px] font-mono text-emerald-300">
+                <span>🖱️ Scroll Wheel Enabled</span>
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setRotaryAutoPlay(!rotaryAutoPlay)}
+                className={`px-3 py-1.5 text-xs font-mono font-semibold uppercase tracking-wider border transition-all cursor-pointer flex items-center gap-1.5 ${
+                  rotaryAutoPlay 
+                    ? 'bg-emerald-600 border-emerald-400 text-white' 
+                    : 'bg-white/5 hover:bg-white/10 border-white/15 text-neutral-300'
+                }`}
+                title="Toggle continuous auto-rotation"
+              >
+                {rotaryAutoPlay ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                <span>{rotaryAutoPlay ? 'Auto: ON' : 'Auto-Rotate'}</span>
+              </button>
+
+              <div className="flex items-center gap-1 border border-white/10 p-0.5 bg-white/5">
+                <button
+                  type="button"
+                  onClick={() => setRotaryDivision((prev) => Math.max(0, prev - 1))}
+                  disabled={rotaryDivision === 0}
+                  className="w-8 h-8 flex items-center justify-center hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none text-white cursor-pointer transition-colors"
+                  title="Previous Category (Rotate Up)"
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </button>
+                <span className="px-2 font-mono text-xs text-emerald-400 font-bold">
+                  0{rotaryDivision + 1}/04
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setRotaryDivision((prev) => Math.min(divisionsData.length - 1, prev + 1))}
+                  disabled={rotaryDivision === divisionsData.length - 1}
+                  className="w-8 h-8 flex items-center justify-center hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none text-white cursor-pointer transition-colors"
+                  title="Next Category (Rotate Down)"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* MAIN ROTARY DIAL WORKSPACE: Left Arc + Attached Detail Box */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center min-h-[580px]">
+
+            {/* LEFT COLUMN: THE SEMI-CIRCLE ROTARY ARC */}
+            <div className="lg:col-span-5 relative w-full h-[380px] sm:h-[480px] lg:h-[540px] flex items-center justify-center lg:justify-start overflow-hidden">
+              
+              {/* Semi-Circle SVG Track on Left */}
+              <svg 
+                className="absolute inset-0 w-full h-full pointer-events-none" 
+                viewBox="0 0 460 540" 
+                fill="none"
+              >
+                {/* Outer decorative dashed trajectory arc */}
+                <path 
+                  d="M 60 45 A 255 255 0 0 1 60 495" 
+                  stroke="#22c55e" 
+                  strokeWidth="1.5" 
+                  strokeDasharray="4 8" 
+                  opacity="0.25" 
+                />
+
+                {/* Primary Solid Semi-Circle Guide Line */}
+                <path 
+                  d="M 60 70 A 230 230 0 0 1 60 470" 
+                  stroke="url(#semiCircleGradient)" 
+                  strokeWidth="3" 
+                  strokeLinecap="round"
+                />
+
+                {/* Inner precision tick marks arc */}
+                <path 
+                  d="M 60 100 A 200 200 0 0 1 60 440" 
+                  stroke="#4ade80" 
+                  strokeWidth="1" 
+                  strokeDasharray="2 6" 
+                  opacity="0.3" 
+                />
+
+                {/* Center Hub Marker on far left */}
+                <circle cx="60" cy="270" r="16" fill="#0c2a1c" stroke="#22c55e" strokeWidth="2" />
+                <circle cx="60" cy="270" r="6" fill="#4ade80" />
+
+                {/* Active Horizontal Connector Beam attaching directly into detail card at right */}
+                <line 
+                  x1="290" 
+                  y1="270" 
+                  x2="460" 
+                  y2="270" 
+                  stroke="#22c55e" 
+                  strokeWidth="2" 
+                  strokeDasharray="4 4"
+                  className="animate-pulse"
+                />
+                <circle cx="456" cy="270" r="4" fill="#4ade80" />
+
+                {/* Gradient Definitions */}
+                <defs>
+                  <linearGradient id="semiCircleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#15803d" stopOpacity="0.4" />
+                    <stop offset="50%" stopColor="#4ade80" stopOpacity="1" />
+                    <stop offset="100%" stopColor="#15803d" stopOpacity="0.4" />
+                  </linearGradient>
+                </defs>
+              </svg>
+
+              {/* ROTARY NODES (Circular Shape Photos attached along the arc) */}
+              <div className="relative w-full h-full">
+                {divisionsData.map((div, idx) => {
+                  const isActive = rotaryDivision === idx;
+                  const delta = idx - rotaryDivision;
+                  // Separation of 36 degrees per division
+                  const angleDeg = delta * 36;
+                  const angleRad = (angleDeg * Math.PI) / 180;
+                  
+                  // Radius = 230px, Center = (60px, 270px)
+                  const nodeX = 60 + 230 * Math.cos(angleRad);
+                  const nodeY = 270 + 230 * Math.sin(angleRad);
+                  
+                  // Hide items rotating too far out of frame
+                  const isVisible = Math.abs(delta) <= 2;
+
+                  return (
+                    <motion.div
+                      key={`rotary-node-${div.id}`}
+                      initial={false}
+                      animate={{
+                        x: nodeX,
+                        y: nodeY,
+                        scale: isActive ? 1.15 : 0.85,
+                        opacity: isVisible ? 1 : 0,
+                        zIndex: isActive ? 30 : 20 - Math.abs(delta)
+                      }}
+                      transition={{ type: 'spring', stiffness: 220, damping: 22 }}
+                      className="absolute -top-10 -left-10 cursor-pointer"
+                      onClick={() => setRotaryDivision(idx)}
+                    >
+                      {/* Circular Shape Photo Container */}
+                      <div className="relative group">
+                        <div
+                          className={`w-20 h-20 sm:w-22 sm:h-22 rounded-full p-1 transition-all duration-300 relative ${
+                            isActive
+                              ? 'ring-4 ring-[#4ade80] ring-offset-3 ring-offset-[#061810] shadow-[0_0_30px_rgba(74,222,128,0.5)] bg-gradient-to-tr from-emerald-600 to-green-400'
+                              : 'border-2 border-emerald-900/60 bg-neutral-900/80 opacity-70 group-hover:opacity-100 group-hover:border-emerald-400/80 group-hover:scale-105'
+                          }`}
+                        >
+                          {/* Inner Circular Image */}
+                          <div className="w-full h-full rounded-full overflow-hidden bg-neutral-800 relative">
+                            <img
+                              src={div.image}
+                              alt={div.shortName}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                            {/* Dark Gradient Overlay for Inactive */}
+                            {!isActive && (
+                              <div className="absolute inset-0 bg-black/35 group-hover:bg-transparent transition-colors" />
+                            )}
+                          </div>
+
+                          {/* Division Number Pill Badge */}
+                          <span
+                            className={`absolute -top-1.5 -right-1 px-1.5 py-0.5 font-mono text-[9px] font-bold rounded-xs border transition-colors ${
+                              isActive
+                                ? 'bg-[#22c55e] text-[#051f13] border-white'
+                                : 'bg-neutral-900 text-neutral-300 border-neutral-700'
+                            }`}
+                          >
+                            {div.number}
+                          </span>
+
+                          {/* Active Focal Indicator Dot */}
+                          {isActive && (
+                            <span className="absolute -right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-4 ring-[#061810] animate-ping" />
+                          )}
+                        </div>
+
+                        {/* Title Tooltip label on hover / active */}
+                        <div
+                          className={`absolute left-full ml-3 top-1/2 -translate-y-1/2 pointer-events-none transition-all duration-300 whitespace-nowrap ${
+                            isActive
+                              ? 'opacity-100 translate-x-0'
+                              : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'
+                          }`}
+                        >
+                          <div className="px-2.5 py-1 bg-black/80 border border-emerald-500/40 backdrop-blur-md rounded-xs text-[11px] font-mono text-emerald-200">
+                            {div.shortName}
+                          </div>
+                        </div>
+
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+            </div>
+
+            {/* RIGHT COLUMN: ATTACHED SPECIFICATIONS & COMMERCE DETAIL BOX */}
+            <div className="lg:col-span-7 relative">
+              <AnimatePresence mode="wait">
+                {(() => {
+                  const current = divisionsData[rotaryDivision];
+                  const CurrentIcon = current.icon;
+                  return (
+                    <motion.div
+                      key={`rotary-detail-box-${current.id}`}
+                      initial={{ opacity: 0, x: 25 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -25 }}
+                      transition={{ duration: 0.28, ease: 'easeOut' }}
+                      className="bg-[#0b2419] border-2 border-emerald-500/30 p-6 sm:p-8 shadow-2xl relative overflow-hidden space-y-6"
+                    >
+                      {/* Attached Connector Indicator on the Left Border */}
+                      <div className="hidden lg:block absolute left-0 top-[45%] -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-emerald-400 rounded-full border-2 border-[#061810] shadow-[0_0_15px_#22c55e]" />
+
+                      {/* Detail Card Header */}
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-emerald-900/40 pb-4">
+                        <div>
+                          <div className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-emerald-400 font-semibold mb-1">
+                            <CurrentIcon className="w-4 h-4 text-emerald-300" />
+                            <span>Division {current.number} · D R &amp; Sons International</span>
+                          </div>
+                          <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-tight">
+                            {current.title}
+                          </h3>
+                          <p className="text-xs text-emerald-300/80 font-serif-brand italic mt-1">
+                            {current.tagline}
+                          </p>
+                        </div>
+
+                        <div className="shrink-0 flex items-center gap-2 font-mono">
+                          <span className="px-2.5 py-1 bg-emerald-950/80 border border-emerald-700/50 text-emerald-300 text-xs font-bold">
+                            SKU #{current.number}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Image Preview & Summary Split */}
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+                        <div className="md:col-span-5 border border-emerald-900/60 overflow-hidden relative group">
+                          <img 
+                            src={current.image} 
+                            alt={current.title} 
+                            className="w-full aspect-16/10 object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/75 backdrop-blur-xs font-mono text-[9px] uppercase tracking-wider text-emerald-300 border border-emerald-500/30">
+                            Direct Facility Line
+                          </div>
+                        </div>
+                        <div className="md:col-span-7 space-y-3">
+                          <p className="text-xs sm:text-sm text-neutral-200 leading-relaxed">
+                            {current.summary}
+                          </p>
+                          
+                          {/* Commercial Key Items Chips */}
+                          <div>
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 block mb-1">
+                              Commercial Deliverables:
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {current.keyItems.map((item, i) => (
+                                <span 
+                                  key={i} 
+                                  className="px-2 py-1 bg-emerald-950/70 border border-emerald-800/40 text-[11px] text-emerald-100 font-medium"
+                                >
+                                  {item}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Technical Specs & Compliance Grid */}
+                      <div className="pt-2 border-t border-emerald-900/40 space-y-2">
+                        <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+                          <span>Verified Process Highlights</span>
+                          <span className="text-emerald-400">FSSAI / BIS IS 14543</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-neutral-200">
+                          {current.specs.map((spec, i) => (
+                            <div key={i} className="flex items-center gap-2 bg-emerald-950/40 p-2 border border-emerald-800/30">
+                              <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                              <span className="truncate">{spec}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Commercial Applications Info */}
+                      <div className="bg-black/30 p-3 border border-white/5 flex items-start gap-2.5 text-xs text-neutral-300">
+                        <span className="font-mono text-emerald-400 shrink-0 font-semibold text-[11px]">Applications:</span>
+                        <span className="leading-snug">{current.applications}</span>
+                      </div>
+
+                      {/* Action Footer: Quote & WhatsApp */}
+                      <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-emerald-900/40">
+                        <div className="flex items-center gap-3">
+                          <a
+                            href="#inquiry-desk"
+                            onClick={() => setInquiryForm({...inquiryForm, division: current.title})}
+                            className="px-5 py-2.5 bg-[#22c55e] hover:bg-[#16a34a] text-[#071f14] text-xs font-bold uppercase tracking-wider transition-all hover:shadow-lg flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <span>Request Commercial RFQ</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </a>
+
+                          <a
+                            href={`https://wa.me/919411268879?text=${encodeURIComponent(`Hi D R & Sons Trade Desk, I am inquiring about Division ${current.number}: ${current.title}`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold uppercase tracking-wider transition-colors"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5 text-emerald-300" />
+                            <span>WhatsApp Trade Desk</span>
+                          </a>
+                        </div>
+
+                        {/* Dial Step Selector Indicator */}
+                        <div className="flex items-center gap-1.5">
+                          {divisionsData.map((d, i) => (
+                            <button
+                              key={`rotary-step-${d.id}`}
+                              type="button"
+                              onClick={() => setRotaryDivision(i)}
+                              className={`h-2 transition-all duration-300 cursor-pointer ${
+                                rotaryDivision === i 
+                                  ? 'w-6 bg-emerald-400' 
+                                  : 'w-2 bg-emerald-900/60 hover:bg-emerald-700'
+                              }`}
+                              title={`Switch to Division ${d.number}`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                    </motion.div>
+                  );
+                })()}
+              </AnimatePresence>
+            </div>
+
           </div>
 
         </div>
