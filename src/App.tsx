@@ -96,6 +96,7 @@ export default function App() {
   // Concept Lab: Semi-Circle Rotary Divisions State
   const [rotaryDivision, setRotaryDivision] = useState<number>(0);
   const [rotaryAutoPlay, setRotaryAutoPlay] = useState<boolean>(false);
+  const [desktopDivisionView, setDesktopDivisionView] = useState<'rotary' | 'classic'>('rotary');
   const lastRotaryWheelTime = useRef<number>(0);
 
   const handleRotaryWheel = (e: React.WheelEvent) => {
@@ -1154,8 +1155,13 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECTION: 4 CORE REGISTERED MANUFACTURING DIVISIONS (Horizontal Scroll Enabled) */}
-      <section id="divisions" className="w-full py-10 sm:py-16 px-3 sm:px-6 lg:px-12 bg-white border-b border-neutral-200">
+      {/* SECTION: 4 CORE REGISTERED MANUFACTURING DIVISIONS (Mobile Default & Classic View) */}
+      <section 
+        id="divisions" 
+        className={`w-full py-10 sm:py-16 px-3 sm:px-6 lg:px-12 bg-white border-b border-neutral-200 ${
+          desktopDivisionView === 'classic' ? 'block' : 'block lg:hidden'
+        }`}
+      >
         <div className="w-full max-w-7xl mx-auto space-y-6">
           
           {/* Header & Horizontal Controls */}
@@ -1169,8 +1175,27 @@ export default function App() {
               </h2>
             </div>
 
-            {/* Horizontal Swipe Affordance & Navigation */}
-            <div className="flex items-center justify-between sm:justify-end gap-3">
+            {/* Desktop View Switcher & Horizontal Swipe Affordance */}
+            <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3">
+              {/* Desktop Toggle to switch to Rotary Dial */}
+              <div className="hidden lg:flex items-center gap-1 border border-neutral-200 bg-neutral-100 p-0.5">
+                <button
+                  type="button"
+                  onClick={() => setDesktopDivisionView('rotary')}
+                  className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-neutral-600 hover:text-neutral-900 cursor-pointer flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Switch to Rotary Dial</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDesktopDivisionView('classic')}
+                  className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider bg-[#0a2318] text-white shadow-xs cursor-pointer"
+                >
+                  <span>Classic Slider</span>
+                </button>
+              </div>
+
               <span className="text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 border border-emerald-900/10">
                 ← Swipe 4 Divisions →
               </span>
@@ -1395,46 +1420,67 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECTION: [CONCEPT PREVIEW] ROTARY SEMI-CIRCLE DIVISION DIAL (Desktop Interactive Arc with Attached Detail Box) */}
+      {/* SECTION: ROTARY SEMI-CIRCLE DIVISION DIAL (Desktop View - White Theme - Left Screen Aligned) */}
       <section 
         id="divisions-rotary-concept" 
         onWheel={handleRotaryWheel}
-        className="w-full py-12 sm:py-20 px-3 sm:px-6 lg:px-12 bg-[#061810] text-white border-b border-neutral-200 relative overflow-hidden select-none"
+        className={`w-full py-10 sm:py-16 bg-white border-b border-neutral-200 relative overflow-hidden select-none ${
+          desktopDivisionView === 'rotary' ? 'hidden lg:block' : 'hidden'
+        }`}
       >
-        {/* Subtle Background Glow & Engineering Grid */}
-        <div className="absolute inset-0 bg-[radial-gradient(#15803d_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none" />
-        <div className="absolute -left-48 top-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Subtle Background Engineering Grid */}
+        <div className="absolute inset-0 bg-[radial-gradient(#15803d_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
+        <div className="absolute -left-36 top-1/2 -translate-y-1/2 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="w-full max-w-7xl mx-auto space-y-8 relative z-10">
+        <div className="w-full max-w-[1720px] mx-auto space-y-6 relative z-10 px-4 sm:px-8 lg:px-10">
 
-          {/* Section Header with Concept Badge & Interactive Hint */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-white/10 pb-5">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 uppercase tracking-widest font-semibold">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Concept Test Lab · Desktop Rotary Semi-Circle Architecture</span>
+          {/* Section Header with Desktop View Switcher & Controls */}
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-neutral-200 pb-4">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Core Portfolio · 4 Registered Divisions</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-                Rotary Semi-Circle <span className="font-serif-brand italic text-[#86efac] font-normal">Division Dial</span>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900">
+                Manufacturing <span className="font-serif-brand italic text-emerald-950 font-normal">Divisions</span>
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-300 max-w-2xl leading-relaxed">
+              <p className="text-xs text-neutral-600 max-w-2xl leading-relaxed">
                 Scroll with mouse wheel or click any circular category on the left semi-circle arc. The arc rotates dynamically and keeps the specifications detail box pinned to the active division.
               </p>
             </div>
 
-            {/* Quick Interactive Controls (Wheel hint, Prev/Next, Auto-Rotate) */}
+            {/* View Switcher, Wheel hint, Prev/Next, Auto-Rotate Controls */}
             <div className="flex flex-wrap items-center gap-2 shrink-0">
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-[11px] font-mono text-emerald-300">
-                <span>🖱️ Scroll Wheel Enabled</span>
+              {/* Desktop Toggle to switch between Rotary and Classic */}
+              <div className="flex items-center gap-1 border border-neutral-200 bg-neutral-100 p-0.5">
+                <button
+                  type="button"
+                  onClick={() => setDesktopDivisionView('rotary')}
+                  className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider bg-[#0a2318] text-white shadow-xs cursor-pointer flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3 h-3 text-emerald-400" />
+                  <span>Rotary Dial</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDesktopDivisionView('classic')}
+                  className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-neutral-600 hover:text-neutral-900 cursor-pointer"
+                >
+                  <span>Classic Slider</span>
+                </button>
+              </div>
+
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-900/15 text-[11px] font-mono text-emerald-900">
+                <span>🖱️ Scroll Wheel Active</span>
               </span>
 
               <button
                 type="button"
                 onClick={() => setRotaryAutoPlay(!rotaryAutoPlay)}
-                className={`px-3 py-1.5 text-xs font-mono font-semibold uppercase tracking-wider border transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-1 text-xs font-mono font-semibold uppercase tracking-wider border transition-all cursor-pointer flex items-center gap-1.5 ${
                   rotaryAutoPlay 
-                    ? 'bg-emerald-600 border-emerald-400 text-white' 
-                    : 'bg-white/5 hover:bg-white/10 border-white/15 text-neutral-300'
+                    ? 'bg-emerald-800 border-emerald-900 text-white shadow-xs' 
+                    : 'bg-white hover:bg-neutral-50 border-neutral-300 text-neutral-700'
                 }`}
                 title="Toggle continuous auto-rotation"
               >
@@ -1442,24 +1488,24 @@ export default function App() {
                 <span>{rotaryAutoPlay ? 'Auto: ON' : 'Auto-Rotate'}</span>
               </button>
 
-              <div className="flex items-center gap-1 border border-white/10 p-0.5 bg-white/5">
+              <div className="flex items-center gap-1 border border-neutral-300 p-0.5 bg-white">
                 <button
                   type="button"
                   onClick={() => setRotaryDivision((prev) => Math.max(0, prev - 1))}
                   disabled={rotaryDivision === 0}
-                  className="w-8 h-8 flex items-center justify-center hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none text-white cursor-pointer transition-colors"
+                  className="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-30 disabled:pointer-events-none text-neutral-800 cursor-pointer transition-colors"
                   title="Previous Category (Rotate Up)"
                 >
                   <ChevronUp className="w-4 h-4" />
                 </button>
-                <span className="px-2 font-mono text-xs text-emerald-400 font-bold">
+                <span className="px-2 font-mono text-xs text-emerald-800 font-bold">
                   0{rotaryDivision + 1}/04
                 </span>
                 <button
                   type="button"
                   onClick={() => setRotaryDivision((prev) => Math.min(divisionsData.length - 1, prev + 1))}
                   disabled={rotaryDivision === divisionsData.length - 1}
-                  className="w-8 h-8 flex items-center justify-center hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none text-white cursor-pointer transition-colors"
+                  className="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-30 disabled:pointer-events-none text-neutral-800 cursor-pointer transition-colors"
                   title="Next Category (Rotate Down)"
                 >
                   <ChevronDown className="w-4 h-4" />
@@ -1468,13 +1514,13 @@ export default function App() {
             </div>
           </div>
 
-          {/* MAIN ROTARY DIAL WORKSPACE: Left Arc + Attached Detail Box */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center min-h-[580px]">
+          {/* MAIN ROTARY DIAL WORKSPACE: Left Arc Anchored to Screen Edge + Attached Detail Box */}
+          <div className="grid grid-cols-12 gap-8 items-center min-h-[560px]">
 
-            {/* LEFT COLUMN: THE SEMI-CIRCLE ROTARY ARC */}
-            <div className="lg:col-span-5 relative w-full h-[380px] sm:h-[480px] lg:h-[540px] flex items-center justify-center lg:justify-start overflow-hidden">
+            {/* LEFT COLUMN: THE SEMI-CIRCLE ROTARY ARC (Flush with Left Side of Screen) */}
+            <div className="col-span-5 relative w-full h-[540px] flex items-center justify-start overflow-visible">
               
-              {/* Semi-Circle SVG Track on Left */}
+              {/* Semi-Circle SVG Track on Left Side of Screen */}
               <svg 
                 className="absolute inset-0 w-full h-full pointer-events-none" 
                 viewBox="0 0 460 540" 
@@ -1482,53 +1528,52 @@ export default function App() {
               >
                 {/* Outer decorative dashed trajectory arc */}
                 <path 
-                  d="M 60 45 A 255 255 0 0 1 60 495" 
-                  stroke="#22c55e" 
+                  d="M 15 25 A 270 270 0 0 1 15 515" 
+                  stroke="#e2e8f0" 
                   strokeWidth="1.5" 
-                  strokeDasharray="4 8" 
-                  opacity="0.25" 
+                  strokeDasharray="4 6" 
                 />
 
                 {/* Primary Solid Semi-Circle Guide Line */}
                 <path 
-                  d="M 60 70 A 230 230 0 0 1 60 470" 
-                  stroke="url(#semiCircleGradient)" 
-                  strokeWidth="3" 
+                  d="M 15 50 A 245 245 0 0 1 15 490" 
+                  stroke="url(#semiCircleWhiteGradient)" 
+                  strokeWidth="3.5" 
                   strokeLinecap="round"
                 />
 
                 {/* Inner precision tick marks arc */}
                 <path 
-                  d="M 60 100 A 200 200 0 0 1 60 440" 
-                  stroke="#4ade80" 
+                  d="M 15 85 A 210 210 0 0 1 15 455" 
+                  stroke="#10b981" 
                   strokeWidth="1" 
-                  strokeDasharray="2 6" 
+                  strokeDasharray="3 5" 
                   opacity="0.3" 
                 />
 
-                {/* Center Hub Marker on far left */}
-                <circle cx="60" cy="270" r="16" fill="#0c2a1c" stroke="#22c55e" strokeWidth="2" />
-                <circle cx="60" cy="270" r="6" fill="#4ade80" />
+                {/* Center Hub Marker on far left edge */}
+                <circle cx="15" cy="270" r="14" fill="#ecfdf5" stroke="#059669" strokeWidth="2.5" />
+                <circle cx="15" cy="270" r="5" fill="#047857" />
 
                 {/* Active Horizontal Connector Beam attaching directly into detail card at right */}
                 <line 
-                  x1="290" 
+                  x1="260" 
                   y1="270" 
                   x2="460" 
                   y2="270" 
-                  stroke="#22c55e" 
-                  strokeWidth="2" 
+                  stroke="#059669" 
+                  strokeWidth="2.5" 
                   strokeDasharray="4 4"
                   className="animate-pulse"
                 />
-                <circle cx="456" cy="270" r="4" fill="#4ade80" />
+                <circle cx="456" cy="270" r="4.5" fill="#047857" />
 
                 {/* Gradient Definitions */}
                 <defs>
-                  <linearGradient id="semiCircleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#15803d" stopOpacity="0.4" />
-                    <stop offset="50%" stopColor="#4ade80" stopOpacity="1" />
-                    <stop offset="100%" stopColor="#15803d" stopOpacity="0.4" />
+                  <linearGradient id="semiCircleWhiteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+                    <stop offset="50%" stopColor="#047857" stopOpacity="1" />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.4" />
                   </linearGradient>
                 </defs>
               </svg>
@@ -1538,20 +1583,20 @@ export default function App() {
                 {divisionsData.map((div, idx) => {
                   const isActive = rotaryDivision === idx;
                   const delta = idx - rotaryDivision;
-                  // Separation of 36 degrees per division
-                  const angleDeg = delta * 36;
+                  // Separation of 38 degrees per division
+                  const angleDeg = delta * 38;
                   const angleRad = (angleDeg * Math.PI) / 180;
                   
-                  // Radius = 230px, Center = (60px, 270px)
-                  const nodeX = 60 + 230 * Math.cos(angleRad);
-                  const nodeY = 270 + 230 * Math.sin(angleRad);
+                  // Radius = 245px, Center = (15px, 270px) - Flush with left screen edge
+                  const nodeX = 15 + 245 * Math.cos(angleRad);
+                  const nodeY = 270 + 245 * Math.sin(angleRad);
                   
                   // Hide items rotating too far out of frame
                   const isVisible = Math.abs(delta) <= 2;
 
                   return (
                     <motion.div
-                      key={`rotary-node-${div.id}`}
+                      key={`rotary-node-white-${div.id}`}
                       initial={false}
                       animate={{
                         x: nodeX,
@@ -1560,29 +1605,29 @@ export default function App() {
                         opacity: isVisible ? 1 : 0,
                         zIndex: isActive ? 30 : 20 - Math.abs(delta)
                       }}
-                      transition={{ type: 'spring', stiffness: 220, damping: 22 }}
-                      className="absolute -top-10 -left-10 cursor-pointer"
+                      transition={{ type: 'spring', stiffness: 240, damping: 24 }}
+                      className="absolute -top-11 -left-11 cursor-pointer"
                       onClick={() => setRotaryDivision(idx)}
                     >
                       {/* Circular Shape Photo Container */}
                       <div className="relative group">
                         <div
-                          className={`w-20 h-20 sm:w-22 sm:h-22 rounded-full p-1 transition-all duration-300 relative ${
+                          className={`w-22 h-22 rounded-full p-1 transition-all duration-300 relative ${
                             isActive
-                              ? 'ring-4 ring-[#4ade80] ring-offset-3 ring-offset-[#061810] shadow-[0_0_30px_rgba(74,222,128,0.5)] bg-gradient-to-tr from-emerald-600 to-green-400'
-                              : 'border-2 border-emerald-900/60 bg-neutral-900/80 opacity-70 group-hover:opacity-100 group-hover:border-emerald-400/80 group-hover:scale-105'
+                              ? 'ring-4 ring-emerald-600 ring-offset-4 ring-offset-white shadow-xl scale-110 bg-white'
+                              : 'border-2 border-neutral-300 bg-white opacity-75 group-hover:opacity-100 group-hover:border-emerald-600 group-hover:scale-105 shadow-2xs'
                           }`}
                         >
                           {/* Inner Circular Image */}
-                          <div className="w-full h-full rounded-full overflow-hidden bg-neutral-800 relative">
+                          <div className="w-full h-full rounded-full overflow-hidden bg-neutral-100 relative">
                             <img
                               src={div.image}
                               alt={div.shortName}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
-                            {/* Dark Gradient Overlay for Inactive */}
+                            {/* Subtle Overlay for Inactive */}
                             {!isActive && (
-                              <div className="absolute inset-0 bg-black/35 group-hover:bg-transparent transition-colors" />
+                              <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
                             )}
                           </div>
 
@@ -1590,8 +1635,8 @@ export default function App() {
                           <span
                             className={`absolute -top-1.5 -right-1 px-1.5 py-0.5 font-mono text-[9px] font-bold rounded-xs border transition-colors ${
                               isActive
-                                ? 'bg-[#22c55e] text-[#051f13] border-white'
-                                : 'bg-neutral-900 text-neutral-300 border-neutral-700'
+                                ? 'bg-[#0a2318] text-white border-emerald-500 shadow-xs'
+                                : 'bg-neutral-100 text-neutral-700 border-neutral-300'
                             }`}
                           >
                             {div.number}
@@ -1599,7 +1644,7 @@ export default function App() {
 
                           {/* Active Focal Indicator Dot */}
                           {isActive && (
-                            <span className="absolute -right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-4 ring-[#061810] animate-ping" />
+                            <span className="absolute -right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-emerald-600 rounded-full ring-4 ring-white animate-ping" />
                           )}
                         </div>
 
@@ -1611,7 +1656,7 @@ export default function App() {
                               : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'
                           }`}
                         >
-                          <div className="px-2.5 py-1 bg-black/80 border border-emerald-500/40 backdrop-blur-md rounded-xs text-[11px] font-mono text-emerald-200">
+                          <div className="px-2.5 py-1 bg-[#0a2318] text-white text-xs font-mono rounded-xs shadow-md border border-emerald-800">
                             {div.shortName}
                           </div>
                         </div>
@@ -1625,40 +1670,40 @@ export default function App() {
             </div>
 
             {/* RIGHT COLUMN: ATTACHED SPECIFICATIONS & COMMERCE DETAIL BOX */}
-            <div className="lg:col-span-7 relative">
+            <div className="col-span-7 relative">
               <AnimatePresence mode="wait">
                 {(() => {
                   const current = divisionsData[rotaryDivision];
                   const CurrentIcon = current.icon;
                   return (
                     <motion.div
-                      key={`rotary-detail-box-${current.id}`}
-                      initial={{ opacity: 0, x: 25 }}
+                      key={`rotary-detail-box-white-${current.id}`}
+                      initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -25 }}
-                      transition={{ duration: 0.28, ease: 'easeOut' }}
-                      className="bg-[#0b2419] border-2 border-emerald-500/30 p-6 sm:p-8 shadow-2xl relative overflow-hidden space-y-6"
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                      className="bg-[#fafbfa] border-2 border-emerald-900/20 p-6 sm:p-8 shadow-xs relative space-y-6 hover:border-emerald-800/40 transition-colors"
                     >
                       {/* Attached Connector Indicator on the Left Border */}
-                      <div className="hidden lg:block absolute left-0 top-[45%] -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-emerald-400 rounded-full border-2 border-[#061810] shadow-[0_0_15px_#22c55e]" />
+                      <div className="absolute left-0 top-[45%] -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-emerald-700 rotate-45 border-2 border-white shadow-xs" />
 
                       {/* Detail Card Header */}
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-emerald-900/40 pb-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-neutral-200 pb-4">
                         <div>
-                          <div className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-emerald-400 font-semibold mb-1">
-                            <CurrentIcon className="w-4 h-4 text-emerald-300" />
+                          <div className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold mb-1">
+                            <CurrentIcon className="w-4 h-4 text-emerald-700" />
                             <span>Division {current.number} · D R &amp; Sons International</span>
                           </div>
-                          <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-tight">
+                          <h3 className="text-xl sm:text-2xl font-bold text-[#0a2318] tracking-tight leading-tight">
                             {current.title}
                           </h3>
-                          <p className="text-xs text-emerald-300/80 font-serif-brand italic mt-1">
+                          <p className="text-xs text-neutral-600 font-serif-brand italic mt-1">
                             {current.tagline}
                           </p>
                         </div>
 
                         <div className="shrink-0 flex items-center gap-2 font-mono">
-                          <span className="px-2.5 py-1 bg-emerald-950/80 border border-emerald-700/50 text-emerald-300 text-xs font-bold">
+                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-900 border border-emerald-900/20 text-xs font-bold">
                             SKU #{current.number}
                           </span>
                         </div>
@@ -1666,31 +1711,31 @@ export default function App() {
 
                       {/* Image Preview & Summary Split */}
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
-                        <div className="md:col-span-5 border border-emerald-900/60 overflow-hidden relative group">
+                        <div className="md:col-span-5 border border-neutral-200 bg-white shadow-2xs overflow-hidden relative group">
                           <img 
                             src={current.image} 
                             alt={current.title} 
                             className="w-full aspect-16/10 object-cover object-center group-hover:scale-105 transition-transform duration-500"
                           />
-                          <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/75 backdrop-blur-xs font-mono text-[9px] uppercase tracking-wider text-emerald-300 border border-emerald-500/30">
+                          <div className="absolute top-2 left-2 px-2 py-0.5 bg-white/90 backdrop-blur-xs font-mono text-[9px] uppercase tracking-wider text-emerald-900 border border-neutral-200">
                             Direct Facility Line
                           </div>
                         </div>
                         <div className="md:col-span-7 space-y-3">
-                          <p className="text-xs sm:text-sm text-neutral-200 leading-relaxed">
+                          <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed">
                             {current.summary}
                           </p>
                           
                           {/* Commercial Key Items Chips */}
                           <div>
-                            <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 block mb-1">
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block mb-1">
                               Commercial Deliverables:
                             </span>
                             <div className="flex flex-wrap gap-1.5">
                               {current.keyItems.map((item, i) => (
                                 <span 
                                   key={i} 
-                                  className="px-2 py-1 bg-emerald-950/70 border border-emerald-800/40 text-[11px] text-emerald-100 font-medium"
+                                  className="px-2.5 py-1 bg-white border border-neutral-200 text-[11px] text-neutral-800 font-medium shadow-2xs"
                                 >
                                   {item}
                                 </span>
@@ -1701,15 +1746,15 @@ export default function App() {
                       </div>
 
                       {/* Technical Specs & Compliance Grid */}
-                      <div className="pt-2 border-t border-emerald-900/40 space-y-2">
-                        <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+                      <div className="pt-2 border-t border-neutral-200 space-y-2">
+                        <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-neutral-500">
                           <span>Verified Process Highlights</span>
-                          <span className="text-emerald-400">FSSAI / BIS IS 14543</span>
+                          <span className="text-emerald-800 font-semibold">FSSAI / BIS IS 14543</span>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-neutral-200">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-neutral-700">
                           {current.specs.map((spec, i) => (
-                            <div key={i} className="flex items-center gap-2 bg-emerald-950/40 p-2 border border-emerald-800/30">
-                              <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <div key={i} className="flex items-center gap-2 bg-white p-2 border border-neutral-200/80 shadow-2xs">
+                              <Check className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                               <span className="truncate">{spec}</span>
                             </div>
                           ))}
@@ -1717,18 +1762,18 @@ export default function App() {
                       </div>
 
                       {/* Commercial Applications Info */}
-                      <div className="bg-black/30 p-3 border border-white/5 flex items-start gap-2.5 text-xs text-neutral-300">
-                        <span className="font-mono text-emerald-400 shrink-0 font-semibold text-[11px]">Applications:</span>
+                      <div className="bg-emerald-50/70 p-3 border border-emerald-900/10 flex items-start gap-2.5 text-xs text-neutral-700">
+                        <span className="font-mono text-emerald-900 shrink-0 font-semibold text-[11px]">Applications:</span>
                         <span className="leading-snug">{current.applications}</span>
                       </div>
 
                       {/* Action Footer: Quote & WhatsApp */}
-                      <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-emerald-900/40">
+                      <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200">
                         <div className="flex items-center gap-3">
                           <a
                             href="#inquiry-desk"
                             onClick={() => setInquiryForm({...inquiryForm, division: current.title})}
-                            className="px-5 py-2.5 bg-[#22c55e] hover:bg-[#16a34a] text-[#071f14] text-xs font-bold uppercase tracking-wider transition-all hover:shadow-lg flex items-center gap-1.5 cursor-pointer"
+                            className="px-6 py-2.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-bold uppercase tracking-wider transition-all hover:shadow-md flex items-center gap-1.5 cursor-pointer"
                           >
                             <span>Request Commercial RFQ</span>
                             <ArrowRight className="w-3.5 h-3.5" />
@@ -1738,9 +1783,9 @@ export default function App() {
                             href={`https://wa.me/919411268879?text=${encodeURIComponent(`Hi D R & Sons Trade Desk, I am inquiring about Division ${current.number}: ${current.title}`)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold uppercase tracking-wider transition-colors"
+                            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 text-xs font-semibold uppercase tracking-wider transition-colors"
                           >
-                            <MessageSquare className="w-3.5 h-3.5 text-emerald-300" />
+                            <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
                             <span>WhatsApp Trade Desk</span>
                           </a>
                         </div>
@@ -1749,13 +1794,13 @@ export default function App() {
                         <div className="flex items-center gap-1.5">
                           {divisionsData.map((d, i) => (
                             <button
-                              key={`rotary-step-${d.id}`}
+                              key={`rotary-step-white-${d.id}`}
                               type="button"
                               onClick={() => setRotaryDivision(i)}
                               className={`h-2 transition-all duration-300 cursor-pointer ${
                                 rotaryDivision === i 
-                                  ? 'w-6 bg-emerald-400' 
-                                  : 'w-2 bg-emerald-900/60 hover:bg-emerald-700'
+                                  ? 'w-6 bg-emerald-700' 
+                                  : 'w-2 bg-neutral-300 hover:bg-neutral-400'
                               }`}
                               title={`Switch to Division ${d.number}`}
                             />
