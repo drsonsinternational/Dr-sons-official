@@ -37,7 +37,8 @@ import {
   Layers,
   Sliders,
   Plus,
-  Minus
+  Minus,
+  Newspaper
 } from 'lucide-react';
 import MaintenancePage from './MaintenancePage';
 
@@ -73,8 +74,8 @@ export default function App() {
   const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
   const [notification, setNotification] = useState<NotificationState>({ type: null, message: '' });
   
-  // Legal Modal State: 'terms' | 'privacy' | 'statutory' | null
-  const [legalModalTab, setLegalModalTab] = useState<'terms' | 'privacy' | 'statutory' | null>(null);
+  // Legal & Regulatory Modal State: 'terms' | 'privacy' | 'statutory' | 'regulatory' | 'press' | null
+  const [legalModalTab, setLegalModalTab] = useState<'terms' | 'privacy' | 'statutory' | 'regulatory' | 'press' | null>(null);
 
   // Mobile Dashboard Drawer State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -227,14 +228,14 @@ export default function App() {
       id: 'water',
       number: '03',
       shortName: 'Drinking Mineral Water',
-      title: 'Drinking Mineral Water',
-      summary: 'Multi-stage reverse osmosis, ozonation, micron filtration, and mineral remineralization yielding crystal-clear pure drinking water.',
-      tagline: 'Pure packaged mineral water with essential minerals and crisp refreshing taste',
+      title: 'Drinking Mineral Water (250ml, 300ml, 500ml & 1L)',
+      summary: 'Multi-stage reverse osmosis, ozonation, micron filtration, and calibrated electrolyte remineralization yielding crystal-clear pure drinking water packaged in 250ml, 300ml, 500ml, and 1L commercial categories.',
+      tagline: 'Pure packaged drinking water certified under IS 14543 with balanced minerals and crisp taste',
       image: '/assets/aistudio/drinking_water_packaging.webp',
       icon: Droplets,
-      keyItems: ['Packaged Mineral Water (500ml & 1L)', 'Bulk Institutional Dispenser Jars', 'Mineral-Balanced Spring Formula', 'Touch-Free Cleanroom Bottling'],
-      specs: ['Multi-stage RO & Ozonation', 'Touch-free bottling line', '100% Recyclable food-grade PET', 'Tamper-evident sealing'],
-      applications: 'Retail brands, corporate offices, hospitality, airline catering & institutions'
+      keyItems: ['250ml Pocket & Event Pack', '300ml Hospitality & Dining Pack', '500ml Retail On-the-Go PET', '1 Litre Table & Family Pack', 'IS 14543 Certified'],
+      specs: ['250ml, 300ml, 500ml & 1L Categories', 'Double-Pass RO & Ozonation', '100% Recyclable Virgin Food-Grade PET', 'Tamper-Evident Induction Sealing'],
+      applications: 'Hospitality, airline catering, retail brands, corporate offices, railway transit & distributors'
     },
     {
       id: 'beverages',
@@ -447,16 +448,16 @@ export default function App() {
     {
       id: 'mineral-water',
       number: '03',
-      division: 'Drinking Mineral Water',
-      title: 'Double-Pass RO & Automated Cleanroom Bottling',
+      division: 'Drinking Mineral Water (250ml, 300ml, 500ml & 1L)',
+      title: 'Double-Pass RO & Automated Cleanroom Bottling (250ml–1L)',
       shortTitle: 'Mineral Water Suite',
-      desc: 'Multi-stage quartz and activated carbon filtration, dual thin-film composite reverse osmosis, calibrated remineralization, and high-speed touch-free Class 100 cleanroom rotary bottling.',
+      desc: 'Multi-stage quartz and activated carbon filtration, dual thin-film composite reverse osmosis, calibrated remineralization, and high-speed touch-free Class 100 cleanroom rotary bottling across 250ml, 300ml, 500ml, and 1L commercial categories.',
       image: '/assets/aistudio/drinking_water_packaging.webp',
       icon: Droplets,
       cleanroomClass: 'Class 100 / ISO 5 Cleanroom Enclosure',
       capacity: '10,000 Litres / Hour Purification',
       equipment: 'Double-Pass RO Skid, Ozonator, 254nm UV Chamber & Monoblock Bottling',
-      tags: ['RO & Ozonation', 'Cleanroom Bottling', 'Mineral Balance', 'Class 100'],
+      tags: ['250ml, 300ml, 500ml, 1L', 'IS 14543:2004', 'RO & Ozonation', 'Class 100'],
       stages: [
         {
           stepNumber: '01',
@@ -527,16 +528,16 @@ export default function App() {
           stepLabel: 'Rotary Bottling',
           phase: 'PHASE 05 · CLASS 100 MONOBLOCK PACKAGING',
           title: 'Touch-Free Rinser-Filler-Capper & Tamper Induction Sealing',
-          summary: 'Bottling occurs within a laminar HEPA-filtered Class 100 cleanroom enclosure. Bottles are air-rinsed with sterile ionized air, filled under gravity-flow isobaric nozzles, and capped with tamper-evident collar closures at 120 bottles/min.',
+          summary: 'Bottling occurs within a laminar HEPA-filtered Class 100 cleanroom enclosure across four calibrated commercial retail categories: 250ml, 300ml, 500ml, and 1L. Bottles are air-rinsed with sterile ionized air, filled under gravity-flow isobaric nozzles, and capped with tamper-evident collar closures at 120 bottles/min.',
           image: '/assets/factory/stages/line3_stage5_rinser_filler_capper.webp',
           telemetry: [
             { label: 'Bottling Velocity', value: '120 Bottles / Minute Rotary' },
             { label: 'Cleanroom Enclosure', value: 'Class 100 / ISO 5 Positive' },
             { label: 'Volumetric Accuracy', value: '± 0.5 ml Laser Calibrated' },
-            { label: 'Container Types', value: '500ml, 1L PET & Bulk Jars' }
+            { label: 'Bottle Categories', value: '250ml, 300ml, 500ml & 1L PET' }
           ],
-          qaStandard: 'Automated High-Speed Machine-Vision Fill-Level & Torque Inspection',
-          highlight: '100% recyclable virgin food-grade PET with tamper-evident security collar.'
+          qaStandard: 'Automated High-Speed Machine-Vision Fill-Level & Torque Inspection (IS 14543 / FSSAI)',
+          highlight: 'Certified virgin food-grade PET across 250ml, 300ml, 500ml & 1L with tamper-evident induction security.'
         }
       ]
     },
@@ -711,9 +712,21 @@ export default function App() {
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-neutral-700">
+          <nav className="hidden lg:flex items-center gap-5 text-xs font-semibold text-neutral-700">
             <a href="#divisions" className="hover:text-emerald-900 transition-colors">4 Divisions</a>
             <a href="#facilities" className="hover:text-emerald-900 transition-colors">Facilities</a>
+            <button 
+              onClick={() => setLegalModalTab('regulatory')}
+              className="hover:text-emerald-900 transition-colors cursor-pointer text-neutral-600 font-medium"
+            >
+              Regulatory
+            </button>
+            <button 
+              onClick={() => setLegalModalTab('press')}
+              className="hover:text-emerald-900 transition-colors cursor-pointer text-neutral-600 font-medium"
+            >
+              Press
+            </button>
             <button 
               onClick={() => setLegalModalTab('terms')}
               className="hover:text-emerald-900 transition-colors cursor-pointer text-neutral-600 font-medium"
@@ -922,6 +935,34 @@ export default function App() {
                         <div className="flex items-center gap-2">
                           <Building className="w-3.5 h-3.5 text-emerald-800" />
                           <span>Statutory Company Details</span>
+                        </div>
+                        <ChevronRight className="w-3 h-3 text-neutral-400" />
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setLegalModalTab('regulatory');
+                        }}
+                        className="flex items-center justify-between w-full p-2 text-xs text-neutral-700 hover:text-emerald-950 hover:bg-neutral-50 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileCheck className="w-3.5 h-3.5 text-emerald-800" />
+                          <span>Regulatory Terms (FSSAI &amp; BIS)</span>
+                        </div>
+                        <ChevronRight className="w-3 h-3 text-neutral-400" />
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setLegalModalTab('press');
+                        }}
+                        className="flex items-center justify-between w-full p-2 text-xs text-neutral-700 hover:text-emerald-950 hover:bg-neutral-50 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Newspaper className="w-3.5 h-3.5 text-emerald-800" />
+                          <span>Corporate Press Releases</span>
                         </div>
                         <ChevronRight className="w-3 h-3 text-neutral-400" />
                       </button>
@@ -1749,7 +1790,7 @@ export default function App() {
                     >
                       <option value="Fruits, Vegetables Powder and starch">Fruits, Vegetables Powder and starch</option>
                       <option value="Fruits and Vegetables Flakes">Fruits and Vegetables Flakes</option>
-                      <option value="Drinking Mineral Water">Drinking Mineral Water</option>
+                      <option value="Drinking Mineral Water (250ml, 300ml, 500ml & 1L)">Drinking Mineral Water (250ml, 300ml, 500ml &amp; 1L)</option>
                       <option value="Non-Alcoholic Drinks and Ice Creams">Non-Alcoholic Drinks and Ice Creams</option>
                     </select>
                     <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -1915,8 +1956,8 @@ export default function App() {
             </div>
           </div>
 
-          {/* Multi-Column Directory Grid (Strictly grounded in website content) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-10">
+          {/* Multi-Column Directory Grid (5 Columns on Desktop: Divisions, Facilities, Trade Desk, Corporate, Regulatory & Press) */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 py-10">
             
             {/* Column 1: Core Manufacturing Divisions */}
             <div className="space-y-3">
@@ -2063,6 +2104,135 @@ export default function App() {
               </ul>
             </div>
 
+            {/* Column 5: Regulatory Compliance & Press Releases */}
+            <div className="space-y-3 col-span-2 sm:col-span-1">
+              <h4 className="text-xs font-bold text-[#0a2318] uppercase tracking-wider flex items-center gap-1.5">
+                <FileCheck className="w-3.5 h-3.5 text-emerald-800" />
+                <span>Regulatory &amp; Press</span>
+              </h4>
+              <ul className="space-y-2 text-xs text-neutral-600">
+                <li>
+                  <button 
+                    onClick={() => setLegalModalTab('regulatory')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left flex items-center gap-1.5"
+                  >
+                    <span className="w-1 h-1 bg-emerald-700"></span>
+                    <span>Regulatory Terms (FSSAI)</span>
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setLegalModalTab('regulatory')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left flex items-center gap-1.5"
+                  >
+                    <span className="w-1 h-1 bg-emerald-700"></span>
+                    <span>Packaged Water (250ml–1L)</span>
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setLegalModalTab('regulatory')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left flex items-center gap-1.5"
+                  >
+                    <span className="w-1 h-1 bg-emerald-700"></span>
+                    <span>BIS IS 14543:2004 Norms</span>
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setLegalModalTab('regulatory')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left flex items-center gap-1.5"
+                  >
+                    <span className="w-1 h-1 bg-emerald-700"></span>
+                    <span>Legal Metrology Act 2011</span>
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setLegalModalTab('press')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left flex items-center gap-1.5"
+                  >
+                    <span className="w-1 h-1 bg-emerald-700"></span>
+                    <span>Official Press Releases</span>
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setLegalModalTab('press')}
+                    className="hover:text-[#143e2b] hover:underline transition-colors cursor-pointer text-left flex items-center gap-1.5"
+                  >
+                    <span className="w-1 h-1 bg-emerald-700"></span>
+                    <span>Corporate Media Desk</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
+          {/* Statutory & Industry Compliance Strip (Strictly rectangular, high trust) */}
+          <div className="py-6 border-t border-neutral-200">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
+                  Indian Industry &amp; Statutory Compliance Framework
+                </span>
+                <p className="text-xs text-neutral-600">
+                  Operated in rigorous adherence to Indian food safety, Bureau of Indian Standards, corporate governance, and environmental legislation.
+                </p>
+              </div>
+
+              {/* 6 Rectangular Compliance Badges */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-left">
+                <button
+                  onClick={() => setLegalModalTab('regulatory')}
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                >
+                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">FSSAI Act 2006</div>
+                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Food Safety Regs</div>
+                </button>
+
+                <button
+                  onClick={() => setLegalModalTab('regulatory')}
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                >
+                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">BIS IS 14543</div>
+                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Packaged Water</div>
+                </button>
+
+                <button
+                  onClick={() => setLegalModalTab('regulatory')}
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                >
+                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">Legal Metrology</div>
+                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">250ml - 1L Pack</div>
+                </button>
+
+                <button
+                  onClick={() => setLegalModalTab('privacy')}
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                >
+                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">DPDP Act 2023</div>
+                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Data Governance</div>
+                </button>
+
+                <button
+                  onClick={() => setLegalModalTab('statutory')}
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                >
+                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">Companies Act</div>
+                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">MCA Pvt. Ltd.</div>
+                </button>
+
+                <button
+                  onClick={() => setLegalModalTab('regulatory')}
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                >
+                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">SPCB / CPCB</div>
+                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Zero Discharge</div>
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Bottom Copyright & Legal Strip */}
@@ -2071,12 +2241,24 @@ export default function App() {
               &copy; {new Date().getFullYear()} D R &amp; Sons International Private Limited. All rights reserved.
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1">
               <span>Incorporated under Companies Act, 2013</span>
               <span className="text-neutral-300" aria-hidden="true">·</span>
               <span>MCA India</span>
               <span className="text-neutral-300" aria-hidden="true">·</span>
-              <span>FSSAI Certified</span>
+              <button 
+                onClick={() => setLegalModalTab('regulatory')}
+                className="hover:text-emerald-950 hover:underline transition-colors cursor-pointer font-medium"
+              >
+                Regulatory Terms (FSSAI &amp; BIS)
+              </button>
+              <span className="text-neutral-300" aria-hidden="true">·</span>
+              <button 
+                onClick={() => setLegalModalTab('press')}
+                className="hover:text-emerald-950 hover:underline transition-colors cursor-pointer font-medium"
+              >
+                Press Releases
+              </button>
               <span className="text-neutral-300" aria-hidden="true">·</span>
               <button 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -2090,7 +2272,7 @@ export default function App() {
         </div>
       </footer>
 
-      {/* LEGAL TERMS MODAL (FOR PRIVATE LIMITED COMPANY) */}
+      {/* LEGAL & REGULATORY TERMS MODAL (FOR PRIVATE LIMITED COMPANY) */}
       <AnimatePresence>
         {legalModalTab && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
@@ -2099,7 +2281,7 @@ export default function App() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ duration: 0.2 }}
-              className="bg-white border border-neutral-200 w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden"
+              className="bg-white border border-neutral-200 w-full max-w-3xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden"
             >
               {/* Modal Header */}
               <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-[#fafbfa]">
@@ -2109,10 +2291,10 @@ export default function App() {
                   </div>
                   <div>
                     <h3 className="text-sm sm:text-base font-bold text-neutral-900 leading-tight">
-                      Corporate Legal Terms
+                      Corporate Governance &amp; Regulatory Portal
                     </h3>
                     <p className="text-[10px] text-neutral-500 font-mono">
-                      D R &amp; Sons International Private Limited
+                      D R &amp; Sons International Private Limited · Statutory &amp; Press Desk
                     </p>
                   </div>
                 </div>
@@ -2129,6 +2311,28 @@ export default function App() {
               {/* Modal Tabs */}
               <div className="flex border-b border-neutral-200 bg-white px-3 overflow-x-auto no-scrollbar">
                 <button
+                  onClick={() => setLegalModalTab('regulatory')}
+                  className={`py-2 px-3 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer border-b-2 -mb-px flex items-center gap-1.5 ${
+                    legalModalTab === 'regulatory'
+                      ? 'border-emerald-800 text-emerald-950 bg-emerald-50/50'
+                      : 'border-transparent text-neutral-500 hover:text-neutral-900'
+                  }`}
+                >
+                  <FileCheck className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Regulatory Terms</span>
+                </button>
+                <button
+                  onClick={() => setLegalModalTab('press')}
+                  className={`py-2 px-3 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer border-b-2 -mb-px flex items-center gap-1.5 ${
+                    legalModalTab === 'press'
+                      ? 'border-emerald-800 text-emerald-950 bg-emerald-50/50'
+                      : 'border-transparent text-neutral-500 hover:text-neutral-900'
+                  }`}
+                >
+                  <Newspaper className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Press Releases</span>
+                </button>
+                <button
                   onClick={() => setLegalModalTab('terms')}
                   className={`py-2 px-3 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer border-b-2 -mb-px flex items-center gap-1.5 ${
                     legalModalTab === 'terms'
@@ -2136,7 +2340,7 @@ export default function App() {
                       : 'border-transparent text-neutral-500 hover:text-neutral-900'
                   }`}
                 >
-                  <FileText className="w-3 h-3 text-emerald-700" />
+                  <FileText className="w-3.5 h-3.5 text-emerald-700" />
                   <span>Terms of Supply</span>
                 </button>
                 <button
@@ -2147,7 +2351,7 @@ export default function App() {
                       : 'border-transparent text-neutral-500 hover:text-neutral-900'
                   }`}
                 >
-                  <Lock className="w-3 h-3 text-emerald-700" />
+                  <Lock className="w-3.5 h-3.5 text-emerald-700" />
                   <span>Privacy (DPDP)</span>
                 </button>
                 <button
@@ -2158,13 +2362,194 @@ export default function App() {
                       : 'border-transparent text-neutral-500 hover:text-neutral-900'
                   }`}
                 >
-                  <Building className="w-3 h-3 text-emerald-700" />
+                  <Building className="w-3.5 h-3.5 text-emerald-700" />
                   <span>Statutory Info</span>
                 </button>
               </div>
 
               {/* Modal Content */}
-              <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs text-neutral-700 leading-relaxed max-h-[55vh]">
+              <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs text-neutral-700 leading-relaxed max-h-[58vh]">
+                
+                {legalModalTab === 'regulatory' && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-emerald-50 border border-emerald-900/15 text-[11px] text-emerald-950 space-y-1">
+                      <div className="font-bold flex items-center gap-1.5 uppercase tracking-wider">
+                        <FileCheck className="w-4 h-4 text-emerald-800" />
+                        <span>Indian Food &amp; Beverage Statutory Regulatory Framework</span>
+                      </div>
+                      <p className="text-neutral-700 leading-relaxed">
+                        D R &amp; Sons International Private Limited operates commercial manufacturing infrastructure in strict compliance with the Food Safety and Standards Authority of India (FSSAI), Bureau of Indian Standards (BIS), Legal Metrology (Packaged Commodities) Rules, 2011, and State Pollution Control Board environmental directives.
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="border border-neutral-200 p-3 bg-white space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                            1. FSSAI Act, 2006 &amp; Central Licensing
+                          </h4>
+                          <span className="text-[10px] font-mono px-2 py-0.5 bg-neutral-100 text-neutral-700 border border-neutral-200">
+                            FSSAI Standard
+                          </span>
+                        </div>
+                        <p className="text-neutral-600 leading-relaxed">
+                          All food processing operations—including spray-dried powders, starch isolation, continuous dehydration, and beverage processing—comply with the Food Safety and Standards Act, 2006 and the Food Safety and Standards (Licensing and Registration of Food Businesses) Regulations, 2011. Every production batch is subject to physical, chemical, and microbiological validation in compliance with prescribed Indian limits for pesticide residues, heavy metals, and bacterial counts.
+                        </p>
+                      </div>
+
+                      <div className="border border-neutral-200 p-3 bg-white space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                            2. Packaged Drinking Water (IS 14543:2004) &amp; Commercial Categories
+                          </h4>
+                          <span className="text-[10px] font-mono px-2 py-0.5 bg-emerald-100 text-emerald-900 border border-emerald-200">
+                            BIS Mandatory ISI
+                          </span>
+                        </div>
+                        <p className="text-neutral-600 leading-relaxed">
+                          Our Drinking Mineral Water division adheres to mandatory Bureau of Indian Standards specification <strong>IS 14543:2004</strong> (Packaged Drinking Water Other Than Packaged Natural Mineral Water). Purification incorporates multi-stage sand filtration, high-iodine activated carbon, 0.0001µm reverse osmosis, UV irradiation, and ozonation.
+                        </p>
+                        <div className="pt-2">
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block mb-1.5 font-semibold">
+                            Authorized Commercial Selling Categories:
+                          </span>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center font-mono text-[11px]">
+                            <div className="p-2 border border-emerald-900/20 bg-emerald-50/50">
+                              <span className="font-bold text-emerald-950 block">250 ml</span>
+                              <span className="text-[9px] text-neutral-500">Pocket &amp; Aviation Pack</span>
+                            </div>
+                            <div className="p-2 border border-emerald-900/20 bg-emerald-50/50">
+                              <span className="font-bold text-emerald-950 block">300 ml</span>
+                              <span className="text-[9px] text-neutral-500">Hospitality &amp; Dining Pack</span>
+                            </div>
+                            <div className="p-2 border border-emerald-900/20 bg-emerald-50/50">
+                              <span className="font-bold text-emerald-950 block">500 ml</span>
+                              <span className="text-[9px] text-neutral-500">Retail On-the-Go PET</span>
+                            </div>
+                            <div className="p-2 border border-emerald-900/20 bg-emerald-50/50">
+                              <span className="font-bold text-emerald-950 block">1 Litre (1L)</span>
+                              <span className="text-[9px] text-neutral-500">Family &amp; Table Pack</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="border border-neutral-200 p-3 bg-white space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                            3. Legal Metrology (Packaged Commodities) Rules, 2011
+                          </h4>
+                          <span className="text-[10px] font-mono px-2 py-0.5 bg-neutral-100 text-neutral-700 border border-neutral-200">
+                            Statutory Labeling
+                          </span>
+                        </div>
+                        <p className="text-neutral-600 leading-relaxed">
+                          All packaged products bear mandatory statutory labeling declarations: Net Quantity (calibrated to 250ml, 300ml, 500ml, 1L for liquids; net weight for dehydrated solids), Maximum Retail Price (MRP inclusive of all taxes), Month and Year of manufacture, Batch/Lot identification, Best Before duration, and Manufacturer Redressal Details (+91 9411268879 / contact@drsonsinternational.com).
+                        </p>
+                      </div>
+
+                      <div className="border border-neutral-200 p-3 bg-white space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                            4. Environmental &amp; Pollution Control Compliance (SPCB &amp; CPCB)
+                          </h4>
+                          <span className="text-[10px] font-mono px-2 py-0.5 bg-neutral-100 text-neutral-700 border border-neutral-200">
+                            ZLD &amp; EPR Norms
+                          </span>
+                        </div>
+                        <p className="text-neutral-600 leading-relaxed">
+                          Manufacturing units function under valid Consent to Establish (CTE) and Consent to Operate (CTO) granted by the State Pollution Control Board. We implement Zero Liquid Discharge (ZLD) effluent treatment, closed-loop water recovery, and strictly conform to Extended Producer Responsibility (EPR) regulations using 100% recyclable virgin food-grade PET preforms.
+                        </p>
+                      </div>
+
+                      <div className="border border-neutral-200 p-3 bg-white space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                            5. Quality Assurance, COA &amp; Traceability
+                          </h4>
+                          <span className="text-[10px] font-mono px-2 py-0.5 bg-neutral-100 text-neutral-700 border border-neutral-200">
+                            NABL Calibration
+                          </span>
+                        </div>
+                        <p className="text-neutral-600 leading-relaxed">
+                          Dispatches are accompanied by a lot-specific Certificate of Analysis (COA) confirming conformance with chemical, sensory, and microbiological parameters. Traceability records are cataloged per Indian food traceability guidelines to guarantee supply integrity.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {legalModalTab === 'press' && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-emerald-50 border border-emerald-900/15 text-[11px] text-emerald-950 space-y-1">
+                      <div className="font-bold flex items-center gap-1.5 uppercase tracking-wider">
+                        <Newspaper className="w-4 h-4 text-emerald-800" />
+                        <span>Corporate Press Office &amp; Media Desk</span>
+                      </div>
+                      <p className="text-neutral-700 leading-relaxed">
+                        Official announcements, commissioning notices, and media releases issued by D R &amp; Sons International Private Limited. All releases are authentic public record under Indian corporate communications guidelines.
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      {/* PR 01 */}
+                      <div className="border border-neutral-200 p-3.5 bg-white space-y-2">
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] font-mono text-neutral-400">
+                          <span className="text-emerald-800 font-bold uppercase tracking-wider">PRESS RELEASE · PR-2026/01</span>
+                          <span>October 2026 · Uttar Pradesh, India</span>
+                        </div>
+                        <h4 className="text-xs sm:text-sm font-bold text-neutral-900 leading-snug">
+                          D R &amp; Sons International Private Limited Formally Commissions Multi-Line Commercial Food &amp; Beverage Processing Complex
+                        </h4>
+                        <p className="text-neutral-600 leading-relaxed">
+                          D R &amp; Sons International Private Limited announced the successful commissioning of its modern food and beverage manufacturing complex. Built to international hygienic standards, the facility integrates four key production divisions: fruit and vegetable powders &amp; starch, dehydrated flakes, packaged mineral water, and non-alcoholic beverages. The operations emphasize farm-gate procurement, low-temperature thermal processing, and automated cleanroom bottling.
+                        </p>
+                      </div>
+
+                      {/* PR 02 */}
+                      <div className="border border-neutral-200 p-3.5 bg-white space-y-2">
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] font-mono text-neutral-400">
+                          <span className="text-emerald-800 font-bold uppercase tracking-wider">PRESS RELEASE · PR-2026/02</span>
+                          <span>November 2026 · Product Launch</span>
+                        </div>
+                        <h4 className="text-xs sm:text-sm font-bold text-neutral-900 leading-snug">
+                          Commercial Rollout of Packaged Drinking Mineral Water in 250ml, 300ml, 500ml &amp; 1L Categories Under BIS IS 14543:2004
+                        </h4>
+                        <p className="text-neutral-600 leading-relaxed">
+                          The company has launched commercial supply of packaged drinking mineral water across four standardized commercial categories: <strong>250ml pocket pack</strong>, <strong>300ml hospitality pack</strong>, <strong>500ml retail PET</strong>, and <strong>1 Litre family/institutional pack</strong>. Each category utilizes double-pass reverse osmosis, 254nm UV sterilization, controlled remineralization, and touch-free Class 100 cleanroom packaging in 100% recyclable virgin food-grade PET with tamper-evident induction sealing.
+                        </p>
+                      </div>
+
+                      {/* PR 03 */}
+                      <div className="border border-neutral-200 p-3.5 bg-white space-y-2">
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] font-mono text-neutral-400">
+                          <span className="text-emerald-800 font-bold uppercase tracking-wider">PRESS RELEASE · PR-2026/03</span>
+                          <span>November 2026 · Industrial B2B</span>
+                        </div>
+                        <h4 className="text-xs sm:text-sm font-bold text-neutral-900 leading-snug">
+                          Continuous Dehydration &amp; Starch Processing Lines Commence Commercial B2B Contract Dispatches
+                        </h4>
+                        <p className="text-neutral-600 leading-relaxed">
+                          Addressing rising industrial demand for shelf-stable ingredients, D R &amp; Sons International opened long-term B2B supply agreements for culinary dehydrated onion/garlic/vegetable flakes and spray-dried fruit starches with moisture controlled beneath 4.0%. All contracts feature batch COA certification under FSSAI criteria.
+                        </p>
+                      </div>
+
+                      {/* Media Desk Box */}
+                      <div className="border border-neutral-200 bg-[#fafbfa] p-3 space-y-1.5 text-[11px]">
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 font-bold block">
+                          Media &amp; Press Relations Desk
+                        </span>
+                        <p className="text-neutral-600">
+                          Journalists, trade publications, and institutional procurement analysts seeking official press statements or facility access may contact our corporate communications desk:
+                        </p>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 font-mono">
+                          <span className="text-neutral-800">Email: contact@drsonsinternational.com</span>
+                          <span className="text-emerald-900 font-bold">WhatsApp: +91 9411268879</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 
                 {legalModalTab === 'terms' && (
                   <div className="space-y-3.5">
