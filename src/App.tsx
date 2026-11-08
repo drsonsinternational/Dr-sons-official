@@ -106,9 +106,34 @@ export default function App() {
   const heroSectionRef = useRef<HTMLElement | null>(null);
   const rotarySectionRef = useRef<HTMLElement | null>(null);
   const facilitiesSectionRef = useRef<HTMLElement | null>(null);
+  const arcContainerRef = useRef<HTMLDivElement | null>(null);
+  const [arcHeight, setArcHeight] = useState<number>(() => 
+    typeof window !== 'undefined' ? Math.max(480, window.innerHeight - 160) : 560
+  );
   const isSectionTransitioningRef = useRef<boolean>(false);
   const currentScrollAnimationRef = useRef<number | null>(null);
   const arcDragStartY = useRef<number | null>(null);
+
+  // Dynamically observe the semi-circle arc container's exact pixel height
+  useEffect(() => {
+    const updateHeight = () => {
+      if (arcContainerRef.current) {
+        const h = arcContainerRef.current.clientHeight;
+        if (h > 0) setArcHeight(h);
+      }
+    };
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && arcContainerRef.current) {
+      ro = new ResizeObserver(updateHeight);
+      ro.observe(arcContainerRef.current);
+    }
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+      if (ro) ro.disconnect();
+    };
+  }, []);
 
   // Cinematic smooth scroll interpolation using requestAnimationFrame & easeInOutCubic
   // Provides a luxurious, continuous glide between sections so the user never feels like they skipped content
@@ -1749,7 +1774,7 @@ export default function App() {
         id="divisions-rotary-concept" 
         ref={rotarySectionRef}
         style={{ scrollMarginTop: '64px' }}
-        className={`w-full py-1.5 lg:py-2 bg-white border-b border-neutral-200 relative overflow-hidden select-none h-[calc(100vh-64px)] max-h-[860px] min-h-[520px] flex flex-col justify-between ${
+        className={`w-full py-2 bg-white border-b border-neutral-200 relative overflow-hidden select-none h-[calc(100vh-64px)] min-h-[560px] flex flex-col justify-between ${
           desktopDivisionView === 'rotary' ? 'hidden lg:flex' : 'hidden'
         }`}
       >
@@ -1757,10 +1782,10 @@ export default function App() {
         <div className="absolute inset-0 bg-[radial-gradient(#15803d_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
         <div className="absolute -left-36 top-1/2 -translate-y-1/2 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="w-full max-w-[1840px] mx-auto px-3 sm:px-5 lg:px-6 flex flex-col justify-between flex-1 relative z-10">
+        <div className="w-full max-w-[1840px] mx-auto px-3 sm:px-5 lg:px-6 flex flex-col flex-1 h-full min-h-0 relative z-10 justify-between">
 
           {/* Section Header with Desktop View Switcher & Controls */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-neutral-200 pb-2">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-neutral-200 pb-2 shrink-0">
             <div className="space-y-0.5">
               <div className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-emerald-800 font-bold">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
@@ -1851,161 +1876,169 @@ export default function App() {
           </div>
 
           {/* MAIN ROTARY DIAL WORKSPACE: Left Semi-Circle Arc Flush Left + Directly Attached Widescreen Detail Box */}
-          <div className="relative w-full h-[370px] flex items-center overflow-visible my-auto">
+          <div className="relative w-full flex-1 min-h-0 flex items-stretch overflow-visible my-1 sm:my-1.5">
 
             {/* LEFT COLUMN: THE SEMI-CIRCLE ROTARY ARC (Flush with Left Side of Screen - Draggable) */}
             <div 
-              className="w-[195px] shrink-0 h-[370px] relative cursor-grab active:cursor-grabbing select-none overflow-visible z-20"
+              ref={arcContainerRef}
+              className="w-[220px] shrink-0 h-full relative cursor-grab active:cursor-grabbing select-none overflow-visible z-20 flex items-center"
               onMouseDown={handleArcMouseDown}
               onMouseMove={handleArcMouseMove}
               onMouseUp={handleArcMouseUp}
               onMouseLeave={handleArcMouseUp}
             >
-              
-              {/* Semi-Circle SVG Track on Left Side of Screen */}
-              <svg 
-                className="absolute inset-0 w-full h-full pointer-events-none" 
-                viewBox="0 0 195 370" 
-                fill="none"
-              >
-                {/* Outer decorative dashed trajectory arc */}
-                <path 
-                  d="M 6 15 A 180 180 0 0 1 6 355" 
-                  stroke="#e2e8f0" 
-                  strokeWidth="1.5" 
-                  strokeDasharray="4 6" 
-                />
-
-                {/* Primary Solid Semi-Circle Guide Line */}
-                <path 
-                  d="M 6 25 A 165 165 0 0 1 6 345" 
-                  stroke="url(#semiCircleWhiteGradient)" 
-                  strokeWidth="3.5" 
-                  strokeLinecap="round" 
-                />
-
-                {/* Inner precision tick marks arc */}
-                <path 
-                  d="M 6 45 A 145 145 0 0 1 6 325" 
-                  stroke="#10b981" 
-                  strokeWidth="1" 
-                  strokeDasharray="3 5" 
-                  opacity="0.3" 
-                />
-
-                {/* Center Hub Marker on far left edge */}
-                <circle cx="6" cy="185" r="10" fill="#ecfdf5" stroke="#059669" strokeWidth="2" />
-                <circle cx="6" cy="185" r="4" fill="#047857" />
-
-                {/* Direct Dock Connector Beam attaching straight into description card socket */}
-                <line 
-                  x1="165" 
-                  y1="185" 
-                  x2="195" 
-                  y2="185" 
-                  stroke="#059669" 
-                  strokeWidth="3.5" 
-                  strokeDasharray="3 3"
-                />
-
-                {/* Gradient Definitions */}
-                <defs>
-                  <linearGradient id="semiCircleWhiteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
-                    <stop offset="50%" stopColor="#047857" stopOpacity="1" />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.4" />
-                  </linearGradient>
-                </defs>
-              </svg>
-
-              {/* ROTARY NODES (Circular Shape Photos attached along the arc) */}
-              <div className="relative w-full h-full">
-                {divisionsData.map((div, idx) => {
-                  const isActive = rotaryDivision === idx;
-                  const delta = idx - rotaryDivision;
-                  // Separation of 40 degrees per division
-                  const angleDeg = delta * 40;
-                  const angleRad = (angleDeg * Math.PI) / 180;
-                  
-                  // Radius = 165px, Center = (6px, 185px) - Flush with left screen edge
-                  const nodeX = 6 + 165 * Math.cos(angleRad);
-                  const nodeY = 185 + 165 * Math.sin(angleRad);
-                  
-                  // Hide items rotating too far out of frame
-                  const isVisible = Math.abs(delta) <= 2;
-
-                  return (
-                    <motion.div
-                      key={`rotary-node-white-${div.id}`}
-                      initial={false}
-                      animate={{
-                        x: nodeX,
-                        y: nodeY,
-                        scale: isActive ? 1.15 : 0.82,
-                        opacity: isVisible ? 1 : 0,
-                        zIndex: isActive ? 40 : 20 - Math.abs(delta)
-                      }}
-                      transition={{ type: 'spring', stiffness: 260, damping: 25 }}
-                      className="absolute -top-10 -left-10 cursor-pointer"
-                      onClick={() => setRotaryDivision(idx)}
+              {(() => {
+                const centerY = arcHeight / 2;
+                const hubX = 6;
+                const radius = 214;
+                return (
+                  <>
+                    {/* Semi-Circle SVG Track on Left Side of Screen */}
+                    <svg 
+                      className="absolute inset-0 w-full h-full pointer-events-none" 
+                      fill="none"
                     >
-                      {/* Circular Shape Photo Container */}
-                      <div className="relative group">
-                        <div
-                          className={`w-20 h-20 rounded-full p-1 transition-all duration-300 relative ${
-                            isActive
-                              ? 'ring-4 ring-emerald-600 ring-offset-2 ring-offset-white shadow-xl scale-105 bg-white'
-                              : 'border-2 border-neutral-300 bg-white opacity-70 group-hover:opacity-100 group-hover:border-emerald-600 group-hover:scale-105 shadow-2xs'
-                          }`}
-                        >
-                          {/* Inner Circular Image */}
-                          <div className="w-full h-full rounded-full overflow-hidden bg-neutral-100 relative">
-                            <img
-                              src={div.image}
-                              alt={div.shortName}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                            {!isActive && (
-                              <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
-                            )}
-                          </div>
+                      {/* Outer decorative dashed trajectory arc */}
+                      <path 
+                        d={`M ${hubX} ${centerY - (radius + 18)} A ${radius + 18} ${radius + 18} 0 0 1 ${hubX} ${centerY + (radius + 18)}`}
+                        stroke="#e2e8f0" 
+                        strokeWidth="1.5" 
+                        strokeDasharray="4 6" 
+                      />
 
-                          {/* Division Number Pill Badge */}
-                          <span
-                            className={`absolute -top-1 -right-0.5 px-1.5 py-0.5 font-mono text-[9px] font-bold rounded-xs border transition-colors ${
-                              isActive
-                                ? 'bg-[#0a2318] text-white border-emerald-500 shadow-xs'
-                                : 'bg-neutral-100 text-neutral-700 border-neutral-300'
-                            }`}
+                      {/* Primary Solid Semi-Circle Guide Line */}
+                      <path 
+                        d={`M ${hubX} ${centerY - radius} A ${radius} ${radius} 0 0 1 ${hubX} ${centerY + radius}`}
+                        stroke="url(#semiCircleWhiteGradient)" 
+                        strokeWidth="3.5" 
+                        strokeLinecap="round" 
+                      />
+
+                      {/* Inner precision tick marks arc */}
+                      <path 
+                        d={`M ${hubX} ${centerY - (radius - 28)} A ${radius - 28} ${radius - 28} 0 0 1 ${hubX} ${centerY + (radius - 28)}`}
+                        stroke="#10b981" 
+                        strokeWidth="1" 
+                        strokeDasharray="3 5" 
+                        opacity="0.3" 
+                      />
+
+                      {/* Center Hub Marker on far left edge */}
+                      <circle cx={hubX} cy={centerY} r="10" fill="#ecfdf5" stroke="#059669" strokeWidth="2" />
+                      <circle cx={hubX} cy={centerY} r="4" fill="#047857" />
+
+                      {/* Direct Dock Connector Beam attaching straight into description card socket */}
+                      <line 
+                        x1={hubX + radius - 10} 
+                        y1={centerY} 
+                        x2={hubX + radius} 
+                        y2={centerY} 
+                        stroke="#059669" 
+                        strokeWidth="3.5" 
+                        strokeDasharray="3 3"
+                      />
+
+                      {/* Gradient Definitions */}
+                      <defs>
+                        <linearGradient id="semiCircleWhiteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+                          <stop offset="50%" stopColor="#047857" stopOpacity="1" />
+                          <stop offset="100%" stopColor="#10b981" stopOpacity="0.4" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+
+                    {/* ROTARY NODES (Circular Shape Photos attached along the arc) */}
+                    <div className="relative w-full h-full">
+                      {divisionsData.map((div, idx) => {
+                        const isActive = rotaryDivision === idx;
+                        const delta = idx - rotaryDivision;
+                        // Separation of 36 degrees per division for full vertical spread
+                        const angleDeg = delta * 36;
+                        const angleRad = (angleDeg * Math.PI) / 180;
+                        
+                        // Radius = 214px, Center = (hubX, centerY) - Flush with left screen edge
+                        const nodeX = hubX + radius * Math.cos(angleRad);
+                        const nodeY = centerY + radius * Math.sin(angleRad);
+                        
+                        // Hide items rotating too far out of frame
+                        const isVisible = Math.abs(delta) <= 2;
+
+                        return (
+                          <motion.div
+                            key={`rotary-node-white-${div.id}`}
+                            initial={false}
+                            animate={{
+                              x: nodeX,
+                              y: nodeY,
+                              scale: isActive ? 1.15 : 0.82,
+                              opacity: isVisible ? 1 : 0,
+                              zIndex: isActive ? 40 : 20 - Math.abs(delta)
+                            }}
+                            transition={{ type: 'spring', stiffness: 260, damping: 25 }}
+                            className="absolute -top-11 -left-11 cursor-pointer"
+                            onClick={() => setRotaryDivision(idx)}
                           >
-                            {div.number}
-                          </span>
+                            {/* Circular Shape Photo Container */}
+                            <div className="relative group">
+                              <div
+                                className={`w-22 h-22 rounded-full p-1 transition-all duration-300 relative ${
+                                  isActive
+                                    ? 'ring-4 ring-emerald-600 ring-offset-2 ring-offset-white shadow-xl scale-105 bg-white'
+                                    : 'border-2 border-neutral-300 bg-white opacity-70 group-hover:opacity-100 group-hover:border-emerald-600 group-hover:scale-105 shadow-2xs'
+                                }`}
+                              >
+                                {/* Inner Circular Image */}
+                                <div className="w-full h-full rounded-full overflow-hidden bg-neutral-100 relative">
+                                  <img
+                                    src={div.image}
+                                    alt={div.shortName}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                  />
+                                  {!isActive && (
+                                    <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
+                                  )}
+                                </div>
 
-                          {/* Active Focal Indicator Ping */}
-                          {isActive && (
-                            <span className="absolute -right-1 top-1/2 -translate-y-1/2 w-3 h-3 bg-emerald-600 rounded-full ring-2 ring-white animate-ping" />
-                          )}
-                        </div>
+                                {/* Division Number Pill Badge */}
+                                <span
+                                  className={`absolute -top-1 -right-0.5 px-1.5 py-0.5 font-mono text-[9px] font-bold rounded-xs border transition-colors ${
+                                    isActive
+                                      ? 'bg-[#0a2318] text-white border-emerald-500 shadow-xs'
+                                      : 'bg-neutral-100 text-neutral-700 border-neutral-300'
+                                  }`}
+                                >
+                                  {div.number}
+                                </span>
 
-                        {/* Title Tooltip on inactive hover */}
-                        {!isActive && (
-                          <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap z-50">
-                            <div className="px-2 py-0.5 bg-[#0a2318] text-white text-[10px] font-mono rounded-xs shadow-md border border-emerald-800">
-                              {div.shortName}
+                                {/* Active Focal Indicator Ping */}
+                                {isActive && (
+                                  <span className="absolute -right-1 top-1/2 -translate-y-1/2 w-3 h-3 bg-emerald-600 rounded-full ring-2 ring-white animate-ping" />
+                                )}
+                              </div>
+
+                              {/* Title Tooltip on inactive hover */}
+                              {!isActive && (
+                                <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap z-50">
+                                  <div className="px-2 py-0.5 bg-[#0a2318] text-white text-[10px] font-mono rounded-xs shadow-md border border-emerald-800">
+                                    {div.shortName}
+                                  </div>
+                                </div>
+                              )}
+
                             </div>
-                          </div>
-                        )}
-
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </>
+                );
+              })()}
 
             </div>
 
             {/* RIGHT COLUMN: ATTACHED WIDESCREEN SPECIFICATIONS & COMMERCE DETAIL BOX */}
-            <div className="flex-1 min-w-0 h-[370px] relative z-10">
+            <div className="flex-1 min-w-0 h-full relative z-10">
               <AnimatePresence mode="wait">
                 {(() => {
                   const current = divisionsData[rotaryDivision];
@@ -2017,20 +2050,20 @@ export default function App() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -16 }}
                       transition={{ duration: 0.22, ease: 'easeOut' }}
-                      className="bg-white border border-emerald-900/20 p-4 sm:p-5 shadow-[0_15px_40px_-12px_rgba(7,31,20,0.09),0_0_0_1px_rgba(5,150,105,0.12)] relative h-full flex flex-col justify-between hover:border-emerald-600/40 transition-all overflow-hidden"
+                      className="bg-white border border-emerald-900/20 p-4 sm:p-5 lg:p-6 shadow-[0_20px_50px_-15px_rgba(7,31,20,0.1),0_0_0_1px_rgba(5,150,105,0.12)] relative h-full flex flex-col justify-between hover:border-emerald-600/40 transition-all overflow-hidden"
                     >
                       {/* Top Accent Gradient Line */}
                       <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#0a2318]" />
 
                       {/* Physical Docking Notch connecting circle to card */}
-                      <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-4.5 h-28 bg-[#0a2318] border-y border-l border-emerald-500/50 rounded-l-lg pointer-events-none flex flex-col items-center justify-around py-2.5 shadow-md z-20">
+                      <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-4.5 h-32 bg-[#0a2318] border-y border-l border-emerald-500/50 rounded-l-lg pointer-events-none flex flex-col items-center justify-around py-3 shadow-md z-20">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                        <div className="w-1 h-12 bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600 rounded-full" />
+                        <div className="w-1 h-14 bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600 rounded-full" />
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       </div>
 
                       {/* Card Header Row */}
-                      <div className="flex items-center justify-between gap-3 border-b border-neutral-200/80 pb-2.5">
+                      <div className="flex items-center justify-between gap-3 border-b border-neutral-200/80 pb-2.5 shrink-0">
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-9 h-9 rounded-md bg-[#0a2318] text-emerald-400 flex items-center justify-center shrink-0 shadow-xs border border-emerald-500/30">
                             <CurrentIcon className="w-4.5 h-4.5 stroke-[2]" />
@@ -2062,27 +2095,27 @@ export default function App() {
                       </div>
 
                       {/* 3-Column Content Architecture across Full Screen Width */}
-                      <div className="grid grid-cols-12 gap-4 items-stretch flex-1 py-2 min-h-0">
+                      <div className="grid grid-cols-12 gap-5 lg:gap-6 items-stretch flex-1 py-3 min-h-0">
                         
                         {/* Sub-Panel 1 (5 Cols): Large Showcase Facility Photo & Commercial Key Deliverables */}
-                        <div className="col-span-5 flex flex-col justify-between h-full space-y-1.5 border-r border-neutral-200/80 pr-3">
-                          <div className="relative group shrink-0 h-[195px] overflow-hidden border border-neutral-300 shadow-sm bg-neutral-900">
+                        <div className="col-span-5 flex flex-col justify-between h-full space-y-2.5 border-r border-neutral-200/80 pr-4">
+                          <div className="relative group flex-1 min-h-[220px] overflow-hidden border border-neutral-300 shadow-sm bg-neutral-900">
                             <img 
                               src={current.image} 
                               alt={current.title} 
                               className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                             />
-                            <div className="absolute top-2 left-2 px-2.5 py-0.5 bg-black/80 backdrop-blur-md font-mono text-[9px] uppercase tracking-wider text-emerald-300 border border-white/20 font-bold flex items-center gap-1.5 shadow-xs">
+                            <div className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-black/80 backdrop-blur-md font-mono text-[9px] uppercase tracking-wider text-emerald-300 border border-white/20 font-bold flex items-center gap-1.5 shadow-xs">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                               <span>Direct Facility Line</span>
                             </div>
-                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 py-1.5 text-white">
+                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 py-2 text-white">
                               <span className="text-[10px] font-mono tracking-wide text-white/95 font-semibold block truncate">Cleanroom Continuous Processing · Batch Certified</span>
                             </div>
                           </div>
 
                           {/* Commercial Deliverables Chips */}
-                          <div className="space-y-1 pt-0.5">
+                          <div className="space-y-1.5 shrink-0 pt-1">
                             <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-neutral-500 font-bold">
                               <span>Commercial Deliverables:</span>
                               <span className="text-emerald-800 font-semibold">Bulk Supply</span>
@@ -2107,93 +2140,95 @@ export default function App() {
                         </div>
 
                         {/* Sub-Panel 2 (5 Cols): Tagline, Summary, Specs 2x2, Applications Bar */}
-                        <div className="col-span-5 flex flex-col justify-between h-full space-y-1.5 px-1">
+                        <div className="col-span-5 flex flex-col justify-between h-full space-y-3 px-1">
                           {/* Tagline & Summary */}
-                          <div className="space-y-0.5">
-                            <p className="text-xs sm:text-[13px] text-emerald-950 font-serif-brand italic font-semibold leading-snug">
+                          <div className="space-y-1.5 shrink-0">
+                            <p className="text-sm sm:text-base font-serif-brand italic font-semibold text-emerald-950 leading-snug">
                               “{current.tagline}”
                             </p>
-                            <p className="text-xs text-neutral-700 leading-relaxed line-clamp-2">
+                            <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed">
                               {current.summary}
                             </p>
                           </div>
 
                           {/* 2x2 Technical Process Highlights */}
-                          <div className="space-y-1">
+                          <div className="space-y-2 flex-1 flex flex-col justify-center">
                             <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-neutral-500 font-bold border-b border-neutral-100 pb-1">
                               <span className="text-neutral-600">Verified Process Highlights</span>
                               <span className="text-emerald-800">ISO 22000 Quality Gate</span>
                             </div>
-                            <div className="grid grid-cols-2 gap-1.5 text-xs">
+                            <div className="grid grid-cols-2 gap-2 text-xs">
                               {current.specs.slice(0, 4).map((spec, i) => (
-                                <div key={i} className="flex items-center gap-2 bg-[#f8faf8] px-2.5 py-1.5 border border-emerald-900/10 shadow-2xs hover:border-emerald-600/40 transition-colors">
-                                  <div className="w-3.5 h-3.5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                                <div key={i} className="flex items-center gap-2.5 bg-[#f8faf8] px-3 py-2.5 border border-emerald-900/10 shadow-2xs hover:border-emerald-600/40 transition-colors">
+                                  <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
                                     <Check className="w-2.5 h-2.5 text-emerald-800 stroke-[3]" />
                                   </div>
-                                  <span className="truncate text-[11px] font-semibold text-neutral-800">{spec}</span>
+                                  <span className="truncate text-xs font-semibold text-neutral-800">{spec}</span>
                                 </div>
                               ))}
                             </div>
                           </div>
 
                           {/* Commercial Applications Info Bar */}
-                          <div className="bg-gradient-to-r from-emerald-50 via-emerald-50/50 to-white px-3 py-1.5 border-l-3 border-emerald-700 flex items-center gap-2 shadow-2xs">
-                            <span className="font-mono text-emerald-950 font-bold text-[10px] uppercase tracking-wider shrink-0 flex items-center gap-1">
-                              <PackageCheck className="w-3.5 h-3.5 text-emerald-800" />
+                          <div className="bg-gradient-to-r from-emerald-50 via-emerald-50/50 to-white px-3.5 py-2.5 border-l-3 border-emerald-700 flex items-center gap-2 shadow-2xs shrink-0">
+                            <span className="font-mono text-emerald-950 font-bold text-[10px] uppercase tracking-wider shrink-0 flex items-center gap-1.5">
+                              <PackageCheck className="w-4 h-4 text-emerald-800" />
                               <span>Applications:</span>
                             </span>
-                            <span className="truncate text-[11px] text-neutral-800 font-medium">{current.applications}</span>
+                            <span className="truncate text-xs text-neutral-800 font-medium">{current.applications}</span>
                           </div>
                         </div>
 
                         {/* Sub-Panel 3 (2 Cols): Compact Executive Trade Desk Console */}
-                        <div className="col-span-2 flex flex-col justify-between h-full border-l border-neutral-200/80 pl-2.5 bg-gradient-to-b from-[#f8faf8] via-white to-[#edf5f0] p-2.5 border border-emerald-900/15 shadow-xs relative overflow-hidden">
+                        <div className="col-span-2 flex flex-col justify-between h-full border-l border-neutral-200/80 pl-3.5 bg-gradient-to-b from-[#f8faf8] via-white to-[#edf5f0] p-3.5 border border-emerald-900/15 shadow-xs relative overflow-hidden">
                           <div className="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
 
-                          <div className="space-y-2 relative z-10">
-                            <div className="flex items-center justify-between border-b border-emerald-900/15 pb-1">
-                              <div className="flex items-center gap-1 text-[9px] font-mono uppercase tracking-widest text-emerald-900 font-bold">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <div className="space-y-3 relative z-10">
+                            <div className="flex items-center justify-between border-b border-emerald-900/15 pb-2">
+                              <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-emerald-900 font-bold">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                                 <span>Trade Desk</span>
                               </div>
-                              <span className="text-[9px] font-mono text-emerald-800 font-bold">0{rotaryDivision + 1}/04</span>
+                              <span className="text-[10px] font-mono text-emerald-800 font-bold">0{rotaryDivision + 1}/04</span>
                             </div>
 
-                            <a
-                              href="#inquiry-desk"
-                              onClick={() => setInquiryForm({...inquiryForm, division: current.title})}
-                              className="w-full py-2 px-1.5 bg-gradient-to-r from-[#0a2318] to-[#143e2b] hover:from-[#143e2b] hover:to-[#0a2318] text-white text-[10px] font-bold uppercase tracking-wider shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1 group cursor-pointer border border-emerald-500/30 text-center"
-                            >
-                              <span>Request RFQ</span>
-                              <ArrowRight className="w-3 h-3 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
-                            </a>
+                            <div className="space-y-2">
+                              <a
+                                href="#inquiry-desk"
+                                onClick={() => setInquiryForm({...inquiryForm, division: current.title})}
+                                className="w-full py-2.5 px-2 bg-gradient-to-r from-[#0a2318] to-[#143e2b] hover:from-[#143e2b] hover:to-[#0a2318] text-white text-[11px] font-bold uppercase tracking-wider shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 group cursor-pointer border border-emerald-500/30 text-center"
+                              >
+                                <span>Request RFQ</span>
+                                <ArrowRight className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
+                              </a>
 
-                            <a
-                              href={`https://wa.me/919411268879?text=${encodeURIComponent(`Hi D R & Sons Trade Desk, I am inquiring about Division ${current.number}: ${current.title}`)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="w-full inline-flex items-center justify-center gap-1 py-1.5 px-1.5 bg-white hover:bg-emerald-50 text-emerald-950 border border-emerald-600/40 hover:border-emerald-600 text-[10px] font-bold uppercase tracking-wider transition-all shadow-2xs text-center"
-                            >
-                              <MessageSquare className="w-3 h-3 text-emerald-600" />
-                              <span>WhatsApp</span>
-                            </a>
+                              <a
+                                href={`https://wa.me/919411268879?text=${encodeURIComponent(`Hi D R & Sons Trade Desk, I am inquiring about Division ${current.number}: ${current.title}`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-2 bg-white hover:bg-emerald-50 text-emerald-950 border border-emerald-600/40 hover:border-emerald-600 text-[11px] font-bold uppercase tracking-wider transition-all shadow-2xs text-center"
+                              >
+                                <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>WhatsApp</span>
+                              </a>
+                            </div>
                           </div>
 
                           {/* Category Stepper & Quality SLA */}
-                          <div className="pt-1.5 border-t border-emerald-900/15 space-y-1 relative z-10">
-                            <div className="flex items-center justify-between text-[9px] font-mono">
+                          <div className="pt-2.5 border-t border-emerald-900/15 space-y-2 relative z-10">
+                            <div className="flex items-center justify-between text-[10px] font-mono">
                               <span className="text-neutral-500 font-bold uppercase tracking-wider">Dial Step:</span>
                               <span className="font-bold text-emerald-900">
                                 0{rotaryDivision + 1}
                               </span>
                             </div>
-                            <div className="grid grid-cols-4 gap-0.5">
+                            <div className="grid grid-cols-4 gap-1">
                               {divisionsData.map((d, i) => (
                                 <button
                                   key={`rotary-step-white-${d.id}`}
                                   type="button"
                                   onClick={() => setRotaryDivision(i)}
-                                  className={`py-1 text-[10px] font-mono font-bold transition-all cursor-pointer border text-center ${
+                                  className={`py-1.5 text-[11px] font-mono font-bold transition-all cursor-pointer border text-center ${
                                     rotaryDivision === i 
                                       ? 'bg-[#0a2318] text-white border-emerald-500 shadow-xs ring-1 ring-emerald-500/50' 
                                       : 'bg-white text-neutral-700 border-neutral-300 hover:border-emerald-700 hover:bg-emerald-50'
@@ -2204,7 +2239,7 @@ export default function App() {
                                 </button>
                               ))}
                             </div>
-                            <div className="text-[8px] font-mono text-center text-neutral-500 pt-0.5 leading-tight">
+                            <div className="text-[9px] font-mono text-center text-neutral-500 pt-1 leading-tight">
                               <span className="text-emerald-800 font-bold block">⚡ 24h SLA</span>
                               <span className="text-neutral-500 block">COA &amp; QC Verified</span>
                             </div>
@@ -2222,7 +2257,7 @@ export default function App() {
           </div>
 
           {/* Bottom Navigation & Interaction Affordance */}
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-neutral-200 text-xs text-neutral-600 font-mono">
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-neutral-200 text-xs text-neutral-600 font-mono shrink-0">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
               <span>Scroll down to advance divisions · After 04/04, glides to Facilities Pipeline</span>
