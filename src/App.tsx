@@ -153,6 +153,18 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [redirectCountdown]);
 
+  // Scroll tracking for transparent-to-frosted navigation bar
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Touch swipe handling for buttery-smooth division sliding
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
@@ -688,52 +700,105 @@ export default function App() {
         </svg>
       </motion.a>
 
-      {/* HEADER / NAVIGATION */}
-      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-neutral-200">
-        <div className="w-full px-4 sm:px-8 lg:px-10 py-2.5 sm:py-3.5 flex items-center justify-between gap-4">
+      {/* HEADER / NAVIGATION (Transparent Floating Nav with Scroll Transition) */}
+      <header 
+        className={`fixed top-0 left-0 right-0 z-40 w-full transition-all duration-300 ${
+          isScrolled 
+            ? 'bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-xs py-2.5 sm:py-3' 
+            : 'bg-gradient-to-b from-black/75 via-black/35 to-transparent border-b border-white/10 py-3 sm:py-4'
+        }`}
+      >
+        <div className="w-full px-4 sm:px-8 lg:px-10 flex items-center justify-between gap-4">
           
           {/* Logo Lockup */}
           <a href="#" className="flex items-center gap-2 sm:gap-3 group shrink-0">
-            <div className="h-9 sm:h-12 flex items-center">
+            <div className={`h-9 sm:h-11 flex items-center transition-all ${
+              isScrolled ? '' : 'bg-white px-2 py-0.5 shadow-xs'
+            }`}>
               <img 
                 src="/assets/brand/drsons_logo.webp" 
                 alt="D R & SONS INTERNATIONAL" 
-                className="h-9 sm:h-12 w-auto object-contain mix-blend-multiply"
+                className={`h-8 sm:h-10 w-auto object-contain ${isScrolled ? 'mix-blend-multiply' : ''}`}
               />
             </div>
-            <div className="border-l border-neutral-200 pl-2.5 hidden md:block">
-              <span className="text-xs sm:text-sm font-bold tracking-tight text-[#0a2318] block leading-none">
+            <div className={`border-l pl-2.5 hidden md:block transition-colors ${
+              isScrolled ? 'border-neutral-200' : 'border-white/25'
+            }`}>
+              <span className={`text-xs sm:text-sm font-bold tracking-tight block leading-none transition-colors ${
+                isScrolled ? 'text-[#0a2318]' : 'text-white'
+              }`}>
                 D R &amp; SONS INTERNATIONAL PVT. LTD.
               </span>
-              <span className="text-[9px] text-neutral-500 uppercase tracking-widest block mt-0.5">
+              <span className={`text-[9px] uppercase tracking-widest block mt-0.5 transition-colors ${
+                isScrolled ? 'text-neutral-500' : 'text-emerald-300/90'
+              }`}>
                 Food &amp; Beverage Manufacturing · Since 2026
               </span>
             </div>
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-5 text-xs font-semibold text-neutral-700">
-            <a href="#divisions" className="hover:text-emerald-900 transition-colors">4 Divisions</a>
-            <a href="#facilities" className="hover:text-emerald-900 transition-colors">Facilities</a>
+          <nav className="hidden lg:flex items-center gap-5 text-xs font-semibold">
+            <a 
+              href="#divisions" 
+              className={`transition-colors ${
+                isScrolled 
+                  ? 'text-neutral-700 hover:text-emerald-900' 
+                  : 'text-white/90 hover:text-emerald-300'
+              }`}
+            >
+              4 Divisions
+            </a>
+            <a 
+              href="#facilities" 
+              className={`transition-colors ${
+                isScrolled 
+                  ? 'text-neutral-700 hover:text-emerald-900' 
+                  : 'text-white/90 hover:text-emerald-300'
+              }`}
+            >
+              Facilities
+            </a>
             <button 
               onClick={() => setLegalModalTab('regulatory')}
-              className="hover:text-emerald-900 transition-colors cursor-pointer text-neutral-600 font-medium"
+              className={`transition-colors cursor-pointer font-medium ${
+                isScrolled 
+                  ? 'text-neutral-600 hover:text-emerald-900' 
+                  : 'text-white/90 hover:text-emerald-300'
+              }`}
             >
               Regulatory
             </button>
             <button 
               onClick={() => setLegalModalTab('press')}
-              className="hover:text-emerald-900 transition-colors cursor-pointer text-neutral-600 font-medium"
+              className={`transition-colors cursor-pointer font-medium ${
+                isScrolled 
+                  ? 'text-neutral-600 hover:text-emerald-900' 
+                  : 'text-white/90 hover:text-emerald-300'
+              }`}
             >
               Press
             </button>
             <button 
               onClick={() => setLegalModalTab('terms')}
-              className="hover:text-emerald-900 transition-colors cursor-pointer text-neutral-600 font-medium"
+              className={`transition-colors cursor-pointer font-medium ${
+                isScrolled 
+                  ? 'text-neutral-600 hover:text-emerald-900' 
+                  : 'text-white/90 hover:text-emerald-300'
+              }`}
             >
               Legal Terms
             </button>
-            <a href="#inquiry-desk" className="hover:text-emerald-900 transition-colors">Trade Desk</a>
+            <a 
+              href="#inquiry-desk" 
+              className={`transition-colors ${
+                isScrolled 
+                  ? 'text-neutral-700 hover:text-emerald-900' 
+                  : 'text-white/90 hover:text-emerald-300'
+              }`}
+            >
+              Trade Desk
+            </a>
           </nav>
 
           {/* Direct WhatsApp Callout & Mobile Three-Bar Button */}
@@ -742,16 +807,24 @@ export default function App() {
               href="https://wa.me/919411268879"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-900/20 text-xs font-medium transition-colors"
+              className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-medium transition-colors ${
+                isScrolled
+                  ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-900/20'
+                  : 'bg-white/10 hover:bg-white/20 text-white border border-white/25 backdrop-blur-xs'
+              }`}
             >
-              <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
+              <MessageSquare className={`w-3.5 h-3.5 ${isScrolled ? 'text-emerald-700' : 'text-emerald-300'}`} />
               <span className="hidden sm:inline">WhatsApp:</span>
               <span className="font-mono font-semibold text-[11px] sm:text-xs">9411268879</span>
             </a>
 
             <a
               href="#inquiry-desk"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#143e2b] hover:bg-[#0c271b] text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+              className={`hidden lg:inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
+                isScrolled
+                  ? 'bg-[#143e2b] hover:bg-[#0c271b] text-white'
+                  : 'bg-[#22c55e] hover:bg-[#16a34a] text-[#071f14] font-bold shadow-md'
+              }`}
             >
               <span>Get Quote</span>
               <ArrowRight className="w-3 h-3" />
@@ -760,13 +833,17 @@ export default function App() {
             {/* Three Bar Lines (Hamburger) in Top Right Corner */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden flex flex-col justify-center items-center gap-[4.5px] w-9 h-9 border border-neutral-300 bg-white hover:bg-neutral-50 active:scale-95 transition-all cursor-pointer shadow-2xs"
+              className={`lg:hidden flex flex-col justify-center items-center gap-[4.5px] w-9 h-9 border active:scale-95 transition-all cursor-pointer ${
+                isScrolled
+                  ? 'border-neutral-300 bg-white hover:bg-neutral-50 shadow-2xs'
+                  : 'border-white/25 bg-black/30 hover:bg-black/50 text-white backdrop-blur-xs'
+              }`}
               aria-label="Open Navigation Dashboard"
               title="Open Navigation Dashboard"
             >
-              <span className="w-4 h-[2px] bg-neutral-900 rounded-full block"></span>
-              <span className="w-4 h-[2px] bg-neutral-900 rounded-full block"></span>
-              <span className="w-4 h-[2px] bg-neutral-900 rounded-full block"></span>
+              <span className={`w-4 h-[2px] rounded-full block ${isScrolled ? 'bg-neutral-900' : 'bg-white'}`}></span>
+              <span className={`w-4 h-[2px] rounded-full block ${isScrolled ? 'bg-neutral-900' : 'bg-white'}`}></span>
+              <span className={`w-4 h-[2px] rounded-full block ${isScrolled ? 'bg-neutral-900' : 'bg-white'}`}></span>
             </button>
           </div>
 
@@ -1001,8 +1078,8 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* HERO SECTION: Fullscreen Ambient Industrial Video Banner */}
-      <section className="relative w-full h-[calc(100dvh-56px)] sm:h-[calc(100dvh-73px)] min-h-[580px] flex items-center justify-center overflow-hidden bg-[#0c2117]">
+      {/* HERO SECTION: Fullscreen Ambient Industrial Video Banner (With Transparent Floating Nav Overlaid) */}
+      <section className="relative w-full h-[100dvh] min-h-[580px] flex items-center justify-center overflow-hidden bg-[#0c2117]">
         
         {/* Background Ambient Industrial Video */}
         <video 
@@ -1044,7 +1121,7 @@ export default function App() {
         </div>
 
         {/* Animated Hero Content (Tightly spaced, minimal text) */}
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-8 py-16 sm:py-24 text-center flex flex-col items-center space-y-4 sm:space-y-6">
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-8 py-16 sm:py-24 pt-20 sm:pt-28 text-center flex flex-col items-center space-y-4 sm:space-y-6">
 
           {/* Minimalist Look Heading */}
           <motion.h1 
@@ -1126,7 +1203,7 @@ export default function App() {
       </section>
 
       {/* SECTION: 4 CORE REGISTERED MANUFACTURING DIVISIONS (Horizontal Scroll Enabled) */}
-      <section id="divisions" className="w-full py-10 sm:py-16 px-3 sm:px-6 lg:px-12 bg-white border-b border-neutral-200">
+      <section id="divisions" className="w-full scroll-mt-16 sm:scroll-mt-20 py-10 sm:py-16 px-3 sm:px-6 lg:px-12 bg-white border-b border-neutral-200">
         <div className="w-full max-w-7xl mx-auto space-y-6">
           
           {/* Header & Horizontal Controls */}
@@ -1367,7 +1444,7 @@ export default function App() {
       </section>
 
       {/* SECTION: PRODUCTION FACILITIES & STACKED STICKY CARDS WORKFLOW */}
-      <section id="facilities" className="w-full py-12 sm:py-20 px-3 sm:px-6 lg:px-12 bg-[#fafbfa] border-b border-neutral-200">
+      <section id="facilities" className="w-full scroll-mt-16 sm:scroll-mt-20 py-12 sm:py-20 px-3 sm:px-6 lg:px-12 bg-[#fafbfa] border-b border-neutral-200">
         <div className="w-full max-w-7xl mx-auto space-y-8">
           
           {/* Header */}
@@ -1715,7 +1792,7 @@ export default function App() {
       </section>
 
       {/* SECTION: COMMERCIAL QUOTATION & WHATSAPP ROUTING DESK (Modern Floating Card on Factory Facility) */}
-      <section id="inquiry-desk" className="w-full py-12 sm:py-20 px-3 sm:px-6 lg:px-12 bg-[#f4f7f5]">
+      <section id="inquiry-desk" className="w-full scroll-mt-16 sm:scroll-mt-20 py-12 sm:py-20 px-3 sm:px-6 lg:px-12 bg-[#f4f7f5]">
         <div className="w-full max-w-7xl mx-auto">
           
           {/* Main Visual Container with Rounded Frame & Background Image */}
