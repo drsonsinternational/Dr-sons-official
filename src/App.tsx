@@ -2094,11 +2094,11 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* 3-Column Content Architecture across Full Screen Width */}
-                      <div className="grid grid-cols-12 gap-5 lg:gap-6 items-stretch flex-1 py-3 min-h-0">
+                      {/* 2-Column Content Architecture across Full Screen Width (Photo Showcase + Technical Specifications) */}
+                      <div className="grid grid-cols-12 gap-6 items-stretch flex-1 py-3 min-h-0">
                         
-                        {/* Sub-Panel 1 (5 Cols): Large Showcase Facility Photo & Commercial Key Deliverables */}
-                        <div className="col-span-5 flex flex-col justify-between h-full space-y-2.5 border-r border-neutral-200/80 pr-4">
+                        {/* Sub-Panel 1 (6 Cols - 50% Width): Large Showcase Facility Photo & Commercial Key Deliverables */}
+                        <div className="col-span-6 flex flex-col justify-between h-full space-y-2.5 border-r border-neutral-200/80 pr-5">
                           <div className="relative group flex-1 min-h-[220px] overflow-hidden border border-neutral-300 shadow-sm bg-neutral-900">
                             <img 
                               src={current.image} 
@@ -2120,30 +2120,25 @@ export default function App() {
                               <span>Commercial Deliverables:</span>
                               <span className="text-emerald-800 font-semibold">Bulk Supply</span>
                             </div>
-                            <div className="flex flex-wrap gap-1">
-                              {current.keyItems.slice(0, 4).map((item, i) => (
+                            <div className="flex flex-wrap gap-1.5">
+                              {current.keyItems.map((item, i) => (
                                 <span 
                                   key={i} 
-                                  className="px-2 py-0.5 bg-neutral-50 hover:bg-emerald-50 border border-neutral-200 hover:border-emerald-600 text-[10px] text-neutral-800 font-medium shadow-2xs truncate max-w-[200px] transition-colors flex items-center gap-1"
+                                  className="px-2.5 py-1 bg-neutral-50 hover:bg-emerald-50 border border-neutral-200 hover:border-emerald-600 text-[10px] text-neutral-800 font-medium shadow-2xs truncate max-w-[240px] transition-colors flex items-center gap-1.5"
                                 >
                                   <span className="text-emerald-600 font-bold text-[8px]">✦</span>
                                   <span>{item}</span>
                                 </span>
                               ))}
-                              {current.keyItems.length > 4 && (
-                                <span className="px-1.5 py-0.5 bg-emerald-50 text-[10px] font-mono text-emerald-900 font-semibold border border-emerald-900/10">
-                                  +{current.keyItems.length - 4} more
-                                </span>
-                              )}
                             </div>
                           </div>
                         </div>
 
-                        {/* Sub-Panel 2 (5 Cols): Tagline, Summary, Specs 2x2, Applications Bar */}
-                        <div className="col-span-5 flex flex-col justify-between h-full space-y-3 px-1">
+                        {/* Sub-Panel 2 (6 Cols - 50% Width): Tagline, Summary, Specs 2x2, Applications Bar & Quality Assurance */}
+                        <div className="col-span-6 flex flex-col justify-between h-full space-y-3 pl-1">
                           {/* Tagline & Summary */}
                           <div className="space-y-1.5 shrink-0">
-                            <p className="text-sm sm:text-base font-serif-brand italic font-semibold text-emerald-950 leading-snug">
+                            <p className="text-base sm:text-lg font-serif-brand italic font-semibold text-emerald-950 leading-snug">
                               “{current.tagline}”
                             </p>
                             <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed">
@@ -2157,9 +2152,9 @@ export default function App() {
                               <span className="text-neutral-600">Verified Process Highlights</span>
                               <span className="text-emerald-800">ISO 22000 Quality Gate</span>
                             </div>
-                            <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="grid grid-cols-2 gap-2.5 text-xs">
                               {current.specs.slice(0, 4).map((spec, i) => (
-                                <div key={i} className="flex items-center gap-2.5 bg-[#f8faf8] px-3 py-2.5 border border-emerald-900/10 shadow-2xs hover:border-emerald-600/40 transition-colors">
+                                <div key={i} className="flex items-center gap-2.5 bg-[#f8faf8] px-3.5 py-2.5 border border-emerald-900/10 shadow-2xs hover:border-emerald-600/40 transition-colors">
                                   <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
                                     <Check className="w-2.5 h-2.5 text-emerald-800 stroke-[3]" />
                                   </div>
@@ -2177,72 +2172,15 @@ export default function App() {
                             </span>
                             <span className="truncate text-xs text-neutral-800 font-medium">{current.applications}</span>
                           </div>
-                        </div>
 
-                        {/* Sub-Panel 3 (2 Cols): Compact Executive Trade Desk Console */}
-                        <div className="col-span-2 flex flex-col justify-between h-full border-l border-neutral-200/80 pl-3.5 bg-gradient-to-b from-[#f8faf8] via-white to-[#edf5f0] p-3.5 border border-emerald-900/15 shadow-xs relative overflow-hidden">
-                          <div className="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
-
-                          <div className="space-y-3 relative z-10">
-                            <div className="flex items-center justify-between border-b border-emerald-900/15 pb-2">
-                              <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-emerald-900 font-bold">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span>Trade Desk</span>
-                              </div>
-                              <span className="text-[10px] font-mono text-emerald-800 font-bold">0{rotaryDivision + 1}/04</span>
+                          {/* Quality Assurance & Production Compliance Bar */}
+                          <div className="flex items-center justify-between pt-2 border-t border-neutral-200/80 text-[10px] font-mono text-neutral-500 shrink-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                              <span className="text-emerald-900 font-bold uppercase tracking-wider">Quality Assurance:</span>
+                              <span>100% Batch Testing &amp; COA Verified</span>
                             </div>
-
-                            <div className="space-y-2">
-                              <a
-                                href="#inquiry-desk"
-                                onClick={() => setInquiryForm({...inquiryForm, division: current.title})}
-                                className="w-full py-2.5 px-2 bg-gradient-to-r from-[#0a2318] to-[#143e2b] hover:from-[#143e2b] hover:to-[#0a2318] text-white text-[11px] font-bold uppercase tracking-wider shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 group cursor-pointer border border-emerald-500/30 text-center"
-                              >
-                                <span>Request RFQ</span>
-                                <ArrowRight className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
-                              </a>
-
-                              <a
-                                href={`https://wa.me/919411268879?text=${encodeURIComponent(`Hi D R & Sons Trade Desk, I am inquiring about Division ${current.number}: ${current.title}`)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-2 bg-white hover:bg-emerald-50 text-emerald-950 border border-emerald-600/40 hover:border-emerald-600 text-[11px] font-bold uppercase tracking-wider transition-all shadow-2xs text-center"
-                              >
-                                <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-                                <span>WhatsApp</span>
-                              </a>
-                            </div>
-                          </div>
-
-                          {/* Category Stepper & Quality SLA */}
-                          <div className="pt-2.5 border-t border-emerald-900/15 space-y-2 relative z-10">
-                            <div className="flex items-center justify-between text-[10px] font-mono">
-                              <span className="text-neutral-500 font-bold uppercase tracking-wider">Dial Step:</span>
-                              <span className="font-bold text-emerald-900">
-                                0{rotaryDivision + 1}
-                              </span>
-                            </div>
-                            <div className="grid grid-cols-4 gap-1">
-                              {divisionsData.map((d, i) => (
-                                <button
-                                  key={`rotary-step-white-${d.id}`}
-                                  type="button"
-                                  onClick={() => setRotaryDivision(i)}
-                                  className={`py-1.5 text-[11px] font-mono font-bold transition-all cursor-pointer border text-center ${
-                                    rotaryDivision === i 
-                                      ? 'bg-[#0a2318] text-white border-emerald-500 shadow-xs ring-1 ring-emerald-500/50' 
-                                      : 'bg-white text-neutral-700 border-neutral-300 hover:border-emerald-700 hover:bg-emerald-50'
-                                  }`}
-                                  title={`Switch to Division ${d.number}: ${d.shortName}`}
-                                >
-                                  {d.number}
-                                </button>
-                              ))}
-                            </div>
-                            <div className="text-[9px] font-mono text-center text-neutral-500 pt-1 leading-tight">
-                              <span className="text-emerald-800 font-bold block">⚡ 24h SLA</span>
-                              <span className="text-neutral-500 block">COA &amp; QC Verified</span>
-                            </div>
+                            <span className="text-emerald-800 font-semibold uppercase tracking-wider">FSSAI · BIS IS 14543</span>
                           </div>
                         </div>
 
