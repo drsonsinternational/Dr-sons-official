@@ -74,7 +74,7 @@ export default function App() {
   const [mobilePipelineView, setMobilePipelineView] = useState<'popup' | 'accordion'>('popup');
   const [popupFacilityIndex, setPopupFacilityIndex] = useState<number | null>(null);
   const [popupStageIndex, setPopupStageIndex] = useState<number>(0);
-  const popupTouchStartX = useRef<number | null>(null);
+  const popupTouchStart = useRef<{ x: number; y: number } | null>(null);
 
   const [activeDivision, setActiveDivision] = useState<number>(0);
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -355,60 +355,6 @@ export default function App() {
     };
   }, [desktopDivisionView, smoothScrollTo]);
 
-  // 3. FACILITIES SECTION WHEEL LISTENER (Desktop):
-  // When user is at the top of Facilities and scrolls UP, smoothly glides back up into Manufacturing Divisions at Division 04
-  useEffect(() => {
-    const facEl = facilitiesSectionRef.current;
-    if (!facEl) return;
-
-    let facWheelDelta = 0;
-    let decayTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const onFacilitiesWheel = (e: WheelEvent) => {
-      if (window.innerWidth < 1024) return;
-      if (isSectionTransitioningRef.current) return;
-
-      const rect = facEl.getBoundingClientRect();
-      const isAtTopOfFacilities = (rect.top >= 45 && rect.top <= 140) || (window.scrollY <= facEl.offsetTop - 64 + 30);
-
-      if (isAtTopOfFacilities && e.deltaY < 0) {
-        facWheelDelta += e.deltaY;
-        if (facWheelDelta <= -35) {
-          e.preventDefault();
-          e.stopPropagation();
-          isSectionTransitioningRef.current = true;
-          facWheelDelta = 0;
-
-          // Set rotary to Division 04 (index 3) when scrolling back up
-          setRotaryDivision(3);
-
-          const rotaryEl = document.getElementById(
-            desktopDivisionView === 'rotary' ? 'divisions-rotary-concept' : 'divisions'
-          );
-          if (rotaryEl) {
-            const navOffset = 64;
-            const targetY = rotaryEl.getBoundingClientRect().top + window.scrollY - navOffset;
-            smoothScrollTo(targetY, 850, () => {
-              isSectionTransitioningRef.current = false;
-            });
-          } else {
-            isSectionTransitioningRef.current = false;
-          }
-        }
-      }
-
-      if (decayTimer) clearTimeout(decayTimer);
-      decayTimer = setTimeout(() => {
-        facWheelDelta = 0;
-      }, 180);
-    };
-
-    facEl.addEventListener('wheel', onFacilitiesWheel, { passive: false });
-    return () => {
-      facEl.removeEventListener('wheel', onFacilitiesWheel);
-      if (decayTimer) clearTimeout(decayTimer);
-    };
-  }, [desktopDivisionView, smoothScrollTo]);
 
   // Inquiry Form State
   const [inquiryForm, setInquiryForm] = useState({
@@ -2190,16 +2136,15 @@ export default function App() {
             </div>
 
             {/* Stacked Sticky Cards Track */}
-            <div className="space-y-8 pb-12 pt-2">
+            <div className="pb-16 pt-4">
               {facilitiesData[selectedFacilityLine].stages.map((stg, sIdx) => {
                 return (
                   <div
                     key={`stacked-card-${sIdx}`}
-                    className="sticky bg-white border border-neutral-300 shadow-2xl p-6 sm:p-8 space-y-6 transition-transform"
+                    className="sticky bg-white border border-neutral-300 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.12)] p-6 sm:p-8 space-y-6 mb-20 lg:mb-28 will-change-transform"
                     style={{
-                      top: `${80 + sIdx * 18}px`,
-                      zIndex: 10 + sIdx,
-                      marginBottom: `${(4 - sIdx) * 16}px`
+                      top: `${84 + sIdx * 20}px`,
+                      zIndex: 10 + sIdx
                     }}
                   >
                     {/* Top Bar on Stacked Card */}
@@ -2412,7 +2357,7 @@ export default function App() {
                           </div>
 
                           {/* Horizontal Compact Phase Step Buttons */}
-                          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 touch-pan-x" style={{ WebkitOverflowScrolling: 'touch' }}>
                             {line.stages.map((stg, sIdx) => {
                               const isStepActive = activeStageIdx === sIdx;
                               return (
@@ -2611,42 +2556,37 @@ export default function App() {
 
                     {/* Interactive Swipeable Stage Card Area */}
                     <div 
-                      className="flex-1 overflow-y-auto p-4 space-y-3 relative touch-pan-y"
+                      className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-3 relative touch-pan-y"
+                      style={{ WebkitOverflowScrolling: 'touch' }}
                       onTouchStart={(e) => {
-                        popupTouchStartX.current = e.touches[0].clientX;
+                        popupTouchStart.current = {
+                          x: e.touches[0].clientX,
+                          y: e.touches[0].clientY
+                        };
                       }}
                       onTouchEnd={(e) => {
-                        if (popupTouchStartX.current === null) return;
-                        const touchEndX = e.changedTouches[0].clientX;
-                        const deltaX = popupTouchStartX.current - touchEndX;
-                        if (deltaX > 40) {
-                          // Swiped Left -> Advance to next stage
-                          handleNextStage();
-                        } else if (deltaX < -40) {
-                          // Swiped Right -> Return to previous stage
-                          handlePrevStage();
+                        if (popupTouchStart.current === null) return;
+                        const deltaX = popupTouchStart.current.x - e.changedTouches[0].clientX;
+                        const deltaY = popupTouchStart.current.y - e.changedTouches[0].clientY;
+                        // ONLY trigger stage flip if gesture was predominantly horizontal
+                        if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
+                          if (deltaX > 0) {
+                            handleNextStage();
+                          } else {
+                            handlePrevStage();
+                          }
                         }
-                        popupTouchStartX.current = null;
+                        popupTouchStart.current = null;
                       }}
                     >
                       <AnimatePresence mode="wait">
                         <motion.div
                           key={`popup-stage-${line.id}-${popupStageIndex}`}
-                          initial={{ opacity: 0, x: 24 }}
+                          initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -24 }}
-                          transition={{ duration: 0.2, ease: 'easeOut' }}
-                          drag="x"
-                          dragConstraints={{ left: 0, right: 0 }}
-                          dragElastic={0.2}
-                          onDragEnd={(_, { offset, velocity }) => {
-                            if (offset.x < -40 || velocity.x < -300) {
-                              handleNextStage();
-                            } else if (offset.x > 40 || velocity.x > 300) {
-                              handlePrevStage();
-                            }
-                          }}
-                          className="space-y-3 cursor-grab active:cursor-grabbing"
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.22, ease: 'easeOut' }}
+                          className="space-y-3"
                         >
                           {/* Large Stage Photo */}
                           <div className="relative aspect-[16/10] w-full bg-neutral-900 border border-neutral-300 overflow-hidden shadow-sm">
