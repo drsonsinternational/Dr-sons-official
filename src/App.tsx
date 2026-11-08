@@ -107,7 +107,56 @@ export default function App() {
   const rotarySectionRef = useRef<HTMLElement | null>(null);
   const facilitiesSectionRef = useRef<HTMLElement | null>(null);
   const isSectionTransitioningRef = useRef<boolean>(false);
+  const currentScrollAnimationRef = useRef<number | null>(null);
   const arcDragStartY = useRef<number | null>(null);
+
+  // Cinematic smooth scroll interpolation using requestAnimationFrame & easeInOutCubic
+  // Provides a luxurious, continuous glide between sections so the user never feels like they skipped content
+  const smoothScrollTo = useCallback((targetY: number, duration = 850, onComplete?: () => void) => {
+    if (currentScrollAnimationRef.current !== null) {
+      cancelAnimationFrame(currentScrollAnimationRef.current);
+      currentScrollAnimationRef.current = null;
+    }
+
+    const startY = window.scrollY;
+    const distance = targetY - startY;
+
+    if (Math.abs(distance) < 3) {
+      window.scrollTo(0, targetY);
+      if (onComplete) onComplete();
+      return;
+    }
+
+    const htmlEl = document.documentElement;
+    const prevScrollBehavior = htmlEl.style.scrollBehavior;
+    htmlEl.style.scrollBehavior = 'auto';
+
+    const startTime = performance.now();
+
+    // easeInOutCubic: gentle onset, clear visible mid-glide, soft cushioned arrival
+    const easeInOutCubic = (t: number) => {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    };
+
+    const step = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeInOutCubic(progress);
+
+      window.scrollTo(0, Math.round(startY + distance * eased));
+
+      if (progress < 1) {
+        currentScrollAnimationRef.current = requestAnimationFrame(step);
+      } else {
+        window.scrollTo(0, targetY);
+        htmlEl.style.scrollBehavior = prevScrollBehavior;
+        currentScrollAnimationRef.current = null;
+        if (onComplete) onComplete();
+      }
+    };
+
+    currentScrollAnimationRef.current = requestAnimationFrame(step);
+  }, []);
 
   // Mouse drag handlers on the semi-circle arc for physical dial interaction (bounded 0 to 3, no loop)
   const handleArcMouseDown = (e: React.MouseEvent) => {
@@ -132,7 +181,7 @@ export default function App() {
   };
 
   // 1. HERO SECTION WHEEL LISTENER (Desktop):
-  // When scrolling down from Hero, glides directly to the Manufacturing Divisions section at Division 01
+  // When scrolling down from Hero, smoothly glides to the Manufacturing Divisions section at Division 01
   useEffect(() => {
     const heroEl = heroSectionRef.current;
     if (!heroEl) return;
@@ -149,7 +198,7 @@ export default function App() {
 
       if (e.deltaY > 0) {
         heroWheelDelta += e.deltaY;
-        if (heroWheelDelta >= 30) {
+        if (heroWheelDelta >= 35) {
           e.preventDefault();
           e.stopPropagation();
           isSectionTransitioningRef.current = true;
@@ -164,12 +213,12 @@ export default function App() {
           if (target) {
             const navOffset = 64;
             const targetY = target.getBoundingClientRect().top + window.scrollY - navOffset;
-            window.scrollTo({ top: targetY, behavior: 'smooth' });
-          }
-
-          setTimeout(() => {
+            smoothScrollTo(targetY, 850, () => {
+              isSectionTransitioningRef.current = false;
+            });
+          } else {
             isSectionTransitioningRef.current = false;
-          }, 850);
+          }
         }
       }
 
@@ -184,7 +233,7 @@ export default function App() {
       heroEl.removeEventListener('wheel', onHeroWheel);
       if (decayTimer) clearTimeout(decayTimer);
     };
-  }, [desktopDivisionView]);
+  }, [desktopDivisionView, smoothScrollTo]);
 
   // 2. ROTARY DIAL SECTION WHEEL LISTENER (Desktop):
   // - Step 1: Scroll down through 01 -> 02 -> 03 -> 04 (NO loop)
@@ -230,11 +279,12 @@ export default function App() {
           if (facilitiesEl) {
             const navOffset = 64;
             const targetY = facilitiesEl.getBoundingClientRect().top + window.scrollY - navOffset;
-            window.scrollTo({ top: targetY, behavior: 'smooth' });
-          }
-          setTimeout(() => {
+            smoothScrollTo(targetY, 850, () => {
+              isSectionTransitioningRef.current = false;
+            });
+          } else {
             isSectionTransitioningRef.current = false;
-          }, 850);
+          }
         }
       } 
       // SCROLL UP
@@ -252,10 +302,9 @@ export default function App() {
           // At Division 01 (first category) -> return smoothly to Hero banner
           isSectionTransitioningRef.current = true;
           accumulatedDelta = 0;
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          setTimeout(() => {
+          smoothScrollTo(0, 850, () => {
             isSectionTransitioningRef.current = false;
-          }, 850);
+          });
         }
       } else {
         // Prevent default on all sub-threshold ticks so window does not jitter
@@ -273,7 +322,7 @@ export default function App() {
       el.removeEventListener('wheel', onWheel);
       if (decayTimer) clearTimeout(decayTimer);
     };
-  }, [desktopDivisionView]);
+  }, [desktopDivisionView, smoothScrollTo]);
 
   // 3. FACILITIES SECTION WHEEL LISTENER (Desktop):
   // When user is at the top of Facilities and scrolls UP, smoothly glides back up into Manufacturing Divisions at Division 04
@@ -289,7 +338,7 @@ export default function App() {
       if (isSectionTransitioningRef.current) return;
 
       const rect = facEl.getBoundingClientRect();
-      const isAtTopOfFacilities = rect.top >= 55 && rect.top <= 90;
+      const isAtTopOfFacilities = (rect.top >= 45 && rect.top <= 140) || (window.scrollY <= facEl.offsetTop - 64 + 30);
 
       if (isAtTopOfFacilities && e.deltaY < 0) {
         facWheelDelta += e.deltaY;
@@ -308,12 +357,12 @@ export default function App() {
           if (rotaryEl) {
             const navOffset = 64;
             const targetY = rotaryEl.getBoundingClientRect().top + window.scrollY - navOffset;
-            window.scrollTo({ top: targetY, behavior: 'smooth' });
-          }
-
-          setTimeout(() => {
+            smoothScrollTo(targetY, 850, () => {
+              isSectionTransitioningRef.current = false;
+            });
+          } else {
             isSectionTransitioningRef.current = false;
-          }, 850);
+          }
         }
       }
 
@@ -328,7 +377,7 @@ export default function App() {
       facEl.removeEventListener('wheel', onFacilitiesWheel);
       if (decayTimer) clearTimeout(decayTimer);
     };
-  }, [desktopDivisionView]);
+  }, [desktopDivisionView, smoothScrollTo]);
 
   // Inquiry Form State
   const [inquiryForm, setInquiryForm] = useState({
@@ -964,21 +1013,36 @@ export default function App() {
             <a 
               href={desktopDivisionView === 'rotary' ? '#divisions-rotary-concept' : '#divisions'}
               onClick={(e) => {
+                e.preventDefault();
                 if (desktopDivisionView === 'rotary') {
-                  e.preventDefault();
                   setRotaryDivision(0);
-                  const target = document.getElementById('divisions-rotary-concept');
-                  if (target) {
-                    const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
-                    window.scrollTo({ top: targetY, behavior: 'smooth' });
-                  }
+                }
+                const target = document.getElementById(
+                  desktopDivisionView === 'rotary' ? 'divisions-rotary-concept' : 'divisions'
+                );
+                if (target) {
+                  const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
+                  smoothScrollTo(targetY, 850);
                 }
               }}
               className="hover:text-emerald-900 transition-colors cursor-pointer"
             >
               4 Divisions
             </a>
-            <a href="#facilities" className="hover:text-emerald-900 transition-colors">Facilities</a>
+            <a 
+              href="#facilities" 
+              onClick={(e) => {
+                e.preventDefault();
+                const target = document.getElementById('facilities');
+                if (target) {
+                  const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
+                  smoothScrollTo(targetY, 850);
+                }
+              }}
+              className="hover:text-emerald-900 transition-colors cursor-pointer"
+            >
+              Facilities
+            </a>
             <button 
               onClick={() => setLegalModalTab('regulatory')}
               className="hover:text-emerald-900 transition-colors cursor-pointer text-neutral-600 font-medium"
@@ -1340,14 +1404,16 @@ export default function App() {
             <a
               href={desktopDivisionView === 'rotary' ? '#divisions-rotary-concept' : '#divisions'}
               onClick={(e) => {
+                e.preventDefault();
                 if (desktopDivisionView === 'rotary') {
-                  e.preventDefault();
                   setRotaryDivision(0);
-                  const target = document.getElementById('divisions-rotary-concept');
-                  if (target) {
-                    const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
-                    window.scrollTo({ top: targetY, behavior: 'smooth' });
-                  }
+                }
+                const target = document.getElementById(
+                  desktopDivisionView === 'rotary' ? 'divisions-rotary-concept' : 'divisions'
+                );
+                if (target) {
+                  const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
+                  smoothScrollTo(targetY, 850);
                 }
               }}
               className="px-5 sm:px-7 py-2.5 sm:py-3 bg-[#22c55e] hover:bg-[#16a34a] text-[#071f14] text-xs font-bold uppercase tracking-wider transition-all hover:shadow-lg flex items-center gap-1.5 cursor-pointer"
@@ -1374,14 +1440,16 @@ export default function App() {
           href={desktopDivisionView === 'rotary' ? '#divisions-rotary-concept' : '#divisions'} 
           aria-label="Scroll down to divisions"
           onClick={(e) => {
+            e.preventDefault();
             if (desktopDivisionView === 'rotary') {
-              e.preventDefault();
               setRotaryDivision(0);
-              const target = document.getElementById('divisions-rotary-concept');
-              if (target) {
-                const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
-                window.scrollTo({ top: targetY, behavior: 'smooth' });
-              }
+            }
+            const target = document.getElementById(
+              desktopDivisionView === 'rotary' ? 'divisions-rotary-concept' : 'divisions'
+            );
+            if (target) {
+              const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
+              smoothScrollTo(targetY, 850);
             }
           }}
           className="absolute bottom-13 sm:bottom-15 left-1/2 -translate-x-1/2 z-20 hidden xs:flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors group cursor-pointer"
@@ -1749,7 +1817,7 @@ export default function App() {
                     if (rotaryDivision > 0) {
                       setRotaryDivision((prev) => prev - 1);
                     } else {
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      smoothScrollTo(0, 850);
                     }
                   }}
                   className="w-7 h-7 flex items-center justify-center hover:bg-neutral-100 text-neutral-800 cursor-pointer transition-colors"
@@ -1769,7 +1837,7 @@ export default function App() {
                       const facilitiesEl = document.getElementById('facilities');
                       if (facilitiesEl) {
                         const targetY = facilitiesEl.getBoundingClientRect().top + window.scrollY - 64;
-                        window.scrollTo({ top: targetY, behavior: 'smooth' });
+                        smoothScrollTo(targetY, 850);
                       }
                     }
                   }}
@@ -2137,7 +2205,7 @@ export default function App() {
                 const facilitiesEl = document.getElementById('facilities');
                 if (facilitiesEl) {
                   const targetY = facilitiesEl.getBoundingClientRect().top + window.scrollY - 64;
-                  window.scrollTo({ top: targetY, behavior: 'smooth' });
+                  smoothScrollTo(targetY, 850);
                 }
               }}
               className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#0a2318] hover:bg-emerald-800 text-white text-xs font-mono font-medium tracking-wider uppercase transition-colors shadow-xs cursor-pointer"
