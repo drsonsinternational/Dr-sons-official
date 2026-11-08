@@ -70,6 +70,12 @@ export default function App() {
     3: 0
   });
 
+  // Mobile Pipeline View Mode (Test Toggle: 'popup' vs 'accordion') & Card Popup State
+  const [mobilePipelineView, setMobilePipelineView] = useState<'popup' | 'accordion'>('popup');
+  const [popupFacilityIndex, setPopupFacilityIndex] = useState<number | null>(null);
+  const [popupStageIndex, setPopupStageIndex] = useState<number>(0);
+  const popupTouchStartX = useRef<number | null>(null);
+
   const [activeDivision, setActiveDivision] = useState<number>(0);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
@@ -2274,9 +2280,83 @@ export default function App() {
             </div>
           </div>
 
-          {/* MOBILE VIEW: Accordion List with Compact Phase Stepper (Matches Reference Layout) */}
+          {/* MOBILE VIEW: Switchable between Card Popup (New Suggestion) and Accordion (Original Version) */}
           <div className="block lg:hidden border-t border-neutral-300 bg-white">
-            {facilitiesData.map((line, idx) => {
+            
+            {/* Quick Testing Switcher Toolbar */}
+            <div className="flex items-center justify-between py-2 px-3 sm:px-4 bg-[#f8faf8] border-b border-neutral-300 text-xs">
+              <span className="font-mono text-[10px] text-neutral-500 uppercase tracking-wider font-bold">
+                Mobile Mode:
+              </span>
+              <div className="flex items-center gap-1 bg-white border border-neutral-300 p-0.5 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => setMobilePipelineView('popup')}
+                  className={`px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    mobilePipelineView === 'popup'
+                      ? 'bg-[#0a2318] text-white shadow-xs'
+                      : 'text-neutral-600 hover:text-neutral-900'
+                  }`}
+                >
+                  Card Popup (New)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMobilePipelineView('accordion')}
+                  className={`px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    mobilePipelineView === 'accordion'
+                      ? 'bg-[#0a2318] text-white shadow-xs'
+                      : 'text-neutral-600 hover:text-neutral-900'
+                  }`}
+                >
+                  Original Boxes
+                </button>
+              </div>
+            </div>
+
+            {/* VERSION A: CARD POPUP TRIGGER LIST (New Suggestion: Tap any pipeline to open swipeable card modal) */}
+            {mobilePipelineView === 'popup' && (
+              <div className="divide-y divide-neutral-200">
+                {facilitiesData.map((line, idx) => {
+                  const prefixNumber = `00-${idx + 1}`;
+                  return (
+                    <button
+                      key={`mob-popup-row-${line.id}`}
+                      type="button"
+                      onClick={() => {
+                        setPopupFacilityIndex(idx);
+                        setPopupStageIndex(0);
+                      }}
+                      className="w-full py-4 px-3 sm:px-4 flex items-center justify-between text-left transition-colors cursor-pointer select-none bg-white hover:bg-[#f4f7f5] active:bg-[#edf5f0]"
+                    >
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0 pr-2">
+                        <span className="font-mono text-xs sm:text-sm font-semibold text-neutral-500 w-11 shrink-0">
+                          {prefixNumber}
+                        </span>
+                        <div className="min-w-0">
+                          <span className="text-xs sm:text-sm font-bold text-neutral-900 uppercase tracking-tight block truncate">
+                            {line.division}
+                          </span>
+                          <span className="text-[10px] font-mono text-emerald-800 block mt-0.5">
+                            {line.capacity} · 5 Stages
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-900 bg-emerald-50 border border-emerald-900/15 px-2 py-0.5">
+                          View Stages
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-neutral-400" />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* VERSION B: ACCORDION (Original Version Preserved Exactly As Is) */}
+            {mobilePipelineView === 'accordion' && facilitiesData.map((line, idx) => {
               const isOpen = mobileOpenDivision === idx;
               const activeStageIdx = mobileActiveStages[idx] ?? 0;
               const activeStg = line.stages[activeStageIdx];
@@ -2451,6 +2531,244 @@ export default function App() {
               );
             })}
           </div>
+
+          {/* MOBILE CARD POPUP MODAL (Swipe Left / Right through Stages) */}
+          <AnimatePresence>
+            {popupFacilityIndex !== null && (() => {
+              const line = facilitiesData[popupFacilityIndex];
+              const stage = line.stages[popupStageIndex];
+              const totalStages = line.stages.length;
+
+              const handlePrevStage = () => {
+                setPopupStageIndex(prev => Math.max(0, prev - 1));
+              };
+
+              const handleNextStage = () => {
+                setPopupStageIndex(prev => Math.min(totalStages - 1, prev + 1));
+              };
+
+              return (
+                <div 
+                  className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-xs p-0 sm:p-4 select-none"
+                  onClick={() => setPopupFacilityIndex(null)}
+                >
+                  <motion.div
+                    initial={{ y: '100%', opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: '100%', opacity: 0 }}
+                    transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                    className="bg-white w-full max-w-lg max-h-[92vh] flex flex-col rounded-t-2xl sm:rounded-2xl border border-neutral-300 shadow-2xl overflow-hidden"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Sheet Drag Handle Pill & Close Header */}
+                    <div className="pt-2 px-4 pb-2.5 border-b border-neutral-200 bg-[#f8faf8] relative shrink-0">
+                      <div className="w-10 h-1 bg-neutral-300 rounded-full mx-auto mb-2" />
+                      
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="px-1.5 py-0.5 bg-emerald-900 text-white font-mono text-[9px] font-bold tracking-wider uppercase">
+                              LINE 0{line.number}
+                            </span>
+                            <span className="text-[10px] font-mono text-emerald-800 font-bold uppercase truncate">
+                              {line.shortTitle}
+                            </span>
+                          </div>
+                          <h3 className="text-sm font-bold text-neutral-900 truncate leading-snug mt-0.5">
+                            {line.division}
+                          </h3>
+                        </div>
+
+                        {/* Close Button */}
+                        <button
+                          type="button"
+                          onClick={() => setPopupFacilityIndex(null)}
+                          className="w-8 h-8 rounded-full bg-white hover:bg-neutral-100 border border-neutral-300 text-neutral-700 flex items-center justify-center shrink-0 cursor-pointer shadow-xs active:scale-95 transition-transform"
+                          aria-label="Close stage popup"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* Segmented Stage Indicator Tabs / Progress Dots */}
+                      <div className="grid grid-cols-5 gap-1.5 pt-2">
+                        {line.stages.map((_, sIdx) => (
+                          <button
+                            key={`popup-seg-${sIdx}`}
+                            onClick={() => setPopupStageIndex(sIdx)}
+                            className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                              popupStageIndex === sIdx
+                                ? 'bg-emerald-700 w-full'
+                                : sIdx < popupStageIndex
+                                ? 'bg-emerald-400/60'
+                                : 'bg-neutral-200'
+                            }`}
+                            aria-label={`Jump to stage ${sIdx + 1}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Interactive Swipeable Stage Card Area */}
+                    <div 
+                      className="flex-1 overflow-y-auto p-4 space-y-3 relative touch-pan-y"
+                      onTouchStart={(e) => {
+                        popupTouchStartX.current = e.touches[0].clientX;
+                      }}
+                      onTouchEnd={(e) => {
+                        if (popupTouchStartX.current === null) return;
+                        const touchEndX = e.changedTouches[0].clientX;
+                        const deltaX = popupTouchStartX.current - touchEndX;
+                        if (deltaX > 40) {
+                          // Swiped Left -> Advance to next stage
+                          handleNextStage();
+                        } else if (deltaX < -40) {
+                          // Swiped Right -> Return to previous stage
+                          handlePrevStage();
+                        }
+                        popupTouchStartX.current = null;
+                      }}
+                    >
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={`popup-stage-${line.id}-${popupStageIndex}`}
+                          initial={{ opacity: 0, x: 24 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -24 }}
+                          transition={{ duration: 0.2, ease: 'easeOut' }}
+                          drag="x"
+                          dragConstraints={{ left: 0, right: 0 }}
+                          dragElastic={0.2}
+                          onDragEnd={(_, { offset, velocity }) => {
+                            if (offset.x < -40 || velocity.x < -300) {
+                              handleNextStage();
+                            } else if (offset.x > 40 || velocity.x > 300) {
+                              handlePrevStage();
+                            }
+                          }}
+                          className="space-y-3 cursor-grab active:cursor-grabbing"
+                        >
+                          {/* Large Stage Photo */}
+                          <div className="relative aspect-[16/10] w-full bg-neutral-900 border border-neutral-300 overflow-hidden shadow-sm">
+                            <img
+                              src={(stage as any).image || line.image}
+                              alt={stage.title}
+                              className="w-full h-full object-cover object-center pointer-events-none"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                            
+                            {/* Top Badges */}
+                            <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                              <span className="bg-[#0a2318] text-white font-mono text-[10px] font-bold px-2 py-0.5 border border-emerald-500/40 shadow-xs">
+                                STAGE 0{stage.stepNumber} / 05
+                              </span>
+                              <span className="bg-black/75 backdrop-blur-md text-emerald-300 font-mono text-[9px] px-2 py-0.5 border border-white/20">
+                                {stage.stepLabel}
+                              </span>
+                            </div>
+
+                            {/* Bottom Line Capacity */}
+                            <div className="absolute bottom-2 left-3 right-3 text-white font-mono text-[10px] flex items-center justify-between">
+                              <span className="text-emerald-400 font-bold uppercase truncate">{line.capacity}</span>
+                              <span className="text-neutral-300 uppercase tracking-wide text-[9px]">{line.cleanroomClass}</span>
+                            </div>
+                          </div>
+
+                          {/* Phase Info & Title */}
+                          <div>
+                            <span className="text-[10px] font-mono text-emerald-800 uppercase block font-bold tracking-wider">
+                              {stage.phase}
+                            </span>
+                            <h4 className="text-sm font-bold text-neutral-900 leading-snug mt-0.5">
+                              {stage.title}
+                            </h4>
+                            <p className="text-xs text-neutral-600 font-light leading-relaxed mt-1">
+                              {stage.summary}
+                            </p>
+                          </div>
+
+                          {/* Telemetry 2x2 Grid */}
+                          <div className="grid grid-cols-2 gap-2 pt-1">
+                            {stage.telemetry.map((tel, tIdx) => (
+                              <div key={`popup-tel-${tIdx}`} className="p-2 bg-neutral-50 border border-neutral-200 shadow-2xs">
+                                <span className="text-[9px] font-mono uppercase text-neutral-500 block truncate font-medium">
+                                  {tel.label}
+                                </span>
+                                <span className="text-xs font-mono font-bold text-neutral-900 block truncate mt-0.5">
+                                  {tel.value}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Highlight Callout */}
+                          {stage.highlight && (
+                            <div className="p-2.5 bg-emerald-50/70 border-l-2 border-emerald-700 text-[11px] text-emerald-950 leading-relaxed font-medium">
+                              {stage.highlight}
+                            </div>
+                          )}
+                        </motion.div>
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Swipe Hint & Bottom Actions Toolbar */}
+                    <div className="p-3 border-t border-neutral-200 bg-[#f8faf8] space-y-2 shrink-0">
+                      <div className="flex items-center justify-between text-xs">
+                        {/* Prev Button */}
+                        <button
+                          type="button"
+                          disabled={popupStageIndex === 0}
+                          onClick={handlePrevStage}
+                          className={`px-3 py-1.5 font-mono text-xs border flex items-center gap-1.5 transition-all ${
+                            popupStageIndex === 0
+                              ? 'opacity-30 cursor-not-allowed bg-neutral-100 text-neutral-400 border-neutral-200'
+                              : 'bg-white hover:bg-neutral-50 text-neutral-800 border-neutral-300 cursor-pointer shadow-2xs active:scale-95'
+                          }`}
+                        >
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                          <span>Prev</span>
+                        </button>
+
+                        {/* Swipe Guide Hint */}
+                        <span className="text-[10px] font-mono text-neutral-400 tracking-wider uppercase text-center">
+                          Swipe Left / Right
+                        </span>
+
+                        {/* Next Button */}
+                        <button
+                          type="button"
+                          disabled={popupStageIndex === totalStages - 1}
+                          onClick={handleNextStage}
+                          className={`px-3 py-1.5 font-mono text-xs border flex items-center gap-1.5 transition-all ${
+                            popupStageIndex === totalStages - 1
+                              ? 'opacity-30 cursor-not-allowed bg-neutral-100 text-neutral-400 border-neutral-200'
+                              : 'bg-white hover:bg-neutral-50 text-neutral-800 border-neutral-300 cursor-pointer shadow-2xs active:scale-95'
+                          }`}
+                        >
+                          <span>Next</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Inquire CTA */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPopupFacilityIndex(null);
+                          handleFacilityInquiry(`${line.division} - Stage ${stage.stepNumber}: ${stage.title}`);
+                        }}
+                        className="w-full py-2.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-[0.99] transition-transform"
+                      >
+                        <span>Inquire for {line.shortTitle}</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
+                      </button>
+                    </div>
+
+                  </motion.div>
+                </div>
+              );
+            })()}
+          </AnimatePresence>
 
         </div>
       </section>
