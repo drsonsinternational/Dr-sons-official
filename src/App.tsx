@@ -1749,7 +1749,7 @@ export default function App() {
         id="divisions-rotary-concept" 
         ref={rotarySectionRef}
         style={{ scrollMarginTop: '64px' }}
-        className={`w-full py-2.5 bg-white border-b border-neutral-200 relative overflow-hidden select-none h-[calc(100vh-64px)] max-h-[860px] min-h-[520px] flex flex-col justify-between ${
+        className={`w-full py-1.5 lg:py-2 bg-white border-b border-neutral-200 relative overflow-hidden select-none h-[calc(100vh-64px)] max-h-[860px] min-h-[520px] flex flex-col justify-between ${
           desktopDivisionView === 'rotary' ? 'hidden lg:flex' : 'hidden'
         }`}
       >
@@ -2004,7 +2004,7 @@ export default function App() {
 
             </div>
 
-            {/* RIGHT COLUMN: DIRECTLY ATTACHED WIDESCREEN SPECIFICATIONS & COMMERCE DETAIL BOX */}
+            {/* RIGHT COLUMN: ATTACHED WIDESCREEN SPECIFICATIONS & COMMERCE DETAIL BOX */}
             <div className="flex-1 min-w-0 h-[370px] relative z-10">
               <AnimatePresence mode="wait">
                 {(() => {
@@ -2017,34 +2017,45 @@ export default function App() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -16 }}
                       transition={{ duration: 0.22, ease: 'easeOut' }}
-                      className="bg-[#fafbfa] border-2 border-emerald-900/25 p-4 sm:p-5 shadow-sm relative h-full flex flex-col justify-between hover:border-emerald-800/40 transition-colors"
+                      className="bg-white border border-emerald-900/20 p-4 sm:p-5 shadow-[0_15px_40px_-12px_rgba(7,31,20,0.09),0_0_0_1px_rgba(5,150,105,0.12)] relative h-full flex flex-col justify-between hover:border-emerald-600/40 transition-all overflow-hidden"
                     >
+                      {/* Top Accent Gradient Line */}
+                      <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#0a2318]" />
+
                       {/* Physical Docking Notch connecting circle to card */}
-                      <div className="absolute -left-3.5 top-1/2 -translate-y-1/2 w-4 h-24 bg-emerald-700/20 border-l-2 border-y-2 border-emerald-600/70 rounded-l-md pointer-events-none flex items-center justify-center">
-                        <div className="w-1.5 h-10 bg-emerald-600 rounded-full shadow-xs" />
+                      <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-4.5 h-28 bg-[#0a2318] border-y border-l border-emerald-500/50 rounded-l-lg pointer-events-none flex flex-col items-center justify-around py-2.5 shadow-md z-20">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                        <div className="w-1 h-12 bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600 rounded-full" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       </div>
 
                       {/* Card Header Row */}
-                      <div className="flex items-center justify-between gap-3 border-b border-neutral-200 pb-2">
+                      <div className="flex items-center justify-between gap-3 border-b border-neutral-200/80 pb-2.5">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-900/20 flex items-center justify-center shrink-0">
-                            <CurrentIcon className="w-4 h-4 text-emerald-800" />
+                          <div className="w-9 h-9 rounded-md bg-[#0a2318] text-emerald-400 flex items-center justify-center shrink-0 shadow-xs border border-emerald-500/30">
+                            <CurrentIcon className="w-4.5 h-4.5 stroke-[2]" />
                           </div>
                           <div className="min-w-0">
-                            <span className="text-[11px] font-sans uppercase tracking-wider text-emerald-800 font-bold block leading-none">
-                              Division {current.number} · D R &amp; Sons International
-                            </span>
-                            <h3 className="text-lg sm:text-xl font-bold text-[#0a2318] tracking-tight truncate leading-tight mt-0.5">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="px-2 py-0.5 bg-emerald-900 text-white font-mono text-[9px] font-bold tracking-widest uppercase">
+                                DIV 0{current.number}
+                              </span>
+                              <span className="text-[10px] font-mono tracking-widest text-emerald-800 font-bold uppercase">
+                                D R &amp; SONS REGISTERED INDUSTRIAL WING
+                              </span>
+                            </div>
+                            <h3 className="text-xl sm:text-2xl font-black text-[#071f14] tracking-tight truncate leading-tight">
                               {current.title}
                             </h3>
                           </div>
                         </div>
 
                         <div className="shrink-0 flex items-center gap-2 font-mono">
-                          <span className="hidden sm:inline-block px-2.5 py-0.5 bg-neutral-100 text-neutral-600 border border-neutral-200 text-[10px] font-semibold">
-                            FSSAI / BIS IS 14543
+                          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-900 border border-emerald-800/20 text-[10px] font-bold tracking-wider">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                            <span>FSSAI · BIS IS 14543</span>
                           </span>
-                          <span className="px-2.5 py-0.5 bg-emerald-900 text-white text-xs font-bold font-mono">
+                          <span className="px-3 py-1 bg-[#0a2318] text-white text-xs font-bold font-mono tracking-wider shadow-xs border border-emerald-500/40">
                             SKU #{current.number}
                           </span>
                         </div>
@@ -2055,33 +2066,39 @@ export default function App() {
                         
                         {/* Sub-Panel 1 (3 Cols): Facility Line Visual & Commercial Key Deliverables */}
                         <div className="col-span-3 flex flex-col justify-between h-full space-y-2 border-r border-neutral-200/80 pr-3">
-                          <div className="border border-neutral-200 bg-white shadow-2xs overflow-hidden relative group shrink-0 h-28">
+                          <div className="relative group shrink-0 h-30 overflow-hidden border border-neutral-300 shadow-xs bg-neutral-900">
                             <img 
                               src={current.image} 
                               alt={current.title} 
-                              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                              className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700"
                             />
-                            <div className="absolute top-1.5 left-1.5 px-2 py-0.5 bg-white/95 backdrop-blur-xs font-mono text-[9px] uppercase tracking-wider text-emerald-900 border border-neutral-200 font-semibold">
-                              Direct Facility Line
+                            <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 backdrop-blur-md font-mono text-[9px] uppercase tracking-wider text-emerald-300 border border-white/20 font-bold flex items-center gap-1.5 shadow-xs">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                              <span>Direct Facility Line</span>
+                            </div>
+                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-2.5 py-1 text-white">
+                              <span className="text-[10px] font-mono tracking-wide text-white/95 font-semibold block truncate">Cleanroom Continuous Processing</span>
                             </div>
                           </div>
 
                           {/* Commercial Deliverables Chips */}
                           <div className="space-y-1">
-                            <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block font-semibold">
-                              Commercial Deliverables:
-                            </span>
+                            <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-neutral-500 font-bold">
+                              <span>Commercial Deliverables:</span>
+                              <span className="text-emerald-800 font-semibold">Bulk Supply</span>
+                            </div>
                             <div className="flex flex-wrap gap-1">
                               {current.keyItems.slice(0, 4).map((item, i) => (
                                 <span 
                                   key={i} 
-                                  className="px-1.5 py-0.5 bg-white border border-neutral-200 text-[10px] text-neutral-800 font-medium shadow-2xs truncate max-w-[170px]"
+                                  className="px-2 py-0.5 bg-neutral-50 hover:bg-emerald-50 border border-neutral-200 hover:border-emerald-600 text-[10px] text-neutral-800 font-medium shadow-2xs truncate max-w-[170px] transition-colors flex items-center gap-1"
                                 >
-                                  {item}
+                                  <span className="text-emerald-600 font-bold text-[8px]">✦</span>
+                                  <span>{item}</span>
                                 </span>
                               ))}
                               {current.keyItems.length > 4 && (
-                                <span className="px-1 py-0.5 bg-emerald-50 text-[10px] font-mono text-emerald-900 font-semibold border border-emerald-900/10">
+                                <span className="px-1.5 py-0.5 bg-emerald-50 text-[10px] font-mono text-emerald-900 font-semibold border border-emerald-900/10">
                                   +{current.keyItems.length - 4} more
                                 </span>
                               )}
@@ -2093,8 +2110,8 @@ export default function App() {
                         <div className="col-span-6 flex flex-col justify-between h-full space-y-1.5 px-1">
                           {/* Tagline & Summary */}
                           <div className="space-y-0.5">
-                            <p className="text-xs text-emerald-900 font-serif-brand italic font-medium leading-snug">
-                              {current.tagline}
+                            <p className="text-xs sm:text-[13px] text-emerald-950 font-serif-brand italic font-semibold leading-snug">
+                              “{current.tagline}”
                             </p>
                             <p className="text-xs text-neutral-700 leading-relaxed line-clamp-2">
                               {current.summary}
@@ -2103,61 +2120,72 @@ export default function App() {
 
                           {/* 2x2 Technical Process Highlights */}
                           <div className="space-y-1">
-                            <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-neutral-500 font-semibold">
-                              <span>Verified Process Highlights</span>
-                              <span className="text-emerald-800 font-bold">Standardized Batch Control</span>
+                            <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-neutral-500 font-bold border-b border-neutral-100 pb-1">
+                              <span className="text-neutral-600">Verified Process Highlights</span>
+                              <span className="text-emerald-800">ISO 22000 Quality Gate</span>
                             </div>
-                            <div className="grid grid-cols-2 gap-1.5 text-xs text-neutral-700 font-medium">
+                            <div className="grid grid-cols-2 gap-1.5 text-xs">
                               {current.specs.slice(0, 4).map((spec, i) => (
-                                <div key={i} className="flex items-center gap-1.5 bg-white px-2 py-1 border border-neutral-200/80 shadow-2xs">
-                                  <Check className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                                  <span className="truncate text-[11px]">{spec}</span>
+                                <div key={i} className="flex items-center gap-2 bg-[#f8faf8] px-2.5 py-1.5 border border-emerald-900/10 shadow-2xs hover:border-emerald-600/40 transition-colors">
+                                  <div className="w-3.5 h-3.5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                                    <Check className="w-2.5 h-2.5 text-emerald-800 stroke-[3]" />
+                                  </div>
+                                  <span className="truncate text-[11px] font-semibold text-neutral-800">{spec}</span>
                                 </div>
                               ))}
                             </div>
                           </div>
 
                           {/* Commercial Applications Info Bar */}
-                          <div className="bg-emerald-50/70 px-2.5 py-1.5 border border-emerald-900/10 flex items-center gap-2 text-xs text-neutral-700">
-                            <span className="font-mono text-emerald-900 shrink-0 font-bold text-[10px] uppercase tracking-wider">
-                              Applications:
+                          <div className="bg-gradient-to-r from-emerald-50 via-emerald-50/50 to-white px-3 py-1.5 border-l-3 border-emerald-700 flex items-center gap-2 shadow-2xs">
+                            <span className="font-mono text-emerald-950 font-bold text-[10px] uppercase tracking-wider shrink-0 flex items-center gap-1">
+                              <PackageCheck className="w-3.5 h-3.5 text-emerald-800" />
+                              <span>Applications:</span>
                             </span>
-                            <span className="truncate text-[11px] text-neutral-800">{current.applications}</span>
+                            <span className="truncate text-[11px] text-neutral-800 font-medium">{current.applications}</span>
                           </div>
                         </div>
 
                         {/* Sub-Panel 3 (3 Cols): Commercial Action Console, RFQ, WhatsApp & Category Stepper */}
-                        <div className="col-span-3 flex flex-col justify-between h-full border-l border-neutral-200/80 pl-3 bg-white p-3 border border-neutral-200/60 shadow-2xs">
-                          <div className="space-y-2">
-                            <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block font-semibold">
-                              Commercial Ordering &amp; Inquiries:
-                            </span>
+                        <div className="col-span-3 flex flex-col justify-between h-full border-l border-neutral-200/80 pl-3.5 bg-gradient-to-b from-[#f8faf8] via-white to-[#edf5f0] p-3.5 border border-emerald-900/15 shadow-xs relative overflow-hidden">
+                          <div className="absolute -top-10 -right-10 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+
+                          <div className="space-y-2 relative z-10">
+                            <div className="flex items-center justify-between border-b border-emerald-900/15 pb-1.5">
+                              <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-emerald-900 font-bold">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                <span>Trade Desk Console</span>
+                              </div>
+                              <span className="text-[9px] font-mono text-neutral-500">2026 Batch</span>
+                            </div>
 
                             <a
                               href="#inquiry-desk"
                               onClick={() => setInquiryForm({...inquiryForm, division: current.title})}
-                              className="w-full px-4 py-2.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-bold uppercase tracking-wider transition-all hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer text-center"
+                              className="w-full py-2.5 px-3 bg-gradient-to-r from-[#0a2318] to-[#143e2b] hover:from-[#143e2b] hover:to-[#0a2318] text-white text-xs font-bold uppercase tracking-wider shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 group cursor-pointer border border-emerald-500/30 text-center"
                             >
                               <span>Request Commercial RFQ</span>
-                              <ArrowRight className="w-3.5 h-3.5" />
+                              <ArrowRight className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-1 transition-transform" />
                             </a>
 
                             <a
                               href={`https://wa.me/919411268879?text=${encodeURIComponent(`Hi D R & Sons Trade Desk, I am inquiring about Division ${current.number}: ${current.title}`)}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-900/20 text-xs font-semibold uppercase tracking-wider transition-colors text-center"
+                              className="w-full inline-flex items-center justify-center gap-2 py-2 px-3 bg-white hover:bg-emerald-50 text-emerald-950 border border-emerald-600/40 hover:border-emerald-600 text-xs font-bold uppercase tracking-wider transition-all shadow-2xs text-center"
                             >
-                              <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
+                              <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
                               <span>WhatsApp Trade Desk</span>
                             </a>
                           </div>
 
                           {/* Category Stepper & Quality SLA */}
-                          <div className="pt-2 border-t border-neutral-100 space-y-1.5">
+                          <div className="pt-2 border-t border-emerald-900/15 space-y-1.5 relative z-10">
                             <div className="flex items-center justify-between text-[10px] font-mono">
-                              <span className="text-neutral-500 font-semibold">Quick Switch:</span>
-                              <span className="font-bold text-emerald-900">0{rotaryDivision + 1}/04</span>
+                              <span className="text-neutral-500 font-bold uppercase tracking-wider">Dial Category:</span>
+                              <span className="font-bold text-emerald-900 bg-emerald-100/70 px-1.5 py-0.5 rounded-xs">
+                                0{rotaryDivision + 1} / 04
+                              </span>
                             </div>
                             <div className="grid grid-cols-4 gap-1">
                               {divisionsData.map((d, i) => (
@@ -2165,10 +2193,10 @@ export default function App() {
                                   key={`rotary-step-white-${d.id}`}
                                   type="button"
                                   onClick={() => setRotaryDivision(i)}
-                                  className={`py-1 text-[10px] font-mono font-bold transition-all cursor-pointer border ${
+                                  className={`py-1 text-[11px] font-mono font-bold transition-all cursor-pointer border text-center ${
                                     rotaryDivision === i 
-                                      ? 'bg-emerald-800 text-white border-emerald-900 shadow-2xs' 
-                                      : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100'
+                                      ? 'bg-[#0a2318] text-white border-emerald-500 shadow-xs ring-1 ring-emerald-500/50' 
+                                      : 'bg-white text-neutral-700 border-neutral-300 hover:border-emerald-700 hover:bg-emerald-50'
                                   }`}
                                   title={`Switch to Division ${d.number}: ${d.shortName}`}
                                 >
@@ -2176,8 +2204,9 @@ export default function App() {
                                 </button>
                               ))}
                             </div>
-                            <div className="text-[10px] text-neutral-500 font-mono text-center pt-0.5">
-                              <span>✓ 24h Quotation SLA · Full COA</span>
+                            <div className="flex items-center justify-between text-[9px] font-mono text-neutral-500 pt-0.5">
+                              <span className="text-emerald-800 font-bold">⚡ 24h Spec SLA</span>
+                              <span className="text-neutral-600 font-semibold">🔒 Full COA &amp; QC</span>
                             </div>
                           </div>
                         </div>
