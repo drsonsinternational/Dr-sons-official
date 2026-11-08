@@ -1477,12 +1477,9 @@ export default function App() {
               smoothScrollTo(targetY, 850);
             }
           }}
-          className="absolute bottom-13 sm:bottom-15 left-1/2 -translate-x-1/2 z-20 hidden xs:flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors group cursor-pointer"
+          className="absolute bottom-13 sm:bottom-15 left-1/2 -translate-x-1/2 z-20 hidden xs:flex items-center justify-center text-white/70 hover:text-white transition-colors group cursor-pointer"
         >
-          <span className="text-[9px] sm:text-[10px] font-mono tracking-widest uppercase text-emerald-300/80 group-hover:text-emerald-200">
-            Scroll
-          </span>
-          <ChevronDown className="w-3.5 h-3.5 animate-bounce text-emerald-400 group-hover:text-emerald-300" />
+          <ChevronDown className="w-4 h-4 animate-bounce text-emerald-400 group-hover:text-emerald-300" />
         </a>
 
         {/* Continuous Looping Operational Marquee (Integrated inside Hero Section) */}
@@ -1531,10 +1528,9 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setDesktopDivisionView('rotary')}
-                  className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-neutral-600 hover:text-neutral-900 cursor-pointer flex items-center gap-1.5"
+                  className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-neutral-600 hover:text-neutral-900 cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>Switch to Rotary Dial</span>
+                  <span>Rotary Dial</span>
                 </button>
                 <button
                   type="button"
@@ -1774,7 +1770,7 @@ export default function App() {
         id="divisions-rotary-concept" 
         ref={rotarySectionRef}
         style={{ scrollMarginTop: '64px' }}
-        className={`w-full py-2 bg-white border-b border-neutral-200 relative overflow-hidden select-none h-[calc(100vh-64px)] min-h-[560px] flex flex-col justify-between ${
+        className={`w-full py-3 bg-white border-b border-neutral-200 relative overflow-hidden select-none h-[calc(100vh-64px)] min-h-[560px] flex flex-col justify-between ${
           desktopDivisionView === 'rotary' ? 'hidden lg:flex' : 'hidden'
         }`}
       >
@@ -1782,101 +1778,28 @@ export default function App() {
         <div className="absolute inset-0 bg-[radial-gradient(#15803d_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
         <div className="absolute -left-36 top-1/2 -translate-y-1/2 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="w-full max-w-[1840px] mx-auto px-3 sm:px-5 lg:px-6 flex flex-col flex-1 h-full min-h-0 relative z-10 justify-between">
+        <div className="w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col flex-1 h-full min-h-0 relative z-10 justify-between">
 
-          {/* Section Header with Desktop View Switcher & Controls */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-neutral-200 pb-2 shrink-0">
-            <div className="space-y-0.5">
-              <div className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-emerald-800 font-bold">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
-                <span>Core Portfolio · 4 Registered Divisions</span>
-              </div>
+          {/* Section Header */}
+          <div className="flex items-center justify-between border-b border-neutral-200 pb-2.5 shrink-0">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-800 font-bold block mb-0.5">
+                Core Portfolio · 4 Registered Divisions
+              </span>
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 leading-tight">
                 Manufacturing <span className="font-serif-brand italic text-emerald-950 font-normal">Divisions</span>
               </h2>
             </div>
 
-            {/* View Switcher, Wheel hint, Prev/Next, Auto-Rotate Controls */}
-            <div className="flex flex-wrap items-center gap-2 shrink-0">
-              {/* Desktop Toggle to switch between Rotary and Classic */}
-              <div className="flex items-center gap-1 border border-neutral-200 bg-neutral-100 p-0.5">
-                <button
-                  type="button"
-                  onClick={() => setDesktopDivisionView('rotary')}
-                  className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider bg-[#0a2318] text-white shadow-xs cursor-pointer flex items-center gap-1.5"
-                >
-                  <Sparkles className="w-3 h-3 text-emerald-400" />
-                  <span>Rotary Dial</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDesktopDivisionView('classic')}
-                  className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-neutral-600 hover:text-neutral-900 cursor-pointer"
-                >
-                  <span>Classic Slider</span>
-                </button>
-              </div>
-
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-900/15 text-[11px] font-mono text-emerald-900">
-                <span>🖱️ Scroll Wheel Advances Divisions</span>
-              </span>
-
-              <button
-                type="button"
-                onClick={() => setRotaryAutoPlay(!rotaryAutoPlay)}
-                className={`px-2.5 py-0.5 text-xs font-mono font-semibold uppercase tracking-wider border transition-all cursor-pointer flex items-center gap-1.5 ${
-                  rotaryAutoPlay 
-                    ? 'bg-emerald-800 border-emerald-900 text-white shadow-xs' 
-                    : 'bg-white hover:bg-neutral-50 border-neutral-300 text-neutral-700'
-                }`}
-                title="Toggle continuous auto-rotation"
-              >
-                {rotaryAutoPlay ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                <span>{rotaryAutoPlay ? 'Auto: ON' : 'Auto-Rotate'}</span>
-              </button>
-
-              <div className="flex items-center gap-1 border border-neutral-300 p-0.5 bg-white">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (rotaryDivision > 0) {
-                      setRotaryDivision((prev) => prev - 1);
-                    } else {
-                      smoothScrollTo(0, 850);
-                    }
-                  }}
-                  className="w-7 h-7 flex items-center justify-center hover:bg-neutral-100 text-neutral-800 cursor-pointer transition-colors"
-                  title={rotaryDivision === 0 ? "Return to Hero" : "Previous Category (Rotate Up)"}
-                >
-                  <ChevronUp className="w-4 h-4" />
-                </button>
-                <span className="px-1.5 font-mono text-xs text-emerald-800 font-bold">
-                  0{rotaryDivision + 1}/04
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (rotaryDivision < divisionsData.length - 1) {
-                      setRotaryDivision((prev) => prev + 1);
-                    } else {
-                      const facilitiesEl = document.getElementById('facilities');
-                      if (facilitiesEl) {
-                        const targetY = facilitiesEl.getBoundingClientRect().top + window.scrollY - 64;
-                        smoothScrollTo(targetY, 850);
-                      }
-                    }
-                  }}
-                  className="w-7 h-7 flex items-center justify-center hover:bg-neutral-100 text-neutral-800 cursor-pointer transition-colors"
-                  title={rotaryDivision === divisionsData.length - 1 ? "Next Section: Facilities Pipeline" : "Next Category (Rotate Down)"}
-                >
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </div>
+            <div className="font-mono text-xs text-neutral-400 font-bold">
+              <span className="text-emerald-900">0{rotaryDivision + 1}</span>
+              <span className="mx-1">/</span>
+              <span>04</span>
             </div>
           </div>
 
           {/* MAIN ROTARY DIAL WORKSPACE: Left Semi-Circle Arc Flush Left + Directly Attached Widescreen Detail Box */}
-          <div className="relative w-full flex-1 min-h-0 flex items-stretch overflow-visible my-1 sm:my-1.5">
+          <div className="relative w-full flex-1 min-h-0 flex items-stretch overflow-visible my-2">
 
             {/* LEFT COLUMN: THE SEMI-CIRCLE ROTARY ARC (Flush with Left Side of Screen - Draggable) */}
             <div 
@@ -2042,7 +1965,6 @@ export default function App() {
               <AnimatePresence mode="wait">
                 {(() => {
                   const current = divisionsData[rotaryDivision];
-                  const CurrentIcon = current.icon;
                   return (
                     <motion.div
                       key={`rotary-detail-box-wide-${current.id}`}
@@ -2050,7 +1972,7 @@ export default function App() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -16 }}
                       transition={{ duration: 0.22, ease: 'easeOut' }}
-                      className="bg-white border border-emerald-900/20 p-4 sm:p-5 lg:p-6 shadow-[0_20px_50px_-15px_rgba(7,31,20,0.1),0_0_0_1px_rgba(5,150,105,0.12)] relative h-full flex flex-col justify-between hover:border-emerald-600/40 transition-all overflow-hidden"
+                      className="bg-white border border-emerald-900/20 p-5 sm:p-6 lg:p-7 shadow-[0_20px_50px_-15px_rgba(7,31,20,0.1),0_0_0_1px_rgba(5,150,105,0.12)] relative h-full flex flex-col justify-between hover:border-emerald-600/40 transition-all overflow-hidden"
                     >
                       {/* Top Accent Gradient Line */}
                       <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#0a2318]" />
@@ -2063,30 +1985,24 @@ export default function App() {
                       </div>
 
                       {/* Card Header Row */}
-                      <div className="flex items-center justify-between gap-3 border-b border-neutral-200/80 pb-2.5 shrink-0">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 rounded-md bg-[#0a2318] text-emerald-400 flex items-center justify-center shrink-0 shadow-xs border border-emerald-500/30">
-                            <CurrentIcon className="w-4.5 h-4.5 stroke-[2]" />
+                      <div className="flex items-center justify-between gap-3 border-b border-neutral-200/80 pb-3 shrink-0">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="px-2 py-0.5 bg-emerald-900 text-white font-mono text-[9px] font-bold tracking-widest uppercase">
+                              DIV 0{current.number}
+                            </span>
+                            <span className="text-[10px] font-mono tracking-widest text-emerald-800 font-bold uppercase">
+                              D R &amp; SONS REGISTERED INDUSTRIAL WING
+                            </span>
                           </div>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2 mb-0.5">
-                              <span className="px-2 py-0.5 bg-emerald-900 text-white font-mono text-[9px] font-bold tracking-widest uppercase">
-                                DIV 0{current.number}
-                              </span>
-                              <span className="text-[10px] font-mono tracking-widest text-emerald-800 font-bold uppercase">
-                                D R &amp; SONS REGISTERED INDUSTRIAL WING
-                              </span>
-                            </div>
-                            <h3 className="text-xl sm:text-2xl font-black text-[#071f14] tracking-tight truncate leading-tight">
-                              {current.title}
-                            </h3>
-                          </div>
+                          <h3 className="text-xl sm:text-2xl font-black text-[#071f14] tracking-tight truncate leading-tight">
+                            {current.title}
+                          </h3>
                         </div>
 
                         <div className="shrink-0 flex items-center gap-2 font-mono">
-                          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-900 border border-emerald-800/20 text-[10px] font-bold tracking-wider">
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                            <span>FSSAI · BIS IS 14543</span>
+                          <span className="hidden sm:inline-flex items-center px-2.5 py-1 bg-emerald-50 text-emerald-900 border border-emerald-800/20 text-[10px] font-bold tracking-wider">
+                            FSSAI · BIS IS 14543
                           </span>
                           <span className="px-3 py-1 bg-[#0a2318] text-white text-xs font-bold font-mono tracking-wider shadow-xs border border-emerald-500/40">
                             SKU #{current.number}
@@ -2098,8 +2014,8 @@ export default function App() {
                       <div className="grid grid-cols-12 gap-6 items-stretch flex-1 py-3 min-h-0">
                         
                         {/* Sub-Panel 1 (6 Cols - 50% Width): Large Showcase Facility Photo & Commercial Key Deliverables */}
-                        <div className="col-span-6 flex flex-col justify-between h-full space-y-2.5 border-r border-neutral-200/80 pr-5">
-                          <div className="relative group flex-1 min-h-[220px] overflow-hidden border border-neutral-300 shadow-sm bg-neutral-900">
+                        <div className="col-span-6 flex flex-col justify-between h-full space-y-2.5 border-r border-neutral-200/80 pr-6">
+                          <div className="relative group flex-1 min-h-[240px] overflow-hidden border border-neutral-300 shadow-sm bg-neutral-900">
                             <img 
                               src={current.image} 
                               alt={current.title} 
@@ -2124,10 +2040,9 @@ export default function App() {
                               {current.keyItems.map((item, i) => (
                                 <span 
                                   key={i} 
-                                  className="px-2.5 py-1 bg-neutral-50 hover:bg-emerald-50 border border-neutral-200 hover:border-emerald-600 text-[10px] text-neutral-800 font-medium shadow-2xs truncate max-w-[240px] transition-colors flex items-center gap-1.5"
+                                  className="px-2.5 py-1 bg-neutral-50 hover:bg-emerald-50 border border-neutral-200 hover:border-emerald-600 text-[10px] text-neutral-800 font-medium shadow-2xs truncate max-w-[240px] transition-colors"
                                 >
-                                  <span className="text-emerald-600 font-bold text-[8px]">✦</span>
-                                  <span>{item}</span>
+                                  {item}
                                 </span>
                               ))}
                             </div>
@@ -2135,7 +2050,7 @@ export default function App() {
                         </div>
 
                         {/* Sub-Panel 2 (6 Cols - 50% Width): Tagline, Summary, Specs 2x2, Applications Bar & Quality Assurance */}
-                        <div className="col-span-6 flex flex-col justify-between h-full space-y-3 pl-1">
+                        <div className="col-span-6 flex flex-col justify-between h-full space-y-3 pl-2">
                           {/* Tagline & Summary */}
                           <div className="space-y-1.5 shrink-0">
                             <p className="text-base sm:text-lg font-serif-brand italic font-semibold text-emerald-950 leading-snug">
@@ -2155,9 +2070,7 @@ export default function App() {
                             <div className="grid grid-cols-2 gap-2.5 text-xs">
                               {current.specs.slice(0, 4).map((spec, i) => (
                                 <div key={i} className="flex items-center gap-2.5 bg-[#f8faf8] px-3.5 py-2.5 border border-emerald-900/10 shadow-2xs hover:border-emerald-600/40 transition-colors">
-                                  <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                                    <Check className="w-2.5 h-2.5 text-emerald-800 stroke-[3]" />
-                                  </div>
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
                                   <span className="truncate text-xs font-semibold text-neutral-800">{spec}</span>
                                 </div>
                               ))}
@@ -2166,9 +2079,8 @@ export default function App() {
 
                           {/* Commercial Applications Info Bar */}
                           <div className="bg-gradient-to-r from-emerald-50 via-emerald-50/50 to-white px-3.5 py-2.5 border-l-3 border-emerald-700 flex items-center gap-2 shadow-2xs shrink-0">
-                            <span className="font-mono text-emerald-950 font-bold text-[10px] uppercase tracking-wider shrink-0 flex items-center gap-1.5">
-                              <PackageCheck className="w-4 h-4 text-emerald-800" />
-                              <span>Applications:</span>
+                            <span className="font-mono text-emerald-950 font-bold text-[10px] uppercase tracking-wider shrink-0">
+                              Applications:
                             </span>
                             <span className="truncate text-xs text-neutral-800 font-medium">{current.applications}</span>
                           </div>
@@ -2194,29 +2106,6 @@ export default function App() {
 
           </div>
 
-          {/* Bottom Navigation & Interaction Affordance */}
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-neutral-200 text-xs text-neutral-600 font-mono shrink-0">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
-              <span>Scroll down to advance divisions · After 04/04, glides to Facilities Pipeline</span>
-            </div>
-            <a
-              href="#facilities"
-              onClick={(e) => {
-                e.preventDefault();
-                const facilitiesEl = document.getElementById('facilities');
-                if (facilitiesEl) {
-                  const targetY = facilitiesEl.getBoundingClientRect().top + window.scrollY - 64;
-                  smoothScrollTo(targetY, 850);
-                }
-              }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#0a2318] hover:bg-emerald-800 text-white text-xs font-mono font-medium tracking-wider uppercase transition-colors shadow-xs cursor-pointer"
-            >
-              <span>Next Section: Facilities Pipeline</span>
-              <ArrowDown className="w-3.5 h-3.5" />
-            </a>
-          </div>
-
         </div>
       </section>
 
@@ -2232,22 +2121,15 @@ export default function App() {
           {/* Header */}
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-neutral-200 pb-6">
             <div className="space-y-2 max-w-2xl">
-              <div className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
-                <Settings2 className="w-3.5 h-3.5 text-emerald-700" />
-                <span>Industrial Workflow &amp; Technical Architecture</span>
-              </div>
+              <span className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold block">
+                Industrial Workflow &amp; Technical Architecture
+              </span>
               <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-neutral-900">
                 Production <span className="font-serif-brand italic text-emerald-900 font-normal">Infrastructure &amp; Process Pipeline</span>
               </h2>
               <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-light">
-                Explore our commercial manufacturing workflow across 4 industrial processing lines. Select any line below and scroll down through the 5 stacked production stages to trace raw intake through precision thermal/mechanical transformation to sealed, certified commercial goods.
+                Explore our commercial manufacturing workflow across 4 industrial processing lines, tracing raw intake through precision thermal and mechanical transformation to sealed, certified commercial goods.
               </p>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs font-mono text-neutral-500 bg-white px-3 py-2 border border-neutral-200 shadow-2xs">
-              <Layers className="w-4 h-4 text-emerald-700" />
-              <span className="hidden sm:inline">Scroll down to stack stages</span>
-              <span className="sm:hidden">Tap division to view stages</span>
             </div>
           </div>
 
