@@ -35,7 +35,9 @@ import {
   CheckCircle2,
   Workflow,
   Layers,
-  Sliders
+  Sliders,
+  Plus,
+  Minus
 } from 'lucide-react';
 import MaintenancePage from './MaintenancePage';
 
@@ -45,46 +47,24 @@ interface NotificationState {
 }
 
 export default function App() {
-  // Secret Preview Mode State (default: false for public visitors)
-  const [isPreviewMode, setIsPreviewMode] = useState<boolean>(() => {
+  // Website is now officially LIVE for all public visitors!
+  // Optional preview of maintenance screen available via ?maintenance=true
+  const [showMaintenancePreview, setShowMaintenancePreview] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
-      // 1. Check URL parameters: e.g. ?preview=drsons or ?preview=drsons2026 or ?dev=true
       const params = new URLSearchParams(window.location.search);
-      const previewKey = params.get('preview') || params.get('dev') || params.get('key');
-      if (previewKey && ['drsons', 'drsons2026', 'true', 'dev', 'admin', 'preview', 'secret'].includes(previewKey.toLowerCase())) {
-        try {
-          localStorage.setItem('drsons_preview_access', 'granted');
-        } catch (e) {}
-        return true;
-      }
-      // 2. Check persistent localStorage
-      try {
-        return localStorage.getItem('drsons_preview_access') === 'granted';
-      } catch (e) {
-        return false;
-      }
+      return params.get('maintenance') === 'true';
     }
     return false;
   });
 
-  const unlockPreview = () => {
-    try {
-      localStorage.setItem('drsons_preview_access', 'granted');
-    } catch (e) {}
-    setIsPreviewMode(true);
-  };
-
-  const lockPreview = () => {
-    try {
-      localStorage.removeItem('drsons_preview_access');
-    } catch (e) {}
-    const url = new URL(window.location.href);
-    url.searchParams.delete('preview');
-    url.searchParams.delete('dev');
-    url.searchParams.delete('key');
-    window.history.replaceState({}, '', url.pathname + (url.search ? url.search : '') + url.hash);
-    setIsPreviewMode(false);
-  };
+  // Mobile Manufacture Pipeline Accordion & Compact Stage State
+  const [mobileOpenDivision, setMobileOpenDivision] = useState<number | null>(0);
+  const [mobileActiveStages, setMobileActiveStages] = useState<{ [divIdx: number]: number }>({
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0
+  });
 
   const [activeDivision, setActiveDivision] = useState<number>(0);
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -658,8 +638,8 @@ export default function App() {
     }
   ];
 
-  if (!isPreviewMode) {
-    return <MaintenancePage onUnlock={unlockPreview} />;
+  if (showMaintenancePreview) {
+    return <MaintenancePage onUnlock={() => setShowMaintenancePreview(false)} />;
   }
 
   return (
@@ -1366,143 +1346,325 @@ export default function App() {
 
             <div className="flex items-center gap-2 text-xs font-mono text-neutral-500 bg-white px-3 py-2 border border-neutral-200 shadow-2xs">
               <Layers className="w-4 h-4 text-emerald-700" />
-              <span>Scroll down to stack stages</span>
+              <span className="hidden sm:inline">Scroll down to stack stages</span>
+              <span className="sm:hidden">Tap division to view stages</span>
             </div>
           </div>
 
-          {/* 4 Line Selector Tabs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
-            {facilitiesData.map((line, idx) => {
-              const LineIcon = line.icon;
-              const isSelected = selectedFacilityLine === idx;
-              return (
-                <button
-                  key={line.id}
-                  onClick={() => setSelectedFacilityLine(idx)}
-                  className={`p-4 border text-left transition-all cursor-pointer relative ${
-                    isSelected 
-                      ? 'bg-[#0a2318] text-white border-[#0a2318] shadow-md' 
-                      : 'bg-white text-neutral-800 border-neutral-200 hover:border-emerald-800/40 hover:bg-[#f6f9f7]'
-                  }`}
-                >
-                  {/* Active Indicator Top Stripe */}
-                  {isSelected && (
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-400" />
-                  )}
-                  
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className={`text-[10px] font-mono font-bold tracking-wider ${
-                      isSelected ? 'text-emerald-300' : 'text-emerald-800'
-                    }`}>
-                      LINE {line.number}
-                    </span>
-                    <div className={`w-7 h-7 flex items-center justify-center ${
-                      isSelected ? 'bg-white/10 text-white' : 'bg-emerald-50 text-emerald-900 border border-emerald-900/10'
-                    }`}>
-                      <LineIcon className="w-3.5 h-3.5 stroke-[1.75]" />
+          {/* DESKTOP VIEW: 4 Line Selector Tabs & Stacked Sticky Cards Track (hidden on mobile, visible on lg+) */}
+          <div className="hidden lg:block space-y-8">
+            {/* 4 Line Selector Tabs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+              {facilitiesData.map((line, idx) => {
+                const LineIcon = line.icon;
+                const isSelected = selectedFacilityLine === idx;
+                return (
+                  <button
+                    key={line.id}
+                    onClick={() => setSelectedFacilityLine(idx)}
+                    className={`p-4 border text-left transition-all cursor-pointer relative ${
+                      isSelected 
+                        ? 'bg-[#0a2318] text-white border-[#0a2318] shadow-md' 
+                        : 'bg-white text-neutral-800 border-neutral-200 hover:border-emerald-800/40 hover:bg-[#f6f9f7]'
+                    }`}
+                  >
+                    {/* Active Indicator Top Stripe */}
+                    {isSelected && (
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-400" />
+                    )}
+                    
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className={`text-[10px] font-mono font-bold tracking-wider ${
+                        isSelected ? 'text-emerald-300' : 'text-emerald-800'
+                      }`}>
+                        LINE {line.number}
+                      </span>
+                      <div className={`w-7 h-7 flex items-center justify-center ${
+                        isSelected ? 'bg-white/10 text-white' : 'bg-emerald-50 text-emerald-900 border border-emerald-900/10'
+                      }`}>
+                        <LineIcon className="w-3.5 h-3.5 stroke-[1.75]" />
+                      </div>
                     </div>
-                  </div>
 
-                  <h3 className={`text-xs sm:text-sm font-bold tracking-tight line-clamp-1 ${
-                    isSelected ? 'text-white' : 'text-neutral-900'
-                  }`}>
-                    {line.shortTitle}
-                  </h3>
-                  <p className={`text-[11px] mt-1 line-clamp-1 font-mono ${
-                    isSelected ? 'text-neutral-300' : 'text-neutral-500'
-                  }`}>
-                    {line.division}
-                  </p>
-                </button>
-              );
-            })}
+                    <h3 className={`text-xs sm:text-sm font-bold tracking-tight line-clamp-1 ${
+                      isSelected ? 'text-white' : 'text-neutral-900'
+                    }`}>
+                      {line.shortTitle}
+                    </h3>
+                    <p className={`text-[11px] mt-1 line-clamp-1 font-mono ${
+                      isSelected ? 'text-neutral-300' : 'text-neutral-500'
+                    }`}>
+                      {line.division}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Stacked Sticky Cards Track */}
+            <div className="space-y-8 pb-12 pt-2">
+              {facilitiesData[selectedFacilityLine].stages.map((stg, sIdx) => {
+                return (
+                  <div
+                    key={`stacked-card-${sIdx}`}
+                    className="sticky bg-white border border-neutral-300 shadow-2xl p-6 sm:p-8 space-y-6 transition-transform"
+                    style={{
+                      top: `${80 + sIdx * 18}px`,
+                      zIndex: 10 + sIdx,
+                      marginBottom: `${(4 - sIdx) * 16}px`
+                    }}
+                  >
+                    {/* Top Bar on Stacked Card */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200 pb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="px-2.5 py-1 bg-[#0a2318] text-white font-mono text-xs font-bold">
+                          STAGE {stg.stepNumber} / 05
+                        </span>
+                        <span className="text-xs font-mono font-bold text-emerald-900 uppercase">
+                          LINE {facilitiesData[selectedFacilityLine].number} · {facilitiesData[selectedFacilityLine].shortTitle}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-neutral-500 uppercase">
+                        {stg.phase}
+                      </span>
+                    </div>
+
+                    {/* Card Content Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                      
+                      {/* Narrative & Metrics (7 cols) */}
+                      <div className="lg:col-span-7 space-y-4">
+                        <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
+                          {stg.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-light">
+                          {stg.summary}
+                        </p>
+
+                        <div className="grid grid-cols-2 gap-2.5 pt-1">
+                          {stg.telemetry.map((t, tIdx) => (
+                            <div key={`stacked-tel-${tIdx}`} className="p-3 border border-neutral-200 bg-neutral-50">
+                              <span className="text-[10px] font-mono uppercase text-neutral-500 block">
+                                {t.label}
+                              </span>
+                              <span className="text-xs font-mono font-bold text-neutral-900 block mt-0.5">
+                                {t.value}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
+                          <span className="text-[11px] font-mono text-neutral-600 flex items-center gap-1.5">
+                            <ShieldCheck className="w-4 h-4 text-emerald-800" />
+                            <span>QA Protocol: <strong className="text-neutral-900">{stg.qaStandard}</strong></span>
+                          </span>
+                          <button
+                            onClick={() => handleFacilityInquiry(facilitiesData[selectedFacilityLine].division)}
+                            className="px-4 py-2 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-colors"
+                          >
+                            <span>Inquire for Stage {stg.stepNumber}</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Right Photo in Card (5 cols) */}
+                      <div className="lg:col-span-5 border border-neutral-200 bg-neutral-900 overflow-hidden relative min-h-[260px] sm:min-h-[300px]">
+                        <img 
+                          src={(stg as any).image || facilitiesData[selectedFacilityLine].image} 
+                          alt={stg.title}
+                          className="absolute inset-0 w-full h-full object-cover object-center"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+
+                        <div className="absolute bottom-4 left-4 right-4 text-white font-mono text-[11px] space-y-1">
+                          <div className="text-emerald-400 font-bold uppercase">{facilitiesData[selectedFacilityLine].cleanroomClass}</div>
+                          <div className="text-neutral-200 font-light truncate">{facilitiesData[selectedFacilityLine].equipment}</div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Stacked Sticky Cards Track */}
-          <div className="space-y-8 pb-12 pt-2">
-            {facilitiesData[selectedFacilityLine].stages.map((stg, sIdx) => {
+          {/* MOBILE VIEW: Accordion List with Compact Phase Stepper (Matches Reference Layout) */}
+          <div className="block lg:hidden border-t border-neutral-300 bg-white">
+            {facilitiesData.map((line, idx) => {
+              const isOpen = mobileOpenDivision === idx;
+              const activeStageIdx = mobileActiveStages[idx] ?? 0;
+              const activeStg = line.stages[activeStageIdx];
+              const prefixNumber = `00-${idx + 1}`;
+
               return (
-                <div
-                  key={`stacked-card-${sIdx}`}
-                  className="sticky bg-white border border-neutral-300 shadow-2xl p-6 sm:p-8 space-y-6 transition-transform"
-                  style={{
-                    top: `${80 + sIdx * 18}px`,
-                    zIndex: 10 + sIdx,
-                    marginBottom: `${(4 - sIdx) * 16}px`
-                  }}
-                >
-                  {/* Top Bar on Stacked Card */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200 pb-3">
-                    <div className="flex items-center gap-3">
-                      <span className="px-2.5 py-1 bg-[#0a2318] text-white font-mono text-xs font-bold">
-                        STAGE {stg.stepNumber} / 05
+                <div key={`mob-div-${line.id}`} className="border-b border-neutral-300">
+                  {/* Division Header Row - Matches User Reference Screenshot */}
+                  <button
+                    onClick={() => setMobileOpenDivision(isOpen ? null : idx)}
+                    className={`w-full py-4 sm:py-5 px-3 sm:px-4 flex items-center justify-between text-left transition-colors cursor-pointer select-none ${
+                      isOpen ? 'bg-[#f4f7f5]' : 'bg-white hover:bg-neutral-50 active:bg-neutral-100'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0 pr-2">
+                      <span className="font-mono text-xs sm:text-sm font-semibold text-neutral-500 w-11 sm:w-12 shrink-0">
+                        {prefixNumber}
                       </span>
-                      <span className="text-xs font-mono font-bold text-emerald-900 uppercase">
-                        LINE {facilitiesData[selectedFacilityLine].number} · {facilitiesData[selectedFacilityLine].shortTitle}
+                      <span className="text-xs sm:text-sm font-bold text-neutral-900 uppercase tracking-tight truncate">
+                        {line.division}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono text-neutral-500 uppercase">
-                      {stg.phase}
-                    </span>
-                  </div>
 
-                  {/* Card Content Grid */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                    
-                    {/* Narrative & Metrics (7 cols) */}
-                    <div className="lg:col-span-7 space-y-4">
-                      <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
-                        {stg.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-light">
-                        {stg.summary}
-                      </p>
+                    <div className="w-6 h-6 flex items-center justify-center shrink-0 text-neutral-600">
+                      {isOpen ? (
+                        <Minus className="w-4 h-4 stroke-[2] text-emerald-900" />
+                      ) : (
+                        <Plus className="w-4 h-4 stroke-[1.75] text-neutral-500" />
+                      )}
+                    </div>
+                  </button>
 
-                      <div className="grid grid-cols-2 gap-2.5 pt-1">
-                        {stg.telemetry.map((t, tIdx) => (
-                          <div key={`stacked-tel-${tIdx}`} className="p-3 border border-neutral-200 bg-neutral-50">
-                            <span className="text-[10px] font-mono uppercase text-neutral-500 block">
-                              {t.label}
+                  {/* Expanded Division Content */}
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25, ease: 'easeInOut' }}
+                        className="overflow-hidden bg-[#fafbfa] border-t border-neutral-200"
+                      >
+                        <div className="p-3 sm:p-4 space-y-3">
+                          
+                          {/* Division Metadata Strip */}
+                          <div className="flex items-center justify-between text-[11px] font-mono text-neutral-500 pb-2 border-b border-neutral-200/80">
+                            <span className="font-bold text-emerald-900 uppercase truncate max-w-[200px]">
+                              {line.shortTitle}
                             </span>
-                            <span className="text-xs font-mono font-bold text-neutral-900 block mt-0.5">
-                              {t.value}
+                            <span className="text-[10px] text-neutral-500 uppercase tracking-wider shrink-0">
+                              {line.cleanroomClass}
                             </span>
                           </div>
-                        ))}
-                      </div>
 
-                      <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
-                        <span className="text-[11px] font-mono text-neutral-600 flex items-center gap-1.5">
-                          <ShieldCheck className="w-4 h-4 text-emerald-800" />
-                          <span>QA Protocol: <strong className="text-neutral-900">{stg.qaStandard}</strong></span>
-                        </span>
-                        <button
-                          onClick={() => handleFacilityInquiry(facilitiesData[selectedFacilityLine].division)}
-                          className="px-4 py-2 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-colors"
-                        >
-                          <span>Inquire for Stage {stg.stepNumber}</span>
-                          <ArrowRight className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </div>
+                          {/* Horizontal Compact Phase Step Buttons */}
+                          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                            {line.stages.map((stg, sIdx) => {
+                              const isStepActive = activeStageIdx === sIdx;
+                              return (
+                                <button
+                                  key={`mob-step-btn-${idx}-${sIdx}`}
+                                  onClick={() => setMobileActiveStages(prev => ({ ...prev, [idx]: sIdx }))}
+                                  className={`px-2.5 py-1.5 text-[11px] font-mono whitespace-nowrap border shrink-0 transition-all cursor-pointer flex items-center gap-1.5 ${
+                                    isStepActive
+                                      ? 'bg-[#0a2318] text-white border-[#0a2318] font-bold shadow-xs'
+                                      : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-400'
+                                  }`}
+                                >
+                                  <span className={isStepActive ? 'text-emerald-300' : 'text-neutral-400 font-bold'}>
+                                    {stg.stepNumber}
+                                  </span>
+                                  <span>{stg.stepLabel}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
 
-                    {/* Right Photo in Card (5 cols) */}
-                    <div className="lg:col-span-5 border border-neutral-200 bg-neutral-900 overflow-hidden relative min-h-[260px] sm:min-h-[300px]">
-                      <img 
-                        src={(stg as any).image || facilitiesData[selectedFacilityLine].image} 
-                        alt={stg.title}
-                        className="absolute inset-0 w-full h-full object-cover object-center"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+                          {/* Active Stage Compact Card (Fits in Mobile View without scrolling down!) */}
+                          <div className="bg-white border border-neutral-300 p-3 sm:p-3.5 space-y-2.5 shadow-xs">
+                            
+                            {/* Compact Photo */}
+                            <div className="relative aspect-[16/9] max-h-[160px] w-full bg-neutral-900 border border-neutral-200 overflow-hidden">
+                              <img 
+                                src={(activeStg as any).image || line.image}
+                                alt={activeStg.title}
+                                className="w-full h-full object-cover object-center"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                              
+                              <div className="absolute top-2 left-2 bg-black/80 text-white font-mono text-[10px] font-bold px-2 py-0.5 border border-white/20">
+                                STAGE {activeStg.stepNumber} / 05
+                              </div>
 
-                      <div className="absolute bottom-4 left-4 right-4 text-white font-mono text-[11px] space-y-1">
-                        <div className="text-emerald-400 font-bold uppercase">{facilitiesData[selectedFacilityLine].cleanroomClass}</div>
-                        <div className="text-neutral-200 font-light truncate">{facilitiesData[selectedFacilityLine].equipment}</div>
-                      </div>
-                    </div>
+                              <div className="absolute bottom-2 left-2.5 right-2.5 text-white font-mono text-[10px] flex items-center justify-between">
+                                <span className="text-emerald-400 font-bold uppercase truncate">{line.capacity}</span>
+                              </div>
+                            </div>
 
-                  </div>
+                            {/* Phase Title & Concise Summary */}
+                            <div>
+                              <span className="text-[10px] font-mono text-emerald-800 uppercase block font-semibold">
+                                {activeStg.phase}
+                              </span>
+                              <h4 className="text-xs sm:text-sm font-bold text-neutral-900 leading-snug mt-0.5">
+                                {activeStg.title}
+                              </h4>
+                              <p className="text-[11px] text-neutral-600 font-light leading-relaxed mt-1 line-clamp-3">
+                                {activeStg.summary}
+                              </p>
+                            </div>
 
+                            {/* Compact 2x2 Telemetry Chips */}
+                            <div className="grid grid-cols-2 gap-1.5 pt-0.5">
+                              {activeStg.telemetry.map((tel, tIdx) => (
+                                <div key={`mob-tel-${tIdx}`} className="p-1.5 bg-neutral-50 border border-neutral-200">
+                                  <span className="text-[9px] font-mono uppercase text-neutral-500 block truncate">{tel.label}</span>
+                                  <span className="text-[11px] font-mono font-bold text-neutral-900 block truncate mt-0.5">{tel.value}</span>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Controls: Prev / Stage Indicator / Next / Inquire */}
+                            <div className="flex items-center justify-between gap-2 pt-2 border-t border-neutral-200">
+                              <div className="flex items-center gap-1">
+                                <button
+                                  disabled={activeStageIdx === 0}
+                                  onClick={() => setMobileActiveStages(prev => ({ ...prev, [idx]: Math.max(0, activeStageIdx - 1) }))}
+                                  className={`px-2 py-1 text-[11px] font-mono border flex items-center gap-1 ${
+                                    activeStageIdx === 0 
+                                      ? 'opacity-30 cursor-not-allowed bg-neutral-100 text-neutral-400 border-neutral-200' 
+                                      : 'bg-white hover:bg-neutral-50 text-neutral-800 border-neutral-300 cursor-pointer'
+                                  }`}
+                                >
+                                  <ChevronLeft className="w-3 h-3" />
+                                  <span>Prev</span>
+                                </button>
+                                
+                                <span className="text-[10px] font-mono text-neutral-500 px-1">
+                                  {activeStageIdx + 1}/5
+                                </span>
+
+                                <button
+                                  disabled={activeStageIdx === line.stages.length - 1}
+                                  onClick={() => setMobileActiveStages(prev => ({ ...prev, [idx]: Math.min(line.stages.length - 1, activeStageIdx + 1) }))}
+                                  className={`px-2 py-1 text-[11px] font-mono border flex items-center gap-1 ${
+                                    activeStageIdx === line.stages.length - 1 
+                                      ? 'opacity-30 cursor-not-allowed bg-neutral-100 text-neutral-400 border-neutral-200' 
+                                      : 'bg-white hover:bg-neutral-50 text-neutral-800 border-neutral-300 cursor-pointer'
+                                  }`}
+                                >
+                                  <span>Next</span>
+                                  <ChevronRight className="w-3 h-3" />
+                                </button>
+                              </div>
+
+                              <button
+                                onClick={() => handleFacilityInquiry(line.division)}
+                                className="px-3 py-1.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shrink-0"
+                              >
+                                <span>Inquire</span>
+                                <ArrowRight className="w-3 h-3" />
+                              </button>
+                            </div>
+
+                          </div>
+
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
@@ -2122,20 +2284,6 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
-
-      {/* Floating Preview Mode Indicator for Client & Developers */}
-      <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 bg-[#0a2318]/95 backdrop-blur-md text-white text-xs px-4 py-2.5 shadow-2xl border border-emerald-500/40 select-none border-l-2 border-l-emerald-400">
-        <span className="w-2 h-2 bg-emerald-400 animate-pulse" />
-        <span className="font-semibold text-neutral-100">Client Preview Active</span>
-        <span className="text-white/40">·</span>
-        <button
-          onClick={lockPreview}
-          className="text-emerald-300 hover:text-white underline cursor-pointer font-medium transition-colors"
-          title="Return to Public Under-Construction Page"
-        >
-          Exit to Maintenance
-        </button>
-      </div>
 
     </div>
   );
