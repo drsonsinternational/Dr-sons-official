@@ -41,12 +41,13 @@ import {
   Newspaper,
   ChevronUp,
   ArrowDown,
-  Sparkles
+  Sparkles,
+  AlertCircle
 } from 'lucide-react';
 import MaintenancePage from './MaintenancePage';
 
 interface NotificationState {
-  type: 'success' | null;
+  type: 'success' | 'error' | null;
   message: string;
 }
 
@@ -356,7 +357,7 @@ export default function App() {
   }, [desktopDivisionView, smoothScrollTo]);
 
 
-  // Inquiry Form State
+  // Inquiry Form State & Strict Field Validation
   const [inquiryForm, setInquiryForm] = useState({
     name: '',
     company: '',
@@ -367,11 +368,117 @@ export default function App() {
     message: ''
   });
 
-  const showNotification = (message: string) => {
-    setNotification({ type: 'success', message });
+  const [formErrors, setFormErrors] = useState<{
+    name?: string;
+    company?: string;
+    email?: string;
+    phone?: string;
+    privacy?: string;
+  }>({});
+
+  const [formTouched, setFormTouched] = useState<{
+    name?: boolean;
+    company?: boolean;
+    email?: boolean;
+    phone?: boolean;
+    privacy?: boolean;
+  }>({});
+
+  const [privacyAccepted, setPrivacyAccepted] = useState(true);
+
+  // Field Sanitizers (strict typing restrictions: filter invalid keystrokes in real time)
+  const sanitizeName = (raw: string) => {
+    // Only allow alphabetic characters, spaces, hyphens, and apostrophes
+    return raw.replace(/[^a-zA-Z\s'-]/g, '').slice(0, 50);
+  };
+
+  const sanitizeEmail = (raw: string) => {
+    // Disallow spaces and illegal characters
+    return raw.replace(/\s+/g, '').replace(/[^a-zA-Z0-9._%+-@]/g, '').slice(0, 80);
+  };
+
+  const sanitizePhone = (raw: string) => {
+    // Only allow leading '+', digits, spaces, hyphens, and parentheses
+    let cleaned = raw.replace(/[^\d+()\s-]/g, '');
+    if (cleaned.indexOf('+') > 0) {
+      cleaned = cleaned.charAt(0) === '+'
+        ? '+' + cleaned.slice(1).replace(/\+/g, '')
+        : cleaned.replace(/\+/g, '');
+    }
+    return cleaned.slice(0, 20);
+  };
+
+  const sanitizeCompany = (raw: string) => {
+    return raw.replace(/[^a-zA-Z0-9\s.,&'()-]/g, '').slice(0, 80);
+  };
+
+  const sanitizeMessage = (raw: string) => {
+    return raw.replace(/[<>]/g, '').slice(0, 800);
+  };
+
+  // Field Validators
+  const validateName = (name: string): string | null => {
+    const trimmed = name.trim();
+    if (!trimmed) return 'Full name is required.';
+    if (trimmed.length < 2) return 'Full name must be at least 2 characters.';
+    if (!/^[a-zA-Z][a-zA-Z\s'-]*[a-zA-Z]$/.test(trimmed) && trimmed.length > 1) {
+      return 'Name must contain only alphabetic letters.';
+    }
+    return null;
+  };
+
+  const validateEmail = (email: string): string | null => {
+    const trimmed = email.trim();
+    if (!trimmed) return 'Corporate email is required.';
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(trimmed)) {
+      return 'Please enter a valid business email address (e.g. name@company.com).';
+    }
+    return null;
+  };
+
+  const validatePhone = (phone: string): string | null => {
+    const trimmed = phone.trim();
+    if (!trimmed) return null; // Optional field
+    const digitsOnly = trimmed.replace(/\D/g, '');
+    if (digitsOnly.length < 10) {
+      return 'Phone number must contain at least 10 digits.';
+    }
+    if (digitsOnly.length > 15) {
+      return 'Phone number cannot exceed 15 digits.';
+    }
+    return null;
+  };
+
+  const validateCompany = (comp: string): string | null => {
+    const trimmed = comp.trim();
+    if (!trimmed) return null; // Optional
+    if (trimmed.length < 2) return 'Company name must be at least 2 characters.';
+    return null;
+  };
+
+  const validateAllFormFields = () => {
+    const nameErr = validateName(inquiryForm.name);
+    const emailErr = validateEmail(inquiryForm.email);
+    const phoneErr = validatePhone(inquiryForm.phone);
+    const companyErr = validateCompany(inquiryForm.company);
+    const privacyErr = !privacyAccepted ? 'Please accept the privacy policy.' : null;
+
+    const errors: typeof formErrors = {};
+    if (nameErr) errors.name = nameErr;
+    if (emailErr) errors.email = emailErr;
+    if (phoneErr) errors.phone = phoneErr;
+    if (companyErr) errors.company = companyErr;
+    if (privacyErr) errors.privacy = privacyErr;
+
+    return errors;
+  };
+
+  const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
+    setNotification({ type, message });
     setTimeout(() => {
       setNotification({ type: null, message: '' });
-    }, 3200);
+    }, 3500);
   };
 
   const handleCopyEmail = (emailStr: string) => {
@@ -383,18 +490,35 @@ export default function App() {
 
   const handleInquirySubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inquiryForm.name || !inquiryForm.email) return;
+
+    // Mark all fields as touched to display validation indicators
+    setFormTouched({
+      name: true,
+      company: true,
+      email: true,
+      phone: true,
+      privacy: true
+    });
+
+    const errors = validateAllFormFields();
+    setFormErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      const firstError = errors.name || errors.email || errors.phone || errors.company || errors.privacy;
+      showNotification(firstError || 'Please correct the highlighted fields before submitting.', 'error');
+      return;
+    }
 
     const textLines = [
       `*Commercial Inquiry - D R & Sons International Pvt. Ltd.*`,
       `*Entity:* D R & Sons International Private Limited`,
-      `*Name:* ${inquiryForm.name}`,
-      `*Company:* ${inquiryForm.company || 'Not Specified'}`,
-      `*Email:* ${inquiryForm.email}`,
-      `*Phone:* ${inquiryForm.phone || 'Not Specified'}`,
+      `*Name:* ${inquiryForm.name.trim()}`,
+      `*Company:* ${inquiryForm.company.trim() || 'Not Specified'}`,
+      `*Email:* ${inquiryForm.email.trim()}`,
+      `*Phone:* ${inquiryForm.phone.trim() || 'Not Specified'}`,
       `*Division:* ${inquiryForm.division}`,
       `*Order Volume:* ${inquiryForm.volume}`,
-      `*Specifications:* ${inquiryForm.message || 'Standard Specifications'}`
+      `*Specifications:* ${inquiryForm.message.trim() || 'Standard Specifications'}`
     ];
     const encodedText = encodeURIComponent(textLines.join('\n'));
     const url = `https://wa.me/919411268879?text=${encodedText}`;
@@ -402,7 +526,7 @@ export default function App() {
     setWhatsappRedirectUrl(url);
     setInquirySubmitted(true);
     setRedirectCountdown(3);
-    showNotification('Inquiry registered. Redirecting to WhatsApp desk...');
+    showNotification('Inquiry validated. Redirecting to WhatsApp desk...', 'success');
 
     setTimeout(() => {
       window.location.href = url;
@@ -927,9 +1051,17 @@ export default function App() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed top-4 left-4 right-4 sm:left-auto sm:right-6 sm:top-auto sm:bottom-6 z-50 bg-[#0c2419] text-white px-4 py-3 shadow-2xl border border-emerald-700/50 flex items-center gap-3 text-xs"
+            className={`fixed top-4 left-4 right-4 sm:left-auto sm:right-6 sm:top-auto sm:bottom-6 z-50 text-white px-4 py-3 shadow-2xl border flex items-center gap-3 text-xs ${
+              notification.type === 'error'
+                ? 'bg-[#2a0e0e] border-red-700/60'
+                : 'bg-[#0c2419] border-emerald-700/50'
+            }`}
           >
-            <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+            {notification.type === 'error' ? (
+              <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+            ) : (
+              <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+            )}
             <span className="font-medium tracking-wide flex-1">{notification.message}</span>
           </motion.div>
         )}
@@ -2743,41 +2875,206 @@ export default function App() {
               </div>
 
               {!inquirySubmitted ? (
-                <form onSubmit={handleInquirySubmit} className="space-y-4">
+                <form onSubmit={handleInquirySubmit} noValidate className="space-y-4">
                   
-                  {/* Your name */}
+                  {/* Your name (Letters only, min 2 chars) */}
                   <div>
-                    <input
-                      type="text"
-                      required
-                      value={inquiryForm.name}
-                      onChange={(e) => setInquiryForm({...inquiryForm, name: e.target.value})}
-                      placeholder="Your name"
-                      className="w-full py-2.5 border-b border-neutral-200 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent"
-                    />
+                    <div className="relative flex items-center">
+                      <input
+                        type="text"
+                        name="name"
+                        autoComplete="name"
+                        value={inquiryForm.name}
+                        onChange={(e) => {
+                          const sanitized = sanitizeName(e.target.value);
+                          setInquiryForm((prev) => ({ ...prev, name: sanitized }));
+                          if (formTouched.name) {
+                            const err = validateName(sanitized);
+                            setFormErrors((prev) => ({ ...prev, name: err || undefined }));
+                          }
+                        }}
+                        onBlur={() => {
+                          setFormTouched((prev) => ({ ...prev, name: true }));
+                          const err = validateName(inquiryForm.name);
+                          setFormErrors((prev) => ({ ...prev, name: err || undefined }));
+                        }}
+                        placeholder="Your full name *"
+                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-colors bg-transparent ${
+                          formTouched.name && formErrors.name
+                            ? 'border-red-500 focus:border-red-600'
+                            : formTouched.name && !formErrors.name && inquiryForm.name.trim().length >= 2
+                            ? 'border-emerald-600 focus:border-emerald-700'
+                            : 'border-neutral-200 focus:border-neutral-900'
+                        }`}
+                      />
+                      <div className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none">
+                        {formTouched.name && formErrors.name && (
+                          <AlertCircle className="w-4 h-4 text-red-500" />
+                        )}
+                        {formTouched.name && !formErrors.name && inquiryForm.name.trim().length >= 2 && (
+                          <Check className="w-4 h-4 text-emerald-600" />
+                        )}
+                      </div>
+                    </div>
+                    {formTouched.name && formErrors.name && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -2 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-[11px] text-red-600 mt-1 flex items-center gap-1 font-medium"
+                      >
+                        <span>{formErrors.name}</span>
+                      </motion.p>
+                    )}
                   </div>
 
-                  {/* Email */}
+                  {/* Company / Organization (Optional) */}
                   <div>
-                    <input
-                      type="email"
-                      required
-                      value={inquiryForm.email}
-                      onChange={(e) => setInquiryForm({...inquiryForm, email: e.target.value})}
-                      placeholder="Email"
-                      className="w-full py-2.5 border-b border-neutral-200 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent"
-                    />
+                    <div className="relative flex items-center">
+                      <input
+                        type="text"
+                        name="company"
+                        autoComplete="organization"
+                        value={inquiryForm.company}
+                        onChange={(e) => {
+                          const sanitized = sanitizeCompany(e.target.value);
+                          setInquiryForm((prev) => ({ ...prev, company: sanitized }));
+                          if (formTouched.company) {
+                            const err = validateCompany(sanitized);
+                            setFormErrors((prev) => ({ ...prev, company: err || undefined }));
+                          }
+                        }}
+                        onBlur={() => {
+                          setFormTouched((prev) => ({ ...prev, company: true }));
+                          const err = validateCompany(inquiryForm.company);
+                          setFormErrors((prev) => ({ ...prev, company: err || undefined }));
+                        }}
+                        placeholder="Company / Organization (optional)"
+                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-colors bg-transparent ${
+                          formTouched.company && formErrors.company
+                            ? 'border-red-500 focus:border-red-600'
+                            : formTouched.company && !formErrors.company && inquiryForm.company.trim().length >= 2
+                            ? 'border-emerald-600 focus:border-emerald-700'
+                            : 'border-neutral-200 focus:border-neutral-900'
+                        }`}
+                      />
+                      <div className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none">
+                        {formTouched.company && formErrors.company && (
+                          <AlertCircle className="w-4 h-4 text-red-500" />
+                        )}
+                        {formTouched.company && !formErrors.company && inquiryForm.company.trim().length >= 2 && (
+                          <Check className="w-4 h-4 text-emerald-600" />
+                        )}
+                      </div>
+                    </div>
+                    {formTouched.company && formErrors.company && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -2 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-[11px] text-red-600 mt-1 flex items-center gap-1 font-medium"
+                      >
+                        <span>{formErrors.company}</span>
+                      </motion.p>
+                    )}
                   </div>
 
-                  {/* Phone number */}
+                  {/* Email (Strict RFC email validation, no spaces) */}
                   <div>
-                    <input
-                      type="tel"
-                      value={inquiryForm.phone}
-                      onChange={(e) => setInquiryForm({...inquiryForm, phone: e.target.value})}
-                      placeholder="Phone number"
-                      className="w-full py-2.5 border-b border-neutral-200 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent"
-                    />
+                    <div className="relative flex items-center">
+                      <input
+                        type="email"
+                        name="email"
+                        autoComplete="email"
+                        value={inquiryForm.email}
+                        onChange={(e) => {
+                          const sanitized = sanitizeEmail(e.target.value);
+                          setInquiryForm((prev) => ({ ...prev, email: sanitized }));
+                          if (formTouched.email) {
+                            const err = validateEmail(sanitized);
+                            setFormErrors((prev) => ({ ...prev, email: err || undefined }));
+                          }
+                        }}
+                        onBlur={() => {
+                          setFormTouched((prev) => ({ ...prev, email: true }));
+                          const err = validateEmail(inquiryForm.email);
+                          setFormErrors((prev) => ({ ...prev, email: err || undefined }));
+                        }}
+                        placeholder="Corporate email address *"
+                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-colors bg-transparent ${
+                          formTouched.email && formErrors.email
+                            ? 'border-red-500 focus:border-red-600'
+                            : formTouched.email && !formErrors.email && inquiryForm.email.trim() && !validateEmail(inquiryForm.email)
+                            ? 'border-emerald-600 focus:border-emerald-700'
+                            : 'border-neutral-200 focus:border-neutral-900'
+                        }`}
+                      />
+                      <div className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none">
+                        {formTouched.email && formErrors.email && (
+                          <AlertCircle className="w-4 h-4 text-red-500" />
+                        )}
+                        {formTouched.email && !formErrors.email && inquiryForm.email.trim() && !validateEmail(inquiryForm.email) && (
+                          <Check className="w-4 h-4 text-emerald-600" />
+                        )}
+                      </div>
+                    </div>
+                    {formTouched.email && formErrors.email && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -2 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-[11px] text-red-600 mt-1 flex items-center gap-1 font-medium"
+                      >
+                        <span>{formErrors.email}</span>
+                      </motion.p>
+                    )}
+                  </div>
+
+                  {/* Phone number (Digits and phone symbols only, min 10 digits if entered) */}
+                  <div>
+                    <div className="relative flex items-center">
+                      <input
+                        type="tel"
+                        name="phone"
+                        autoComplete="tel"
+                        value={inquiryForm.phone}
+                        onChange={(e) => {
+                          const sanitized = sanitizePhone(e.target.value);
+                          setInquiryForm((prev) => ({ ...prev, phone: sanitized }));
+                          if (formTouched.phone) {
+                            const err = validatePhone(sanitized);
+                            setFormErrors((prev) => ({ ...prev, phone: err || undefined }));
+                          }
+                        }}
+                        onBlur={() => {
+                          setFormTouched((prev) => ({ ...prev, phone: true }));
+                          const err = validatePhone(inquiryForm.phone);
+                          setFormErrors((prev) => ({ ...prev, phone: err || undefined }));
+                        }}
+                        placeholder="Phone number (e.g. +91 94112 68879)"
+                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-colors bg-transparent ${
+                          formTouched.phone && formErrors.phone
+                            ? 'border-red-500 focus:border-red-600'
+                            : formTouched.phone && !formErrors.phone && inquiryForm.phone.trim() && !validatePhone(inquiryForm.phone)
+                            ? 'border-emerald-600 focus:border-emerald-700'
+                            : 'border-neutral-200 focus:border-neutral-900'
+                        }`}
+                      />
+                      <div className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none">
+                        {formTouched.phone && formErrors.phone && (
+                          <AlertCircle className="w-4 h-4 text-red-500" />
+                        )}
+                        {formTouched.phone && !formErrors.phone && inquiryForm.phone.trim() && !validatePhone(inquiryForm.phone) && (
+                          <Check className="w-4 h-4 text-emerald-600" />
+                        )}
+                      </div>
+                    </div>
+                    {formTouched.phone && formErrors.phone && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -2 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-[11px] text-red-600 mt-1 flex items-center gap-1 font-medium"
+                      >
+                        <span>{formErrors.phone}</span>
+                      </motion.p>
+                    )}
                   </div>
 
                   {/* Division Selection (Underline Styled Select) */}
@@ -2800,32 +3097,54 @@ export default function App() {
                     <input
                       type="text"
                       value={inquiryForm.message}
-                      onChange={(e) => setInquiryForm({...inquiryForm, message: e.target.value})}
+                      onChange={(e) => {
+                        const sanitized = sanitizeMessage(e.target.value);
+                        setInquiryForm((prev) => ({ ...prev, message: sanitized }));
+                      }}
                       placeholder="How can we help? (e.g. order volume, custom requirements)"
                       className="w-full py-2.5 border-b border-neutral-200 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent"
                     />
                   </div>
 
                   {/* Privacy Agreement Checkbox */}
-                  <label className="flex items-start gap-2.5 cursor-pointer pt-2 select-none">
-                    <input
-                      type="checkbox"
-                      defaultChecked
-                      required
-                      className="mt-0.5 w-3.5 h-3.5 rounded-xs accent-[#0a2318] border-neutral-300 text-neutral-900 focus:ring-neutral-800"
-                    />
-                    <span className="text-[11px] text-neutral-500 leading-snug">
-                      By submitting this form, you agree to the processing of your personal data in accordance with our{' '}
-                      <button
-                        type="button"
-                        onClick={() => setLegalModalTab('privacy')}
-                        className="text-neutral-900 underline font-medium cursor-pointer hover:text-emerald-900"
+                  <div className="pt-2">
+                    <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={privacyAccepted}
+                        onChange={(e) => {
+                          setPrivacyAccepted(e.target.checked);
+                          if (formTouched.privacy) {
+                            setFormErrors((prev) => ({
+                              ...prev,
+                              privacy: !e.target.checked ? 'Please accept the privacy policy to submit.' : undefined
+                            }));
+                          }
+                        }}
+                        className="mt-0.5 w-3.5 h-3.5 rounded-xs accent-[#0a2318] border-neutral-300 text-neutral-900 focus:ring-neutral-800"
+                      />
+                      <span className="text-[11px] text-neutral-500 leading-snug">
+                        By submitting this form, you agree to the processing of your personal data in accordance with our{' '}
+                        <button
+                          type="button"
+                          onClick={() => setLegalModalTab('privacy')}
+                          className="text-neutral-900 underline font-medium cursor-pointer hover:text-emerald-900"
+                        >
+                          Privacy Policy
+                        </button>
+                        .
+                      </span>
+                    </label>
+                    {formTouched.privacy && formErrors.privacy && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -2 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-[11px] text-red-600 mt-1 flex items-center gap-1 font-medium"
                       >
-                        Privacy Policy
-                      </button>
-                      .
-                    </span>
-                  </label>
+                        <span>{formErrors.privacy}</span>
+                      </motion.p>
+                    )}
+                  </div>
 
                   {/* Send Message Button (Sharp Professional Button) */}
                   <div className="pt-2">
@@ -2864,6 +3183,9 @@ export default function App() {
                         setInquirySubmitted(false);
                         setRedirectCountdown(null);
                         setInquiryForm({ name: '', company: '', email: '', phone: '', division: 'Fruits, Vegetables Powder and starch', volume: 'Commercial Bulk Supply', message: '' });
+                        setFormErrors({});
+                        setFormTouched({});
+                        setPrivacyAccepted(true);
                       }}
                       className="text-xs text-neutral-600 underline cursor-pointer"
                     >

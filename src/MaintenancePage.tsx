@@ -16,11 +16,12 @@ import {
   ShieldCheck,
   Phone,
   Lock,
-  Key
+  Key,
+  AlertCircle
 } from 'lucide-react';
 
 interface NotificationState {
-  type: 'success' | null;
+  type: 'success' | 'error' | null;
   message: string;
 }
 
@@ -77,7 +78,7 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
     return () => clearInterval(interval);
   }, []);
 
-  // Inquiry form state
+  // Inquiry form state & validation
   const [inquiryForm, setInquiryForm] = useState({
     name: '',
     company: '',
@@ -86,8 +87,89 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
     message: ''
   });
 
-  const showNotification = (message: string) => {
-    setNotification({ type: 'success', message });
+  const [formErrors, setFormErrors] = useState<{
+    name?: string;
+    company?: string;
+    email?: string;
+    message?: string;
+  }>({});
+
+  const [formTouched, setFormTouched] = useState<{
+    name?: boolean;
+    company?: boolean;
+    email?: boolean;
+    message?: boolean;
+  }>({});
+
+  // Strict Sanitizers
+  const sanitizeName = (raw: string) => {
+    return raw.replace(/[^a-zA-Z\s'-]/g, '').slice(0, 50);
+  };
+
+  const sanitizeEmail = (raw: string) => {
+    return raw.replace(/\s+/g, '').replace(/[^a-zA-Z0-9._%+-@]/g, '').slice(0, 80);
+  };
+
+  const sanitizeCompany = (raw: string) => {
+    return raw.replace(/[^a-zA-Z0-9\s.,&'()-]/g, '').slice(0, 80);
+  };
+
+  const sanitizeMessage = (raw: string) => {
+    return raw.replace(/[<>]/g, '').slice(0, 800);
+  };
+
+  // Validators
+  const validateName = (name: string): string | null => {
+    const trimmed = name.trim();
+    if (!trimmed) return 'Full name is required.';
+    if (trimmed.length < 2) return 'Full name must be at least 2 characters.';
+    if (!/^[a-zA-Z][a-zA-Z\s'-]*[a-zA-Z]$/.test(trimmed) && trimmed.length > 1) {
+      return 'Name must contain only alphabetic letters.';
+    }
+    return null;
+  };
+
+  const validateEmail = (email: string): string | null => {
+    const trimmed = email.trim();
+    if (!trimmed) return 'Corporate email is required.';
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(trimmed)) {
+      return 'Please enter a valid email address (e.g. name@company.com).';
+    }
+    return null;
+  };
+
+  const validateCompany = (comp: string): string | null => {
+    const trimmed = comp.trim();
+    if (!trimmed) return null; // Optional
+    if (trimmed.length < 2) return 'Company name must be at least 2 characters.';
+    return null;
+  };
+
+  const validateMessage = (msg: string): string | null => {
+    const trimmed = msg.trim();
+    if (!trimmed) return 'Please specify your requirements or batch volumes.';
+    if (trimmed.length < 5) return 'Message must be at least 5 characters.';
+    return null;
+  };
+
+  const validateMaintenanceForm = () => {
+    const errors: typeof formErrors = {};
+    const nameErr = validateName(inquiryForm.name);
+    const emailErr = validateEmail(inquiryForm.email);
+    const compErr = validateCompany(inquiryForm.company);
+    const msgErr = validateMessage(inquiryForm.message);
+
+    if (nameErr) errors.name = nameErr;
+    if (emailErr) errors.email = emailErr;
+    if (compErr) errors.company = compErr;
+    if (msgErr) errors.message = msgErr;
+
+    return errors;
+  };
+
+  const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
+    setNotification({ type, message });
     setTimeout(() => {
       setNotification({ type: null, message: '' });
     }, 3500);
@@ -95,9 +177,14 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!emailInput || !emailInput.includes('@')) return;
+    const cleanEmail = emailInput.trim();
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!cleanEmail || !emailRegex.test(cleanEmail)) {
+      showNotification('Please enter a valid email address (e.g. name@domain.com).', 'error');
+      return;
+    }
     setIsSubscribed(true);
-    showNotification('Email registered for launch notification.');
+    showNotification('Email registered for launch notification.', 'success');
   };
 
   const handleCopyEmail = (emailStr: string) => {
@@ -120,15 +207,30 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
 
   const handleInquirySubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inquiryForm.name || !inquiryForm.email || !inquiryForm.message) return;
+
+    setFormTouched({
+      name: true,
+      company: true,
+      email: true,
+      message: true
+    });
+
+    const errors = validateMaintenanceForm();
+    setFormErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      const firstError = errors.name || errors.email || errors.company || errors.message;
+      showNotification(firstError || 'Please correct the highlighted fields.', 'error');
+      return;
+    }
 
     const textLines = [
       `*New Inquiry - D R & Sons International*`,
-      `*Name:* ${inquiryForm.name}`,
-      `*Company:* ${inquiryForm.company || 'Not Specified'}`,
-      `*Email:* ${inquiryForm.email}`,
+      `*Name:* ${inquiryForm.name.trim()}`,
+      `*Company:* ${inquiryForm.company.trim() || 'Not Specified'}`,
+      `*Email:* ${inquiryForm.email.trim()}`,
       `*Category:* ${inquiryForm.category}`,
-      `*Message:* ${inquiryForm.message}`
+      `*Message:* ${inquiryForm.message.trim()}`
     ];
     const encodedText = encodeURIComponent(textLines.join('\n'));
     const url = `https://wa.me/919411268879?text=${encodedText}`;
@@ -136,7 +238,7 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
     setWhatsappRedirectUrl(url);
     setInquirySubmitted(true);
     setRedirectCountdown(3);
-    showNotification('Inquiry registered. Redirecting to WhatsApp desk...');
+    showNotification('Inquiry registered. Redirecting to WhatsApp desk...', 'success');
 
     setTimeout(() => {
       window.location.href = url;
@@ -156,8 +258,16 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
       
       {/* Toast Notification */}
       {notification.message && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0d281c] text-white px-4 py-3 shadow-xl border border-emerald-800/40 flex items-center gap-3 text-xs">
-          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className={`fixed bottom-6 right-6 z-50 text-white px-4 py-3 shadow-xl border flex items-center gap-3 text-xs ${
+          notification.type === 'error'
+            ? 'bg-[#2a0e0e] border-red-700/60'
+            : 'bg-[#0d281c] border-emerald-800/40'
+        }`}>
+          {notification.type === 'error' ? (
+            <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+          ) : (
+            <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+          )}
           <span className="font-medium tracking-wide">{notification.message}</span>
         </div>
       )}
@@ -256,8 +366,8 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
                   <input
                     type="email"
                     value={emailInput}
-                    onChange={(e) => setEmailInput(e.target.value)}
-                    placeholder="Enter email for launch announcement"
+                    onChange={(e) => setEmailInput(sanitizeEmail(e.target.value))}
+                    placeholder="Enter business email for launch announcement"
                     required
                     className="flex-1 px-4 py-2.5 bg-[#fbfdfb] border border-neutral-300 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-emerald-800 transition-colors"
                   />
@@ -622,32 +732,96 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
             </div>
 
             {!inquirySubmitted ? (
-              <form onSubmit={handleInquirySubmit} className="space-y-4 pt-2">
+              <form onSubmit={handleInquirySubmit} noValidate className="space-y-4 pt-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
                       Full Name *
                     </label>
-                    <input
-                      type="text"
-                      required
-                      value={inquiryForm.name}
-                      onChange={(e) => setInquiryForm({...inquiryForm, name: e.target.value})}
-                      placeholder="Your Name"
-                      className="w-full px-3.5 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800 transition-colors"
-                    />
+                    <div className="relative flex items-center">
+                      <input
+                        type="text"
+                        name="name"
+                        value={inquiryForm.name}
+                        onChange={(e) => {
+                          const sanitized = sanitizeName(e.target.value);
+                          setInquiryForm((prev) => ({ ...prev, name: sanitized }));
+                          if (formTouched.name) {
+                            const err = validateName(sanitized);
+                            setFormErrors((prev) => ({ ...prev, name: err || undefined }));
+                          }
+                        }}
+                        onBlur={() => {
+                          setFormTouched((prev) => ({ ...prev, name: true }));
+                          const err = validateName(inquiryForm.name);
+                          setFormErrors((prev) => ({ ...prev, name: err || undefined }));
+                        }}
+                        placeholder="Your Name"
+                        className={`w-full px-3.5 py-2 pr-8 bg-white border text-xs text-neutral-900 focus:outline-none transition-colors ${
+                          formTouched.name && formErrors.name
+                            ? 'border-red-500 focus:border-red-600'
+                            : formTouched.name && !formErrors.name && inquiryForm.name.trim().length >= 2
+                            ? 'border-emerald-700 focus:border-emerald-800'
+                            : 'border-neutral-300 focus:border-emerald-800'
+                        }`}
+                      />
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                        {formTouched.name && formErrors.name && (
+                          <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                        )}
+                        {formTouched.name && !formErrors.name && inquiryForm.name.trim().length >= 2 && (
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        )}
+                      </div>
+                    </div>
+                    {formTouched.name && formErrors.name && (
+                      <p className="text-[11px] text-red-600 mt-1 font-medium">{formErrors.name}</p>
+                    )}
                   </div>
+
                   <div>
                     <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
                       Company / Organization
                     </label>
-                    <input
-                      type="text"
-                      value={inquiryForm.company}
-                      onChange={(e) => setInquiryForm({...inquiryForm, company: e.target.value})}
-                      placeholder="Company Name"
-                      className="w-full px-3.5 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800 transition-colors"
-                    />
+                    <div className="relative flex items-center">
+                      <input
+                        type="text"
+                        name="company"
+                        value={inquiryForm.company}
+                        onChange={(e) => {
+                          const sanitized = sanitizeCompany(e.target.value);
+                          setInquiryForm((prev) => ({ ...prev, company: sanitized }));
+                          if (formTouched.company) {
+                            const err = validateCompany(sanitized);
+                            setFormErrors((prev) => ({ ...prev, company: err || undefined }));
+                          }
+                        }}
+                        onBlur={() => {
+                          setFormTouched((prev) => ({ ...prev, company: true }));
+                          const err = validateCompany(inquiryForm.company);
+                          setFormErrors((prev) => ({ ...prev, company: err || undefined }));
+                        }}
+                        placeholder="Company Name (optional)"
+                        className={`w-full px-3.5 py-2 pr-8 bg-white border text-xs text-neutral-900 focus:outline-none transition-colors ${
+                          formTouched.company && formErrors.company
+                            ? 'border-red-500 focus:border-red-600'
+                            : formTouched.company && !formErrors.company && inquiryForm.company.trim().length >= 2
+                            ? 'border-emerald-700 focus:border-emerald-800'
+                            : 'border-neutral-300 focus:border-emerald-800'
+                        }`}
+                      />
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                        {formTouched.company && formErrors.company && (
+                          <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                        )}
+                        {formTouched.company && !formErrors.company && inquiryForm.company.trim().length >= 2 && (
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        )}
+                      </div>
+                    </div>
+                    {formTouched.company && formErrors.company && (
+                      <p className="text-[11px] text-red-600 mt-1 font-medium">{formErrors.company}</p>
+                    )}
                   </div>
                 </div>
 
@@ -656,15 +830,47 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
                     <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
                       Email Address *
                     </label>
-                    <input
-                      type="email"
-                      required
-                      value={inquiryForm.email}
-                      onChange={(e) => setInquiryForm({...inquiryForm, email: e.target.value})}
-                      placeholder="corporate@domain.com"
-                      className="w-full px-3.5 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800 transition-colors"
-                    />
+                    <div className="relative flex items-center">
+                      <input
+                        type="email"
+                        name="email"
+                        value={inquiryForm.email}
+                        onChange={(e) => {
+                          const sanitized = sanitizeEmail(e.target.value);
+                          setInquiryForm((prev) => ({ ...prev, email: sanitized }));
+                          if (formTouched.email) {
+                            const err = validateEmail(sanitized);
+                            setFormErrors((prev) => ({ ...prev, email: err || undefined }));
+                          }
+                        }}
+                        onBlur={() => {
+                          setFormTouched((prev) => ({ ...prev, email: true }));
+                          const err = validateEmail(inquiryForm.email);
+                          setFormErrors((prev) => ({ ...prev, email: err || undefined }));
+                        }}
+                        placeholder="corporate@domain.com"
+                        className={`w-full px-3.5 py-2 pr-8 bg-white border text-xs text-neutral-900 focus:outline-none transition-colors ${
+                          formTouched.email && formErrors.email
+                            ? 'border-red-500 focus:border-red-600'
+                            : formTouched.email && !formErrors.email && !validateEmail(inquiryForm.email)
+                            ? 'border-emerald-700 focus:border-emerald-800'
+                            : 'border-neutral-300 focus:border-emerald-800'
+                        }`}
+                      />
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                        {formTouched.email && formErrors.email && (
+                          <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                        )}
+                        {formTouched.email && !formErrors.email && inquiryForm.email.trim() && !validateEmail(inquiryForm.email) && (
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        )}
+                      </div>
+                    </div>
+                    {formTouched.email && formErrors.email && (
+                      <p className="text-[11px] text-red-600 mt-1 font-medium">{formErrors.email}</p>
+                    )}
                   </div>
+
                   <div>
                     <label className="block text-[11px] font-medium text-neutral-700 uppercase tracking-wide mb-1">
                       Manufacturing Division
@@ -672,7 +878,7 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
                     <select
                       value={inquiryForm.category}
                       onChange={(e) => setInquiryForm({...inquiryForm, category: e.target.value})}
-                      className="w-full px-3.5 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800 transition-colors"
+                      className="w-full px-3.5 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800 transition-colors cursor-pointer"
                     >
                       <option value="Fruits, Vegetables Powder and starch">Fruits, Vegetables Powder and starch</option>
                       <option value="Fruits and Vegetables Flakes">Fruits and Vegetables Flakes</option>
@@ -688,12 +894,32 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
                   </label>
                   <textarea
                     rows={3}
-                    required
                     value={inquiryForm.message}
-                    onChange={(e) => setInquiryForm({...inquiryForm, message: e.target.value})}
+                    onChange={(e) => {
+                      const sanitized = sanitizeMessage(e.target.value);
+                      setInquiryForm((prev) => ({ ...prev, message: sanitized }));
+                      if (formTouched.message) {
+                        const err = validateMessage(sanitized);
+                        setFormErrors((prev) => ({ ...prev, message: err || undefined }));
+                      }
+                    }}
+                    onBlur={() => {
+                      setFormTouched((prev) => ({ ...prev, message: true }));
+                      const err = validateMessage(inquiryForm.message);
+                      setFormErrors((prev) => ({ ...prev, message: err || undefined }));
+                    }}
                     placeholder="Specify target volumes, batch packaging, or distribution requirements."
-                    className="w-full px-3.5 py-2 bg-white border border-neutral-300 text-xs text-neutral-900 focus:outline-none focus:border-emerald-800 transition-colors"
+                    className={`w-full px-3.5 py-2 bg-white border text-xs text-neutral-900 focus:outline-none transition-colors ${
+                      formTouched.message && formErrors.message
+                        ? 'border-red-500 focus:border-red-600'
+                        : formTouched.message && !formErrors.message && inquiryForm.message.trim().length >= 5
+                        ? 'border-emerald-700 focus:border-emerald-800'
+                        : 'border-neutral-300 focus:border-emerald-800'
+                    }`}
                   />
+                  {formTouched.message && formErrors.message && (
+                    <p className="text-[11px] text-red-600 mt-1 font-medium">{formErrors.message}</p>
+                  )}
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-neutral-100">
@@ -734,6 +960,8 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
                       setInquirySubmitted(false);
                       setRedirectCountdown(null);
                       setInquiryForm({ name: '', company: '', email: '', category: 'Fruits, Vegetables Powder and starch', message: '' });
+                      setFormErrors({});
+                      setFormTouched({});
                     }}
                     className="text-xs text-neutral-600 underline underline-offset-4 cursor-pointer hover:text-neutral-900"
                   >
