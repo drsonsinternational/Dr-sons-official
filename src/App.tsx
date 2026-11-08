@@ -95,22 +95,67 @@ export default function App() {
 
   // Concept Lab: Semi-Circle Rotary Divisions State
   const [rotaryDivision, setRotaryDivision] = useState<number>(0);
+  const rotaryDivisionRef = useRef<number>(0);
+  rotaryDivisionRef.current = rotaryDivision;
+
   const [rotaryAutoPlay, setRotaryAutoPlay] = useState<boolean>(false);
   const [desktopDivisionView, setDesktopDivisionView] = useState<'rotary' | 'classic'>('rotary');
-  const lastRotaryWheelTime = useRef<number>(0);
+  const rotarySectionRef = useRef<HTMLElement | null>(null);
 
-  const handleRotaryWheel = (e: React.WheelEvent) => {
-    const now = Date.now();
-    if (now - lastRotaryWheelTime.current < 280) return;
-    if (Math.abs(e.deltaY) > 20) {
-      if (e.deltaY > 0) {
-        setRotaryDivision((prev) => Math.min(divisionsData.length - 1, prev + 1));
+  // Non-passive wheel event listener with e.preventDefault() so page does NOT scroll down while rotating
+  useEffect(() => {
+    const el = rotarySectionRef.current;
+    if (!el) return;
+
+    let lastWheelTime = 0;
+    let boundaryHitTime = 0;
+    const TOTAL_DIVISIONS = 4;
+
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) < 15) return;
+
+      const now = Date.now();
+      const isScrollingDown = e.deltaY > 0;
+      const currentDiv = rotaryDivisionRef.current;
+
+      if (isScrollingDown) {
+        if (currentDiv < TOTAL_DIVISIONS - 1) {
+          // Prevent window scroll and advance to next category
+          e.preventDefault();
+          if (now - lastWheelTime > 320) {
+            lastWheelTime = now;
+            boundaryHitTime = now;
+            setRotaryDivision(currentDiv + 1);
+          }
+        } else {
+          // At last division (04): absorb quick follow-up wheel ticks for 450ms so user can inspect it
+          if (now - boundaryHitTime < 450) {
+            e.preventDefault();
+          }
+        }
       } else {
-        setRotaryDivision((prev) => Math.max(0, prev - 1));
+        if (currentDiv > 0) {
+          // Prevent window scroll and rotate back to previous category
+          e.preventDefault();
+          if (now - lastWheelTime > 320) {
+            lastWheelTime = now;
+            boundaryHitTime = now;
+            setRotaryDivision(currentDiv - 1);
+          }
+        } else {
+          // At first division (01): absorb quick follow-up wheel ticks for 450ms so user can inspect it
+          if (now - boundaryHitTime < 450) {
+            e.preventDefault();
+          }
+        }
       }
-      lastRotaryWheelTime.current = now;
-    }
-  };
+    };
+
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+    };
+  }, []);
 
   // Inquiry Form State
   const [inquiryForm, setInquiryForm] = useState({
@@ -1423,7 +1468,7 @@ export default function App() {
       {/* SECTION: ROTARY SEMI-CIRCLE DIVISION DIAL (Desktop View - White Theme - Left Screen Aligned) */}
       <section 
         id="divisions-rotary-concept" 
-        onWheel={handleRotaryWheel}
+        ref={rotarySectionRef}
         className={`w-full py-10 sm:py-16 bg-white border-b border-neutral-200 relative overflow-hidden select-none ${
           desktopDivisionView === 'rotary' ? 'hidden lg:block' : 'hidden'
         }`}
@@ -1471,7 +1516,7 @@ export default function App() {
               </div>
 
               <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-900/15 text-[11px] font-mono text-emerald-900">
-                <span>🖱️ Scroll Wheel Active</span>
+                <span>🖱️ Scroll Wheel Changes Division</span>
               </span>
 
               <button
