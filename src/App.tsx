@@ -1100,11 +1100,11 @@ export default function App() {
           
           {/* Logo Lockup */}
           <a href="#" className="flex items-center gap-2 sm:gap-3 group shrink-0">
-            <div className="h-9 sm:h-12 flex items-center">
+            <div className="h-9 sm:h-11 flex items-center">
               <img 
                 src="/assets/brand/drsons_logo.webp" 
                 alt="D R & SONS INTERNATIONAL" 
-                className="h-9 sm:h-12 w-auto object-contain mix-blend-multiply"
+                className="h-9 sm:h-11 w-auto aspect-square object-contain"
               />
             </div>
             <div className="border-l border-neutral-200 pl-2.5 hidden md:block">
@@ -1240,7 +1240,7 @@ export default function App() {
                     <img
                       src="/assets/brand/drsons_logo.webp"
                       alt="D R & SONS INTERNATIONAL"
-                      className="h-8 w-auto object-contain mix-blend-multiply"
+                      className="h-8 w-auto aspect-square object-contain"
                     />
                     <div>
                       <span className="text-xs font-bold tracking-tight text-[#0a2318] block leading-none">
@@ -3232,7 +3232,7 @@ export default function App() {
                 <img 
                   src="/assets/brand/drsons_logo.webp" 
                   alt="D R & SONS INTERNATIONAL" 
-                  className="h-10 w-auto object-contain mix-blend-multiply"
+                  className="h-11 w-auto aspect-square object-contain"
                 />
                 <div className="border-l border-neutral-300 pl-3">
                   <span className="text-sm font-bold tracking-tight text-[#0a2318] block leading-none">

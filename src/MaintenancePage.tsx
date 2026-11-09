@@ -278,7 +278,7 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
           <img 
             src="/assets/brand/drsons_logo.webp" 
             alt="D R & SONS INTERNATIONAL" 
-            className="h-10 sm:h-12 w-auto object-contain mix-blend-multiply"
+            className="h-10 sm:h-12 w-auto aspect-square object-contain"
           />
           <div className="border-l border-neutral-300 pl-3 hidden xs:block">
             <span className="text-xs sm:text-sm font-bold tracking-tight text-[#0a2318] block leading-none">
