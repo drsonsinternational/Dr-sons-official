@@ -233,7 +233,7 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
       `*Message:* ${inquiryForm.message.trim()}`
     ];
     const encodedText = encodeURIComponent(textLines.join('\n'));
-    const url = `https://wa.me/919411268879?text=${encodedText}`;
+    const url = `https://wa.me/918077622461?text=${encodedText}`;
 
     setWhatsappRedirectUrl(url);
     setInquirySubmitted(true);
@@ -299,7 +299,7 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
             Commercial Inquiry
           </button>
           <a
-            href="https://wa.me/919411268879"
+            href="https://wa.me/918077622461"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#143e2b] text-white text-xs font-medium uppercase tracking-wider hover:bg-[#0c281c] transition-colors"
@@ -397,11 +397,11 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
             <div className="flex flex-wrap items-center gap-3">
               {/* WhatsApp direct button */}
               <a
-                href="https://wa.me/919411268879"
+                href="https://wa.me/918077622461"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 border border-neutral-300 hover:border-emerald-700 bg-white hover:bg-emerald-50 text-[#0f2e21] flex items-center justify-center transition-colors shadow-xs"
-                title="Chat on WhatsApp (+91 9411268879)"
+                title="Chat on WhatsApp (+91 8077622461)"
               >
                 <MessageSquare className="w-4 h-4 text-emerald-800" />
               </a>
@@ -425,7 +425,7 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
               </button>
 
               <span className="text-xs font-mono text-emerald-900 font-medium ml-1">
-                +91 9411268879
+                +91 8077622461
               </span>
             </div>
           </div>
@@ -707,7 +707,7 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
                 Commercial Manufacturing Inquiry
               </h3>
               <p className="text-xs text-neutral-600 mt-1">
-                Submitting this form immediately routes your specifications to our WhatsApp desk at <strong className="font-semibold text-neutral-900">+91 9411268879</strong>.
+                Submitting this form immediately routes your specifications to our WhatsApp desk at <strong className="font-semibold text-neutral-900">+91 8077622461</strong>.
               </p>
             </div>
 
@@ -924,7 +924,7 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-neutral-100">
                   <span className="text-[11px] text-neutral-500">
-                    Connects directly to WhatsApp: <strong className="text-emerald-900 font-mono">9411268879</strong>
+                    Connects directly to WhatsApp: <strong className="text-emerald-900 font-mono">8077622461</strong>
                   </span>
                   <button
                     type="submit"
@@ -942,7 +942,7 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
                   <span>Inquiry Prepared</span>
                 </div>
                 <p className="text-xs text-neutral-700 leading-relaxed">
-                  Thank you, <strong className="font-semibold text-neutral-900">{inquiryForm.name}</strong>. Redirecting you to DrSons WhatsApp desk (<strong className="font-mono text-neutral-900">9411268879</strong>){redirectCountdown !== null && redirectCountdown > 0 ? ` in ${redirectCountdown}s...` : ' now.'}
+                  Thank you, <strong className="font-semibold text-neutral-900">{inquiryForm.name}</strong>. Redirecting you to DrSons WhatsApp desk (<strong className="font-mono text-neutral-900">8077622461</strong>){redirectCountdown !== null && redirectCountdown > 0 ? ` in ${redirectCountdown}s...` : ' now.'}
                 </p>
                 <div className="flex flex-wrap items-center gap-3 pt-1">
                   <a
@@ -952,7 +952,7 @@ export default function MaintenancePage({ onUnlock }: MaintenancePageProps) {
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#0c271b] transition-colors"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
-                    <span>Open WhatsApp Directly (9411268879)</span>
+                    <span>Open WhatsApp Directly (8077622461)</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                   <button

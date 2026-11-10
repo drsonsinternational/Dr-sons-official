@@ -508,7 +508,7 @@ export default function App() {
       `*Specifications:* ${inquiryForm.message.trim() || 'Standard Specifications'}`
     ];
     const encodedText = encodeURIComponent(textLines.join('\n'));
-    const url = `https://wa.me/919411268879?text=${encodedText}`;
+    const url = `https://wa.me/918077622461?text=${encodedText}`;
 
     setWhatsappRedirectUrl(url);
     setInquirySubmitted(true);
@@ -579,7 +579,7 @@ export default function App() {
     'Advanced Spray & Drum Drying',
     'Class 100 Cleanroom Bottling & RO Ozonation',
     'BIS IS 14543:2004 & FSSAI Certified Supply',
-    'Direct WhatsApp: 9411268879'
+    'Direct WhatsApp: 8077622461'
   ];
 
   const divisionsData = [
@@ -1074,12 +1074,12 @@ export default function App() {
         transition={{ delay: 0.5, duration: 0.4 }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
-        href="https://wa.me/919411268879"
+        href="https://wa.me/918077622461"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-5 left-5 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#25D366] text-white shadow-2xl flex items-center justify-center hover:bg-[#20ba59] active:scale-95 transition-all hover:shadow-emerald-500/30 group"
-        title="Chat on WhatsApp (+91 9411268879)"
-        aria-label="Chat on WhatsApp (+91 9411268879)"
+        title="Chat on WhatsApp (+91 8077622461)"
+        aria-label="Chat on WhatsApp (+91 8077622461)"
       >
         {/* Subtle Online Ping Ring */}
         <span className="absolute -inset-1 rounded-full bg-[#25D366] opacity-35 animate-ping pointer-events-none" />
@@ -1176,14 +1176,14 @@ export default function App() {
           {/* Direct WhatsApp Callout & Mobile Three-Bar Button */}
           <div className="flex items-center gap-2">
             <a
-              href="https://wa.me/919411268879"
+              href="https://wa.me/918077622461"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-900/20 text-xs font-medium transition-colors"
             >
               <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
               <span className="hidden sm:inline">WhatsApp:</span>
-              <span className="font-mono font-semibold text-[11px] sm:text-xs">9411268879</span>
+              <span className="font-mono font-semibold text-[11px] sm:text-xs">8077622461</span>
             </a>
 
             <a
@@ -1411,13 +1411,13 @@ export default function App() {
               {/* Drawer Bottom Actions */}
               <div className="p-4 border-t border-neutral-200 bg-[#fafbfa] space-y-2.5">
                 <a
-                  href="https://wa.me/919411268879"
+                  href="https://wa.me/918077622461"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#143e2b] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#0c281c] transition-colors"
                 >
                   <MessageSquare className="w-4 h-4 text-emerald-300" />
-                  <span>WhatsApp: 9411268879</span>
+                  <span>WhatsApp: 8077622461</span>
                 </a>
 
                 <a
@@ -1532,13 +1532,13 @@ export default function App() {
             </a>
 
             <a
-              href="https://wa.me/919411268879"
+              href="https://wa.me/918077622461"
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 sm:px-7 py-2.5 sm:py-3 bg-black/40 hover:bg-black/60 text-white border border-white/25 text-xs font-semibold uppercase tracking-wider backdrop-blur-md transition-all flex items-center gap-1.5"
             >
               <MessageSquare className="w-3.5 h-3.5 text-emerald-300" />
-              <span>WhatsApp: 9411268879</span>
+              <span>WhatsApp: 8077622461</span>
             </a>
           </motion.div>
 
@@ -1814,7 +1814,7 @@ export default function App() {
                         </a>
 
                         <a
-                          href={`https://wa.me/919411268879?text=${encodeURIComponent(`Hi D R & Sons Trade Desk, I am inquiring about Division ${current.number}: ${current.title}`)}`}
+                          href={`https://wa.me/918077622461?text=${encodeURIComponent(`Hi D R & Sons Trade Desk, I am inquiring about Division ${current.number}: ${current.title}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-900 hover:text-emerald-950"
@@ -2948,7 +2948,7 @@ export default function App() {
                           const err = validatePhone(inquiryForm.phone);
                           setFormErrors((prev) => ({ ...prev, phone: err || undefined }));
                         }}
-                        placeholder="Phone number (e.g. +91 94112 68879)"
+                        placeholder="Phone number (e.g. +91 80776 22461)"
                         className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-colors bg-transparent ${
                           formTouched.phone && formErrors.phone
                             ? 'border-red-500 focus:border-red-600'
@@ -3065,7 +3065,7 @@ export default function App() {
                     <span>Inquiry Prepared</span>
                   </div>
                   <p className="text-xs text-neutral-700 leading-relaxed">
-                    Routing your inquiry directly to our WhatsApp Trade Desk (<strong className="font-mono">9411268879</strong>){redirectCountdown !== null && redirectCountdown > 0 ? ` in ${redirectCountdown}s...` : ' now.'}
+                    Routing your inquiry directly to our WhatsApp Trade Desk (<strong className="font-mono">8077622461</strong>){redirectCountdown !== null && redirectCountdown > 0 ? ` in ${redirectCountdown}s...` : ' now.'}
                   </p>
                   <div className="flex flex-wrap items-center gap-3 pt-1">
                     <a
@@ -3098,13 +3098,13 @@ export default function App() {
               {/* Mobile Quick Trade Desk Details */}
               <div className="pt-3 border-t border-neutral-100 flex sm:hidden items-center justify-between text-[11px] text-neutral-500">
                 <a 
-                  href="https://wa.me/919411268879" 
+                  href="https://wa.me/918077622461" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="font-mono font-semibold text-emerald-900 flex items-center gap-1"
                 >
                   <MessageSquare className="w-3 h-3 text-emerald-700" />
-                  <span>WhatsApp: 9411268879</span>
+                  <span>WhatsApp: 8077622461</span>
                 </a>
                 <button
                   onClick={() => setLegalModalTab('statutory')}
@@ -3155,13 +3155,13 @@ export default function App() {
               </div>
               <div className="flex flex-col gap-1.5 text-xs">
                 <a 
-                  href="https://wa.me/919411268879" 
+                  href="https://wa.me/918077622461" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="font-mono text-sm font-bold text-[#143e2b] hover:underline flex items-center gap-1.5"
                 >
                   <MessageSquare className="w-4 h-4 text-emerald-700" />
-                  <span>WhatsApp: +91 9411268879</span>
+                  <span>WhatsApp: +91 8077622461</span>
                 </a>
                 <div className="flex items-center justify-between text-neutral-600 pt-1 border-t border-neutral-100">
                   <span className="font-mono text-[11px]">contact@drsonsinternational.com</span>
@@ -3256,12 +3256,12 @@ export default function App() {
                 </li>
                 <li>
                   <a 
-                    href="https://wa.me/919411268879"
+                    href="https://wa.me/918077622461"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-[#143e2b] hover:underline transition-colors block font-mono text-[11px]"
                   >
-                    WhatsApp: +91 9411268879
+                    WhatsApp: +91 8077622461
                   </a>
                 </li>
                 <li>
@@ -3665,7 +3665,7 @@ export default function App() {
                           </span>
                         </div>
                         <p className="text-neutral-600 leading-relaxed">
-                          All packaged products bear mandatory statutory labeling declarations: Net Quantity (calibrated to 250ml, 300ml, 500ml, 1L for liquids; net weight for dehydrated solids), Maximum Retail Price (MRP inclusive of all taxes), Month and Year of manufacture, Batch/Lot identification, Best Before duration, and Manufacturer Redressal Details (+91 9411268879 / contact@drsonsinternational.com).
+                          All packaged products bear mandatory statutory labeling declarations: Net Quantity (calibrated to 250ml, 300ml, 500ml, 1L for liquids; net weight for dehydrated solids), Maximum Retail Price (MRP inclusive of all taxes), Month and Year of manufacture, Batch/Lot identification, Best Before duration, and Manufacturer Redressal Details (+91 8077622461 / contact@drsonsinternational.com).
                         </p>
                       </div>
 
@@ -3765,7 +3765,7 @@ export default function App() {
                         </p>
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 font-mono">
                           <span className="text-neutral-800">Email: contact@drsonsinternational.com</span>
-                          <span className="text-emerald-900 font-bold">WhatsApp: +91 9411268879</span>
+                          <span className="text-emerald-900 font-bold">WhatsApp: +91 8077622461</span>
                         </div>
                       </div>
                     </div>
@@ -3828,7 +3828,7 @@ export default function App() {
                         2. Commercial Data Use
                       </h4>
                       <p>
-                        Submitted business inquiries are strictly used to fulfill manufacturing quotes, share specifications, and communicate via WhatsApp (+91 9411268879) or corporate email.
+                        Submitted business inquiries are strictly used to fulfill manufacturing quotes, share specifications, and communicate via WhatsApp (+91 8077622461) or corporate email.
                       </p>
                     </div>
 
@@ -3868,7 +3868,7 @@ export default function App() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-neutral-500">Direct Desk:</span>
-                        <span className="font-bold text-emerald-900">+91 9411268879</span>
+                        <span className="font-bold text-emerald-900">+91 8077622461</span>
                       </div>
                     </div>
                   </div>
