@@ -2086,9 +2086,6 @@ export default function App() {
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-neutral-200 pb-4">
             <div className="space-y-1 max-w-2xl">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-800 block">
-                Commercial Portfolio · 4 Registered Wings
-              </span>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 text-balance">
                 Four Certified Manufacturing Divisions
               </h2>
@@ -2243,11 +2240,6 @@ export default function App() {
                         alt={current.title} 
                         className="w-full h-full max-h-[380px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                       />
-                      
-                      {/* Subtle Corner Badge */}
-                      <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/95 backdrop-blur-sm border border-neutral-200 rounded-md shadow-2xs text-[11px] font-mono tabular-nums text-neutral-700">
-                        <strong className="text-emerald-900">0{current.number}</strong> · Commercial Pack
-                      </div>
                     </div>
 
                     {/* Right Column: Group with Spacing (No Empty Space!) */}
@@ -2255,9 +2247,6 @@ export default function App() {
                       
                       {/* Group 1: Identity & Value Proposition */}
                       <div className="space-y-2">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-800 block">
-                          Certified Industrial Wing
-                        </span>
                         <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 leading-snug text-balance">
                           {current.title}
                         </h3>
@@ -2735,15 +2724,6 @@ export default function App() {
                       <span className="bg-[#0a2318] text-white font-mono text-[10px] font-bold px-2 py-0.5 border border-emerald-500/40 rounded-md shadow-xs">
                         STAGE <span className="tabular-nums">0{currentFacilityStage.stepNumber}</span> / 05
                       </span>
-                      <span className="bg-black/70 backdrop-blur-md text-emerald-300 font-mono text-[9px] px-2 py-0.5 border border-white/20 rounded-md">
-                        {currentFacilityStage.stepLabel}
-                      </span>
-                    </div>
-
-                    {/* Bottom Line Details */}
-                    <div className="absolute bottom-2.5 left-3 right-3 text-white font-mono text-[10px] flex items-center justify-between">
-                      <span className="text-emerald-400 font-bold uppercase truncate tabular-nums">{currentFacilityLine.capacity}</span>
-                      <span className="text-neutral-300 uppercase tracking-wide text-[9px] truncate ml-2">{currentFacilityLine.cleanroomClass}</span>
                     </div>
                   </div>
 
