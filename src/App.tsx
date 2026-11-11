@@ -1677,9 +1677,6 @@ export default function App() {
           {/* Section Header */}
           <div className="flex items-center justify-between border-b border-neutral-200 pb-3 shrink-0">
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-800 font-bold block mb-0.5">
-                Commercial Portfolio · 4 Registered Divisions
-              </span>
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 leading-tight">
                 Four Certified Manufacturing Divisions
               </h2>
@@ -2351,26 +2348,14 @@ export default function App() {
         <div className="w-full max-w-7xl mx-auto space-y-8">
           
           {/* Header */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-neutral-200 pb-6">
+          <div className="border-b border-neutral-200 pb-6">
             <div className="space-y-2 max-w-2xl">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
-                <span className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold block">
-                  Industrial Architecture
-                </span>
-              </div>
               <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-neutral-900 text-balance">
                 Production Facilities &amp; Process Pipeline
               </h2>
               <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed font-normal">
                 Explore our commercial manufacturing workflow across 4 industrial processing lines, tracing raw intake through precision thermal and mechanical transformation to sealed, certified commercial goods.
               </p>
-            </div>
-
-            <div className="hidden lg:flex items-center gap-2.5 text-xs font-mono">
-              <span className="px-3 py-1.5 bg-white border border-neutral-200 text-neutral-700 shadow-2xs rounded-md">
-                Cleanroom Standard: <strong className="text-emerald-900 font-bold">{currentFacilityLine.cleanroomClass}</strong>
-              </span>
             </div>
           </div>
 
@@ -2380,7 +2365,6 @@ export default function App() {
             {/* 4 Line Selector Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {facilitiesData.map((line, idx) => {
-                const LineIcon = line.icon;
                 const isSelected = selectedFacilityLine === idx;
                 return (
                   <button
@@ -2400,19 +2384,6 @@ export default function App() {
                     {isSelected && (
                       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c2a76f] via-emerald-400 to-[#c2a76f] rounded-t-xl" />
                     )}
-                    
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className={`text-[10px] font-mono font-bold tracking-wider ${
-                        isSelected ? 'text-[#c2a76f]' : 'text-emerald-800'
-                      }`}>
-                        LINE <span className="tabular-nums font-mono">{line.number}</span>
-                      </span>
-                      <div className={`w-7 h-7 flex items-center justify-center rounded-lg ${
-                        isSelected ? 'bg-white/10 text-emerald-300 border border-white/15' : 'bg-emerald-50 text-emerald-900 border border-emerald-900/10'
-                      }`}>
-                        <LineIcon className="w-3.5 h-3.5 stroke-[1.75]" />
-                      </div>
-                    </div>
 
                     <h3 className={`text-xs sm:text-sm font-bold tracking-tight line-clamp-1 ${
                       isSelected ? 'text-white' : 'text-neutral-900'
@@ -2647,24 +2618,10 @@ export default function App() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/40 pointer-events-none" />
 
                   {/* Top Overlay Pill */}
-                  <div className="relative z-10 p-4 sm:p-5 flex items-center justify-between">
+                  <div className="relative z-10 p-4 sm:p-5 flex items-center">
                     <span className="px-2.5 py-1 bg-black/60 backdrop-blur-md border border-white/20 text-white font-mono text-[10px] font-bold uppercase tracking-wider rounded-md">
                       STAGE <span className="tabular-nums font-mono">{currentFacilityStage.stepNumber}</span> / 05
                     </span>
-                    <span className="px-2.5 py-1 bg-emerald-950/80 backdrop-blur-md border border-emerald-500/30 text-emerald-300 font-mono text-[10px] uppercase font-bold tracking-wider rounded-md tabular-nums">
-                      {currentFacilityLine.capacity}
-                    </span>
-                  </div>
-
-                  {/* Bottom Overlay Facility Specs */}
-                  <div className="relative z-10 p-5 sm:p-6 text-white font-mono text-xs space-y-1.5">
-                    <div className="text-emerald-400 font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      <span>{currentFacilityLine.cleanroomClass}</span>
-                    </div>
-                    <div className="text-neutral-100 font-normal text-[11px] line-clamp-2 leading-relaxed">
-                      {currentFacilityLine.equipment}
-                    </div>
                   </div>
 
                 </div>
@@ -3549,70 +3506,7 @@ export default function App() {
 
           </div>
 
-          {/* Statutory & Industry Compliance Strip (Strictly rectangular, high trust) */}
-          <div className="py-6 border-t border-neutral-200">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
-                  Indian Industry &amp; Statutory Compliance Framework
-                </span>
-                <p className="text-xs text-neutral-600">
-                  Operated in rigorous adherence to Indian food safety, Bureau of Indian Standards, corporate governance, and environmental legislation.
-                </p>
-              </div>
 
-              {/* 6 Rectangular Compliance Badges */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-left">
-                <button
-                  onClick={() => setLegalModalTab('regulatory')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
-                >
-                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">FSSAI Act 2006</div>
-                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Food Safety Regs</div>
-                </button>
-
-                <button
-                  onClick={() => setLegalModalTab('regulatory')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
-                >
-                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">BIS IS 14543</div>
-                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Packaged Water</div>
-                </button>
-
-                <button
-                  onClick={() => setLegalModalTab('regulatory')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
-                >
-                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">Legal Metrology</div>
-                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">250ml - 1L Pack</div>
-                </button>
-
-                <button
-                  onClick={() => setLegalModalTab('privacy')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
-                >
-                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">DPDP Act 2023</div>
-                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Data Governance</div>
-                </button>
-
-                <button
-                  onClick={() => setLegalModalTab('statutory')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
-                >
-                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">Companies Act</div>
-                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">MCA Pvt. Ltd.</div>
-                </button>
-
-                <button
-                  onClick={() => setLegalModalTab('regulatory')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
-                >
-                  <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">SPCB / CPCB</div>
-                  <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Zero Discharge</div>
-                </button>
-              </div>
-            </div>
-          </div>
 
           {/* Bottom Copyright & Legal Strip */}
           <div className="pt-6 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-neutral-500">
