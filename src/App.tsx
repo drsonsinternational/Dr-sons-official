@@ -179,6 +179,218 @@ export default function App() {
     currentScrollAnimationRef.current = requestAnimationFrame(step);
   }, []);
 
+  // 1. HERO SECTION WHEEL LISTENER (Desktop):
+  // When scrolling down from Hero, smoothly glides to the Manufacturing Divisions section at Division 01
+  useEffect(() => {
+    const heroEl = heroSectionRef.current;
+    if (!heroEl) return;
+
+    let heroWheelDelta = 0;
+    let decayTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const onHeroWheel = (e: WheelEvent) => {
+      if (window.innerWidth < 1024) return;
+      if (isSectionTransitioningRef.current) {
+        e.preventDefault();
+        return;
+      }
+
+      if (e.deltaY > 0) {
+        heroWheelDelta += e.deltaY;
+        if (heroWheelDelta >= 35) {
+          e.preventDefault();
+          e.stopPropagation();
+          isSectionTransitioningRef.current = true;
+          heroWheelDelta = 0;
+
+          // Always initialize rotary dial at Division 01 (index 0)
+          rotaryDivisionRef.current = 0;
+          setRotaryDivision(0);
+          setActiveDivision(0);
+
+          const target = document.getElementById(
+            desktopDivisionView === 'rotary' ? 'divisions-rotary-concept' : 'divisions'
+          );
+          if (target) {
+            const navOffset = 64;
+            const targetY = target.getBoundingClientRect().top + window.scrollY - navOffset;
+            smoothScrollTo(targetY, 850, () => {
+              isSectionTransitioningRef.current = false;
+            });
+          } else {
+            isSectionTransitioningRef.current = false;
+          }
+        }
+      }
+
+      if (decayTimer) clearTimeout(decayTimer);
+      decayTimer = setTimeout(() => {
+        heroWheelDelta = 0;
+      }, 180);
+    };
+
+    heroEl.addEventListener('wheel', onHeroWheel, { passive: false });
+    return () => {
+      heroEl.removeEventListener('wheel', onHeroWheel);
+      if (decayTimer) clearTimeout(decayTimer);
+    };
+  }, [desktopDivisionView, smoothScrollTo]);
+
+  // 2. ROTARY DIAL SECTION WHEEL LISTENER (Desktop):
+  // - Step 1: Scroll down through 01 -> 02 -> 03 -> 04 (NO loop)
+  // - Step 2: Once at Division 04, scrolling down smoothly advances to the next section (#facilities)
+  // - Step 3: Scrolling up steps 04 -> 03 -> 02 -> 01, and scrolling up from 01 smoothly returns to Hero
+  useEffect(() => {
+    const el = rotarySectionRef.current;
+    if (!el) return;
+
+    let accumulatedDelta = 0;
+    let lastStepTime = 0;
+    let decayTimer: ReturnType<typeof setTimeout> | null = null;
+    const TOTAL_DIVISIONS = 4;
+    const THRESHOLD = 35; // Responsive threshold
+    const COOLDOWN_MS = 240; // Crisp notch spacing
+
+    const onWheel = (e: WheelEvent) => {
+      if (window.innerWidth < 1024) return;
+      if (desktopDivisionView !== 'rotary') return;
+      if (isSectionTransitioningRef.current) {
+        e.preventDefault();
+        return;
+      }
+
+      accumulatedDelta += e.deltaY;
+      const now = performance.now();
+
+      // SCROLL DOWN
+      if (accumulatedDelta >= THRESHOLD && now - lastStepTime > COOLDOWN_MS) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const current = rotaryDivisionRef.current;
+        if (current < TOTAL_DIVISIONS - 1) {
+          // Advance to next division: 0 -> 1 -> 2 -> 3
+          const next = current + 1;
+          rotaryDivisionRef.current = next;
+          setRotaryDivision(next);
+          setActiveDivision(next);
+          lastStepTime = now;
+          accumulatedDelta = 0;
+        } else {
+          // At Division 04 (last category) -> smoothly glide to next section (#facilities)
+          isSectionTransitioningRef.current = true;
+          accumulatedDelta = 0;
+          const facilitiesEl = document.getElementById('facilities');
+          if (facilitiesEl) {
+            const navOffset = 64;
+            const targetY = facilitiesEl.getBoundingClientRect().top + window.scrollY - navOffset;
+            smoothScrollTo(targetY, 850, () => {
+              isSectionTransitioningRef.current = false;
+            });
+          } else {
+            isSectionTransitioningRef.current = false;
+          }
+        }
+      } 
+      // SCROLL UP
+      else if (accumulatedDelta <= -THRESHOLD && now - lastStepTime > COOLDOWN_MS) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const current = rotaryDivisionRef.current;
+        if (current > 0) {
+          // Step back to previous division: 3 -> 2 -> 1 -> 0
+          const prev = current - 1;
+          rotaryDivisionRef.current = prev;
+          setRotaryDivision(prev);
+          setActiveDivision(prev);
+          lastStepTime = now;
+          accumulatedDelta = 0;
+        } else {
+          // At Division 01 (first category) -> return smoothly to Hero banner
+          isSectionTransitioningRef.current = true;
+          accumulatedDelta = 0;
+          smoothScrollTo(0, 850, () => {
+            isSectionTransitioningRef.current = false;
+          });
+        }
+      } else {
+        // Prevent default on all sub-threshold ticks so window does not jitter
+        e.preventDefault();
+      }
+
+      if (decayTimer) clearTimeout(decayTimer);
+      decayTimer = setTimeout(() => {
+        accumulatedDelta = 0;
+      }, 160);
+    };
+
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+      if (decayTimer) clearTimeout(decayTimer);
+    };
+  }, [desktopDivisionView, smoothScrollTo]);
+
+  // 3. FACILITIES SECTION WHEEL LISTENER (Desktop):
+  // When at the very top of Facilities and scrolling up, glide back to Rotary Divisions at division 04
+  useEffect(() => {
+    const el = facilitiesSectionRef.current;
+    if (!el) return;
+
+    let facilitiesWheelDelta = 0;
+    let decayTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const onFacilitiesWheel = (e: WheelEvent) => {
+      if (window.innerWidth < 1024) return;
+      if (desktopDivisionView !== 'rotary') return;
+      if (isSectionTransitioningRef.current) {
+        e.preventDefault();
+        return;
+      }
+
+      const navOffset = 64;
+      const facilitiesTop = el.getBoundingClientRect().top - navOffset;
+      // If at or near top of facilities section and scrolling UP
+      if (facilitiesTop >= -10 && e.deltaY < 0) {
+        facilitiesWheelDelta += e.deltaY;
+        if (facilitiesWheelDelta <= -35) {
+          e.preventDefault();
+          e.stopPropagation();
+          isSectionTransitioningRef.current = true;
+          facilitiesWheelDelta = 0;
+
+          rotaryDivisionRef.current = 3;
+          setRotaryDivision(3);
+          setActiveDivision(3);
+
+          const target = document.getElementById('divisions-rotary-concept');
+          if (target) {
+            const targetY = target.getBoundingClientRect().top + window.scrollY - navOffset;
+            smoothScrollTo(targetY, 850, () => {
+              isSectionTransitioningRef.current = false;
+            });
+          } else {
+            isSectionTransitioningRef.current = false;
+          }
+        }
+      } else {
+        facilitiesWheelDelta = 0;
+      }
+
+      if (decayTimer) clearTimeout(decayTimer);
+      decayTimer = setTimeout(() => {
+        facilitiesWheelDelta = 0;
+      }, 180);
+    };
+
+    el.addEventListener('wheel', onFacilitiesWheel, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', onFacilitiesWheel);
+      if (decayTimer) clearTimeout(decayTimer);
+    };
+  }, [desktopDivisionView, smoothScrollTo]);
+
   // Inquiry Form State & Strict Field Validation
   const [inquiryForm, setInquiryForm] = useState({
     name: '',
