@@ -1979,10 +1979,6 @@ export default function App() {
                               alt={current.title} 
                               className="w-full h-full max-h-[300px] object-contain group-hover:scale-105 transition-transform duration-500"
                             />
-                            <div className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-white/90 backdrop-blur-md font-mono text-[9px] uppercase tracking-wider text-emerald-900 border border-neutral-200 font-bold flex items-center gap-1.5 shadow-xs rounded-md">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                              <span>Direct Facility Line</span>
-                            </div>
                           </div>
 
                           {/* Commercial Deliverables Chips */}
@@ -2529,9 +2525,8 @@ export default function App() {
                               key={`tel-${selectedFacilityLine}-${selectedFacilityStage}-${tIdx}`} 
                               className="p-2.5 sm:p-3 border border-neutral-200 bg-[#fafbfa] rounded-lg"
                             >
-                              <div className="flex items-center justify-between gap-1 text-[10px] font-mono uppercase text-neutral-500">
+                              <div className="text-[10px] font-mono uppercase text-neutral-500">
                                 <span className="truncate">{t.label}</span>
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                               </div>
                               <span className="text-xs font-mono font-bold text-neutral-900 block mt-1 truncate tabular-nums">
                                 {t.value}
