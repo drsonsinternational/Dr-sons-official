@@ -68,3 +68,21 @@
   scrollbar-width: none;
 }
 
+/* Typography & Layout Rules */
+.text-balance {
+  text-wrap: balance;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Brand Design System Tokens */
+:root {
+  --color-brand-emerald: #0a2318;
+  --color-brand-gold: #c2a76f;
+  --color-brand-gold-hover: #b3975d;
+  --color-surface-card: #ffffff;
+  --color-surface-muted: #f8faf8;
+}
+

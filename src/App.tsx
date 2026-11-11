@@ -42,7 +42,8 @@ import {
   ChevronUp,
   ArrowDown,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 import MaintenancePage from './MaintenancePage';
 
@@ -65,6 +66,7 @@ export default function App() {
   const [activeDivision, setActiveDivision] = useState<number>(0);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
+  const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
   const [whatsappRedirectUrl, setWhatsappRedirectUrl] = useState('');
   const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
   const [notification, setNotification] = useState<NotificationState>({ type: null, message: '' });
@@ -176,173 +178,6 @@ export default function App() {
 
     currentScrollAnimationRef.current = requestAnimationFrame(step);
   }, []);
-
-  // Mouse drag handlers on the semi-circle arc for physical dial interaction (bounded 0 to 3, no loop)
-  const handleArcMouseDown = (e: React.MouseEvent) => {
-    arcDragStartY.current = e.clientY;
-  };
-
-  const handleArcMouseMove = (e: React.MouseEvent) => {
-    if (arcDragStartY.current === null) return;
-    const delta = e.clientY - arcDragStartY.current;
-    if (Math.abs(delta) > 36) {
-      if (delta > 0) {
-        setRotaryDivision((prev) => Math.min(3, prev + 1));
-      } else {
-        setRotaryDivision((prev) => Math.max(0, prev - 1));
-      }
-      arcDragStartY.current = e.clientY;
-    }
-  };
-
-  const handleArcMouseUp = () => {
-    arcDragStartY.current = null;
-  };
-
-  // 1. HERO SECTION WHEEL LISTENER (Desktop):
-  // When scrolling down from Hero, smoothly glides to the Manufacturing Divisions section at Division 01
-  useEffect(() => {
-    const heroEl = heroSectionRef.current;
-    if (!heroEl) return;
-
-    let heroWheelDelta = 0;
-    let decayTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const onHeroWheel = (e: WheelEvent) => {
-      if (window.innerWidth < 1024) return;
-      if (isSectionTransitioningRef.current) {
-        e.preventDefault();
-        return;
-      }
-
-      if (e.deltaY > 0) {
-        heroWheelDelta += e.deltaY;
-        if (heroWheelDelta >= 35) {
-          e.preventDefault();
-          e.stopPropagation();
-          isSectionTransitioningRef.current = true;
-          heroWheelDelta = 0;
-
-          // Always initialize rotary dial at Division 01 (index 0)
-          setRotaryDivision(0);
-
-          const target = document.getElementById(
-            desktopDivisionView === 'rotary' ? 'divisions-rotary-concept' : 'divisions'
-          );
-          if (target) {
-            const navOffset = 64;
-            const targetY = target.getBoundingClientRect().top + window.scrollY - navOffset;
-            smoothScrollTo(targetY, 850, () => {
-              isSectionTransitioningRef.current = false;
-            });
-          } else {
-            isSectionTransitioningRef.current = false;
-          }
-        }
-      }
-
-      if (decayTimer) clearTimeout(decayTimer);
-      decayTimer = setTimeout(() => {
-        heroWheelDelta = 0;
-      }, 180);
-    };
-
-    heroEl.addEventListener('wheel', onHeroWheel, { passive: false });
-    return () => {
-      heroEl.removeEventListener('wheel', onHeroWheel);
-      if (decayTimer) clearTimeout(decayTimer);
-    };
-  }, [desktopDivisionView, smoothScrollTo]);
-
-  // 2. ROTARY DIAL SECTION WHEEL LISTENER (Desktop):
-  // - Step 1: Scroll down through 01 -> 02 -> 03 -> 04 (NO loop)
-  // - Step 2: Once at Division 04, scrolling down smoothly advances to the next section (#facilities)
-  // - Step 3: Scrolling up steps 04 -> 03 -> 02 -> 01, and scrolling up from 01 smoothly returns to Hero
-  useEffect(() => {
-    const el = rotarySectionRef.current;
-    if (!el) return;
-
-    let accumulatedDelta = 0;
-    let lastStepTime = 0;
-    let decayTimer: ReturnType<typeof setTimeout> | null = null;
-    const TOTAL_DIVISIONS = 4;
-    const THRESHOLD = 35; // Sensitive, responsive threshold
-    const COOLDOWN_MS = 240; // Crisp notch spacing
-
-    const onWheel = (e: WheelEvent) => {
-      if (window.innerWidth < 1024) return;
-      if (isSectionTransitioningRef.current) {
-        e.preventDefault();
-        return;
-      }
-
-      accumulatedDelta += e.deltaY;
-      const now = performance.now();
-
-      // SCROLL DOWN
-      if (accumulatedDelta >= THRESHOLD && now - lastStepTime > COOLDOWN_MS) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const current = rotaryDivisionRef.current;
-        if (current < TOTAL_DIVISIONS - 1) {
-          // Advance to next division: 0 -> 1 -> 2 -> 3
-          setRotaryDivision(current + 1);
-          lastStepTime = now;
-          accumulatedDelta = 0;
-        } else {
-          // At Division 04 (last category) -> smoothly glide to next section (#facilities)
-          isSectionTransitioningRef.current = true;
-          accumulatedDelta = 0;
-          const facilitiesEl = document.getElementById('facilities');
-          if (facilitiesEl) {
-            const navOffset = 64;
-            const targetY = facilitiesEl.getBoundingClientRect().top + window.scrollY - navOffset;
-            smoothScrollTo(targetY, 850, () => {
-              isSectionTransitioningRef.current = false;
-            });
-          } else {
-            isSectionTransitioningRef.current = false;
-          }
-        }
-      } 
-      // SCROLL UP
-      else if (accumulatedDelta <= -THRESHOLD && now - lastStepTime > COOLDOWN_MS) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const current = rotaryDivisionRef.current;
-        if (current > 0) {
-          // Step back to previous division: 3 -> 2 -> 1 -> 0
-          setRotaryDivision(current - 1);
-          lastStepTime = now;
-          accumulatedDelta = 0;
-        } else {
-          // At Division 01 (first category) -> return smoothly to Hero banner
-          isSectionTransitioningRef.current = true;
-          accumulatedDelta = 0;
-          smoothScrollTo(0, 850, () => {
-            isSectionTransitioningRef.current = false;
-          });
-        }
-      } else {
-        // Prevent default on all sub-threshold ticks so window does not jitter
-        e.preventDefault();
-      }
-
-      if (decayTimer) clearTimeout(decayTimer);
-      decayTimer = setTimeout(() => {
-        accumulatedDelta = 0;
-      }, 160);
-    };
-
-    el.addEventListener('wheel', onWheel, { passive: false });
-    return () => {
-      el.removeEventListener('wheel', onWheel);
-      if (decayTimer) clearTimeout(decayTimer);
-    };
-  }, [desktopDivisionView, smoothScrollTo]);
-
 
   // Inquiry Form State & Strict Field Validation
   const [inquiryForm, setInquiryForm] = useState({
@@ -510,14 +345,18 @@ export default function App() {
     const encodedText = encodeURIComponent(textLines.join('\n'));
     const url = `https://wa.me/918077622461?text=${encodedText}`;
 
-    setWhatsappRedirectUrl(url);
-    setInquirySubmitted(true);
-    setRedirectCountdown(3);
-    showNotification('Inquiry validated. Redirecting to WhatsApp desk...', 'success');
-
+    setIsSubmittingInquiry(true);
     setTimeout(() => {
-      window.location.href = url;
-    }, 2800);
+      setIsSubmittingInquiry(false);
+      setWhatsappRedirectUrl(url);
+      setInquirySubmitted(true);
+      setRedirectCountdown(3);
+      showNotification('Inquiry validated. Redirecting to WhatsApp desk...', 'success');
+
+      setTimeout(() => {
+        window.location.href = url;
+      }, 2800);
+    }, 600);
   };
 
   // Countdown timer for automatic redirect
@@ -1118,25 +957,20 @@ export default function App() {
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-5 text-xs font-semibold text-neutral-700">
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-neutral-700">
             <a 
-              href={desktopDivisionView === 'rotary' ? '#divisions-rotary-concept' : '#divisions'}
+              href="#divisions"
               onClick={(e) => {
                 e.preventDefault();
-                if (desktopDivisionView === 'rotary') {
-                  setRotaryDivision(0);
-                }
-                const target = document.getElementById(
-                  desktopDivisionView === 'rotary' ? 'divisions-rotary-concept' : 'divisions'
-                );
+                const target = document.getElementById('divisions');
                 if (target) {
                   const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
                   smoothScrollTo(targetY, 850);
                 }
               }}
-              className="hover:text-emerald-900 transition-colors cursor-pointer"
+              className="hover:text-emerald-950 transition-colors cursor-pointer"
             >
-              4 Divisions
+              Divisions
             </a>
             <a 
               href="#facilities" 
@@ -1148,50 +982,57 @@ export default function App() {
                   smoothScrollTo(targetY, 850);
                 }
               }}
-              className="hover:text-emerald-900 transition-colors cursor-pointer"
+              className="hover:text-emerald-950 transition-colors cursor-pointer"
             >
               Facilities
             </a>
             <button 
               onClick={() => setLegalModalTab('regulatory')}
-              className="hover:text-emerald-900 transition-colors cursor-pointer text-neutral-600 font-medium"
+              className="hover:text-emerald-950 transition-colors cursor-pointer text-neutral-600 font-medium"
             >
               Regulatory
             </button>
             <button 
               onClick={() => setLegalModalTab('press')}
-              className="hover:text-emerald-900 transition-colors cursor-pointer text-neutral-600 font-medium"
+              className="hover:text-emerald-950 transition-colors cursor-pointer text-neutral-600 font-medium"
             >
               Press
             </button>
             <button 
               onClick={() => setLegalModalTab('terms')}
-              className="hover:text-emerald-900 transition-colors cursor-pointer text-neutral-600 font-medium"
+              className="hover:text-emerald-950 transition-colors cursor-pointer text-neutral-600 font-medium"
             >
               Legal Terms
             </button>
-            <a href="#inquiry-desk" className="hover:text-emerald-900 transition-colors">Trade Desk</a>
           </nav>
 
-          {/* Direct WhatsApp Callout & Mobile Three-Bar Button */}
-          <div className="flex items-center gap-2">
+          {/* Direct WhatsApp Callout & Primary CTA Button */}
+          <div className="flex items-center gap-2.5">
             <a
               href="https://wa.me/918077622461"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-900/20 text-xs font-medium transition-colors"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100/80 text-emerald-950 border border-emerald-900/15 text-xs font-medium rounded-md transition-colors"
             >
-              <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
+              <MessageSquare className="w-3.5 h-3.5 text-emerald-800" />
               <span className="hidden sm:inline">WhatsApp:</span>
-              <span className="font-mono font-semibold text-[11px] sm:text-xs">8077622461</span>
+              <span className="font-mono tabular-nums font-semibold text-[11px] sm:text-xs">8077622461</span>
             </a>
 
             <a
               href="#inquiry-desk"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#143e2b] hover:bg-[#0c271b] text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                const target = document.getElementById('inquiry-desk');
+                if (target) {
+                  const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
+                  smoothScrollTo(targetY, 850);
+                }
+              }}
+              className="hidden lg:inline-flex items-center gap-1.5 px-4 py-2 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider rounded-md shadow-xs transition-colors cursor-pointer"
             >
               <span>Get Quote</span>
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-3 h-3 text-[#c2a76f]" />
             </a>
 
             {/* Three Bar Lines (Hamburger) in Top Right Corner */}
@@ -1466,79 +1307,60 @@ export default function App() {
         {/* Subtle High-Contrast Gradient Scrim */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#071911]/90 via-[#071911]/50 to-[#071911]/35" />
 
-        {/* Rotating Concentric Trajectory Ring */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden opacity-30">
-          <svg 
-            className="w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] animate-spin-slow" 
-            viewBox="0 0 674 674" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="337" cy="337" r="335" stroke="#4ade80" strokeWidth="1.5" strokeDasharray="6 8" />
-            <circle cx="337" cy="337" r="260" stroke="#86efac" strokeWidth="1" strokeDasharray="4 6" />
-            <circle cx="337" cy="337" r="180" stroke="#ffffff" strokeWidth="1" opacity="0.4" />
-          </svg>
-        </div>
-
-        {/* Animated Hero Content (Tightly spaced, minimal text) */}
+        {/* Animated Hero Content */}
         <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-8 py-16 sm:py-24 text-center flex flex-col items-center space-y-4 sm:space-y-6">
 
-          {/* Minimalist Look Heading */}
+          {/* Clean Specific Heading (Unitalicized & Balanced) */}
           <motion.h1 
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]"
+            className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] text-balance max-w-3xl"
           >
-            Purity in <span className="font-serif-brand italic font-normal text-[#86efac]">Every Batch</span>
+            Purity in Every Batch
           </motion.h1>
 
-          {/* Minimal Category Subline */}
+          {/* Clean Category Subline (Sans-serif, No Mono) */}
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-xs sm:text-sm font-mono tracking-wider uppercase text-neutral-300 max-w-lg"
+            className="text-sm sm:text-base font-normal text-neutral-200 max-w-xl text-balance leading-relaxed"
           >
-            Fruits, Vegetables Powder and starch · Flakes · Drinking Mineral Water · Drinks &amp; Ice Creams
+            Commercial food &amp; beverage manufacturing across fruit &amp; vegetable powders, produce flakes, packaged drinking water, and beverages.
           </motion.p>
 
-          {/* Minimal Dual CTAs */}
+          {/* Emphasized Primary CTA & Direct WhatsApp */}
           <motion.div 
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex flex-wrap items-center justify-center gap-3 pt-1"
+            className="flex flex-wrap items-center justify-center gap-3.5 pt-2"
           >
             <a
-              href={desktopDivisionView === 'rotary' ? '#divisions-rotary-concept' : '#divisions'}
+              href="#divisions"
               onClick={(e) => {
                 e.preventDefault();
-                if (desktopDivisionView === 'rotary') {
-                  setRotaryDivision(0);
-                }
-                const target = document.getElementById(
-                  desktopDivisionView === 'rotary' ? 'divisions-rotary-concept' : 'divisions'
-                );
+                const target = document.getElementById('divisions');
                 if (target) {
                   const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
                   smoothScrollTo(targetY, 850);
                 }
               }}
-              className="px-5 sm:px-7 py-2.5 sm:py-3 bg-[#22c55e] hover:bg-[#16a34a] text-[#071f14] text-xs font-bold uppercase tracking-wider transition-all hover:shadow-lg flex items-center gap-1.5 cursor-pointer"
+              className="px-7 py-3.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-lg hover:shadow-xl rounded-md flex items-center gap-2 border border-emerald-500/30 group cursor-pointer"
             >
               <span>Explore Divisions</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#c2a76f] group-hover:translate-x-1 transition-transform" />
             </a>
 
             <a
               href="https://wa.me/918077622461"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 sm:px-7 py-2.5 sm:py-3 bg-black/40 hover:bg-black/60 text-white border border-white/25 text-xs font-semibold uppercase tracking-wider backdrop-blur-md transition-all flex items-center gap-1.5"
+              className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/30 text-xs font-semibold uppercase tracking-wider backdrop-blur-md transition-all rounded-md flex items-center gap-2"
             >
               <MessageSquare className="w-3.5 h-3.5 text-emerald-300" />
-              <span>WhatsApp: 8077622461</span>
+              <span className="tabular-nums">WhatsApp: 8077622461</span>
             </a>
           </motion.div>
 
@@ -1546,16 +1368,11 @@ export default function App() {
 
         {/* Subtle Scroll Indicator Above Marquee */}
         <a 
-          href={desktopDivisionView === 'rotary' ? '#divisions-rotary-concept' : '#divisions'} 
+          href="#divisions" 
           aria-label="Scroll down to divisions"
           onClick={(e) => {
             e.preventDefault();
-            if (desktopDivisionView === 'rotary') {
-              setRotaryDivision(0);
-            }
-            const target = document.getElementById(
-              desktopDivisionView === 'rotary' ? 'divisions-rotary-concept' : 'divisions'
-            );
+            const target = document.getElementById('divisions');
             if (target) {
               const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
               smoothScrollTo(targetY, 850);
@@ -1568,7 +1385,7 @@ export default function App() {
 
         {/* Continuous Looping Operational Marquee (Integrated inside Hero Section) */}
         <div className="absolute bottom-0 left-0 right-0 z-20 w-full border-t border-emerald-500/25 bg-[#071911]/90 backdrop-blur-md text-white py-2.5 sm:py-3 overflow-hidden select-none shadow-2xl">
-          <div className="animate-marquee flex items-center gap-6 text-[10px] sm:text-[11px] font-medium uppercase tracking-widest font-mono">
+          <div className="animate-marquee flex items-center gap-6 text-[10px] sm:text-[11px] font-medium uppercase tracking-widest">
             {tickerItems.map((item, idx) => (
               <div key={`hero-ticker-1-${idx}`} className="flex items-center gap-6 shrink-0">
                 <span className="text-emerald-100">{item}</span>
@@ -1585,239 +1402,177 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECTION: 4 CORE REGISTERED MANUFACTURING DIVISIONS (Mobile Default & Classic View) */}
+      {/* SECTION: 4 CERTIFIED MANUFACTURING DIVISIONS (Unified Product Showcase) */}
       <section 
         id="divisions" 
-        className={`w-full py-10 sm:py-16 px-3 sm:px-6 lg:px-12 bg-white border-b border-neutral-200 ${
-          desktopDivisionView === 'classic' ? 'block' : 'block lg:hidden'
-        }`}
+        style={{ scrollMarginTop: '64px' }}
+        className="w-full py-12 sm:py-20 px-4 sm:px-6 lg:px-12 bg-white border-b border-neutral-200"
       >
-        <div className="w-full max-w-7xl mx-auto space-y-6">
+        <div className="w-full max-w-7xl mx-auto space-y-8">
           
-          {/* Header & Horizontal Controls */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-neutral-200 pb-4">
-            <div className="space-y-1">
-              <div className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
-                Core Portfolio · 4 Registered Wings
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900">
-                Manufacturing <span className="font-serif-brand italic text-emerald-900 font-normal">Divisions</span>
-              </h2>
-            </div>
-
-            {/* Desktop View Switcher & Horizontal Swipe Affordance */}
-            <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3">
-              {/* Desktop Toggle to switch to Rotary Dial */}
-              <div className="hidden lg:flex items-center gap-1 border border-neutral-200 bg-neutral-100 p-0.5">
-                <button
-                  type="button"
-                  onClick={() => setDesktopDivisionView('rotary')}
-                  className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-neutral-600 hover:text-neutral-900 cursor-pointer"
-                >
-                  <span>Rotary Dial</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDesktopDivisionView('classic')}
-                  className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider bg-[#0a2318] text-white shadow-xs cursor-pointer"
-                >
-                  <span>Classic Slider</span>
-                </button>
-              </div>
-
-              <span className="text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 border border-emerald-900/10">
-                ← Swipe 4 Divisions →
+          {/* Section Header */}
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-neutral-200 pb-6">
+            <div className="space-y-1.5 max-w-2xl">
+              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-800 block">
+                Commercial Portfolio
               </span>
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => scrollToDivision(Math.max(0, activeDivision - 1))}
-                  disabled={activeDivision === 0}
-                  className="w-8 h-8 flex items-center justify-center border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
-                  title="Previous Division"
-                >
-                  <ChevronLeft className="w-4 h-4 text-neutral-700" />
-                </button>
-                <button
-                  onClick={() => scrollToDivision(Math.min(divisionsData.length - 1, activeDivision + 1))}
-                  disabled={activeDivision === divisionsData.length - 1}
-                  className="w-8 h-8 flex items-center justify-center border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
-                  title="Next Division"
-                >
-                  <ChevronRight className="w-4 h-4 text-neutral-700" />
-                </button>
-              </div>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-neutral-900 text-balance">
+                Four Certified Manufacturing Divisions
+              </h2>
+              <p className="text-sm text-neutral-600 leading-relaxed font-light">
+                Direct industrial processing and contract packaging across fruit &amp; vegetable powders, dehydrated produce flakes, certified packaged drinking water, and beverages.
+              </p>
+            </div>
+
+            {/* Division Counter */}
+            <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono tabular-nums text-neutral-500 bg-neutral-50 border border-neutral-200 px-3 py-1.5 rounded-md">
+              <span className="text-emerald-900 font-bold">0{activeDivision + 1}</span>
+              <span>/</span>
+              <span>04</span>
+              <span className="ml-1 text-neutral-400">DIVISIONS</span>
             </div>
           </div>
 
-          {/* MOBILE VIEW: Circle Images for Category Buttons */}
-          <div className="flex sm:hidden items-center justify-between gap-1.5 py-2 px-1 border-b border-neutral-100 overflow-x-auto no-scrollbar">
+          {/* 4 Division Selector Tabs */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
             {divisionsData.map((div, idx) => {
               const isActive = activeDivision === idx;
               return (
                 <button
                   type="button"
-                  key={`mobile-circle-${div.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    scrollToDivision(idx);
-                  }}
-                  className="flex flex-col items-center gap-1 focus:outline-hidden cursor-pointer group flex-1 min-w-[70px] max-w-[85px]"
-                  title={`Division ${div.number}: ${div.title}`}
-                >
-                  <div
-                    className={`relative w-14 h-14 rounded-full p-[2px] transition-all duration-300 ${
-                      isActive
-                        ? 'ring-2 ring-emerald-700 ring-offset-2 scale-105 shadow-md bg-emerald-700'
-                        : 'border-2 border-neutral-300 opacity-80 group-hover:opacity-100 group-hover:border-neutral-400 bg-white'
-                    }`}
-                  >
-                    <div className="w-full h-full rounded-full overflow-hidden bg-neutral-100 relative">
-                      <img
-                        src={div.image}
-                        alt={div.shortName}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    </div>
-                    {isActive && (
-                      <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-emerald-700 ring-2 ring-white" />
-                    )}
-                  </div>
-                  <span
-                    className={`text-[11px] text-center leading-tight line-clamp-2 px-0.5 transition-colors ${
-                      isActive
-                        ? 'text-emerald-950 font-bold'
-                        : 'text-neutral-600 font-medium'
-                    }`}
-                  >
-                    {div.shortName}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* DESKTOP VIEW: Sleek Tabs with Thumbnail Circles & Numbers */}
-          <div className="hidden sm:flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-            {divisionsData.map((div, idx) => {
-              const isActive = activeDivision === idx;
-              return (
-                <button
-                  type="button"
-                  key={`desktop-tab-${div.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    scrollToDivision(idx);
-                  }}
-                  className={`shrink-0 px-3.5 py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border flex items-center gap-2.5 ${
-                    isActive
-                      ? 'border-emerald-800 text-emerald-950 bg-emerald-50 shadow-2xs'
-                      : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
+                  key={`div-tab-${div.id}`}
+                  onClick={() => setActiveDivision(idx)}
+                  className={`p-3 sm:p-4 text-left transition-all duration-200 cursor-pointer rounded-lg relative border flex items-center gap-3 ${
+                    isActive 
+                      ? 'bg-[#0a2318] text-white border-[#0a2318] shadow-md ring-1 ring-emerald-500/20' 
+                      : 'bg-white text-neutral-800 border-neutral-200 hover:border-emerald-800/40 hover:bg-[#f8faf8] shadow-2xs'
                   }`}
                 >
-                  <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-neutral-300 bg-neutral-100">
-                    <img src={div.image} alt="" className="w-full h-full object-cover" />
+                  {/* Active Indicator Top Stripe (Metallic Gold) */}
+                  {isActive && (
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-[#c2a76f] rounded-t-lg" />
+                  )}
+
+                  {/* Circular Product Thumbnail */}
+                  <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden shrink-0 border transition-all ${
+                    isActive ? 'border-[#c2a76f] ring-2 ring-[#c2a76f]/30' : 'border-neutral-200 bg-neutral-100'
+                  }`}>
+                    <img src={div.image} alt={div.shortName} className="w-full h-full object-cover" />
                   </div>
-                  <span className="font-mono text-emerald-800">{div.number}.</span>
-                  <span>{div.shortName}</span>
+
+                  <div className="min-w-0">
+                    <span className={`text-[10px] font-mono tabular-nums font-bold tracking-wider block ${
+                      isActive ? 'text-[#c2a76f]' : 'text-emerald-800'
+                    }`}>
+                      DIVISION {div.number}
+                    </span>
+                    <h3 className={`text-xs sm:text-sm font-semibold truncate leading-tight mt-0.5 ${
+                      isActive ? 'text-white' : 'text-neutral-900'
+                    }`}>
+                      {div.shortName}
+                    </h3>
+                  </div>
                 </button>
               );
             })}
           </div>
 
-          {/* SILKY SMOOTH GPU-ACCELERATED SLIDING CARDS TRACK */}
-          <div 
-            className="overflow-hidden w-full relative select-none"
-            onTouchStart={handleDivisionTouchStart}
-            onTouchEnd={handleDivisionTouchEnd}
-          >
-            <div 
-              className="flex transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
-              style={{ transform: `translateX(-${activeDivision * 100}%)` }}
-            >
-              {divisionsData.map((current, idx) => {
-                const CurrentIcon = current.icon;
+          {/* Main Showcase Console (Hero Product Column + Grouped Details Column) */}
+          <div className="bg-[#fafbfa] border border-neutral-300 rounded-2xl p-4 sm:p-8 shadow-sm">
+            <AnimatePresence mode="wait">
+              {(() => {
+                const current = divisionsData[activeDivision];
                 return (
-                  <div 
-                    key={current.id}
-                    className="w-full shrink-0 px-0.5 sm:px-1"
+                  <motion.div
+                    key={`div-showcase-${current.id}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.22, ease: 'easeOut' }}
+                    className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-stretch"
                   >
-                    <div className="bg-[#fafbfa] border border-neutral-200/90 hover:border-emerald-900/30 p-5 sm:p-7 flex flex-col justify-between transition-all shadow-xs">
+                    
+                    {/* Left Column: Enlarge the Main Feature & Show the Actual Product */}
+                    <div className="lg:col-span-6 bg-white border border-neutral-200/90 rounded-xl overflow-hidden shadow-xs flex items-center justify-center p-4 sm:p-8 min-h-[340px] sm:min-h-[440px] relative group">
+                      <img 
+                        src={current.image} 
+                        alt={current.title} 
+                        className="w-full h-full max-h-[380px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                      />
                       
-                      {/* Card Header & Content */}
-                      <div className="space-y-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <div className="flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold">
-                              <CurrentIcon className="w-3.5 h-3.5 text-emerald-700" />
-                              <span>Division {current.number} · D R &amp; Sons International</span>
-                            </div>
-                            <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight mt-1">
-                              {current.title}
-                            </h3>
-                          </div>
-                          <span className="font-mono text-lg font-bold text-neutral-300">
-                            {current.number}
-                          </span>
-                        </div>
+                      {/* Subtle Corner Badge */}
+                      <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/95 backdrop-blur-sm border border-neutral-200 rounded-md shadow-2xs text-[11px] font-mono tabular-nums text-neutral-700">
+                        <strong className="text-emerald-900">0{current.number}</strong> · Commercial Pack
+                      </div>
+                    </div>
 
-                        {/* Image & Tagline Split */}
-                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
-                          <div className="sm:col-span-5 overflow-hidden border border-neutral-200 bg-white shadow-2xs">
-                            <img 
-                              src={current.image} 
-                              alt={current.title} 
-                              className="w-full aspect-16/9 sm:h-44 object-cover object-center hover:scale-105 transition-transform duration-500"
-                            />
-                          </div>
-                          <div className="sm:col-span-7 space-y-2">
-                            <p className="text-xs text-neutral-700 leading-relaxed">
-                              {current.summary}
-                            </p>
-                            
-                            {/* Compact Key Item Chips */}
-                            <div className="flex flex-wrap gap-1.5 pt-1">
-                              {current.keyItems.map((item, i) => (
-                                <span key={i} className="px-2 py-0.5 bg-white border border-neutral-200 text-[11px] text-neutral-800 font-medium">
-                                  {item}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Technical Specs Tags */}
-                        <div className="pt-2 border-t border-neutral-200/80">
-                          <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 mb-1.5">
-                            Technical Highlights:
-                          </div>
-                          <div className="grid grid-cols-2 gap-1.5 text-[11px] text-neutral-700">
-                            {current.specs.map((spec, i) => (
-                              <div key={i} className="flex items-center gap-1.5 bg-white px-2 py-1 border border-neutral-200/60">
-                                <Check className="w-3 h-3 text-emerald-700 shrink-0" />
-                                <span className="truncate">{spec}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
+                    {/* Right Column: Group with Spacing (No Empty Space!) */}
+                    <div className="lg:col-span-6 flex flex-col justify-between space-y-5">
+                      
+                      {/* Group 1: Identity & Value Proposition */}
+                      <div className="space-y-2">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-800 block">
+                          Certified Industrial Wing
+                        </span>
+                        <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 leading-snug text-balance">
+                          {current.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed font-normal">
+                          {current.summary}
+                        </p>
                       </div>
 
-                      {/* Card Bottom Actions */}
-                      <div className="pt-4 mt-4 border-t border-neutral-200 flex items-center justify-between gap-3">
-                        <a
-                          href="#inquiry-desk"
-                          onClick={() => setInquiryForm({...inquiryForm, division: current.title})}
-                          className="px-4 py-2 bg-[#143e2b] hover:bg-[#0c271b] text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                      {/* Group 2: Key Deliverables & Products */}
+                      <div className="space-y-2">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500 block">
+                          Commercial Deliverables
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {current.keyItems.map((item, i) => (
+                            <span 
+                              key={i} 
+                              className="px-2.5 py-1 bg-white border border-neutral-200 rounded-md text-xs text-neutral-800 font-medium shadow-2xs"
+                            >
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Group 3: Verified Technical Specifications (2x2 Grid) */}
+                      <div className="space-y-2">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500 block">
+                          Process Standards
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                          {current.specs.map((spec, i) => (
+                            <div 
+                              key={i} 
+                              className="flex items-center gap-2 p-2.5 bg-white border border-neutral-200/80 rounded-md text-neutral-800 font-medium"
+                            >
+                              <Check className="w-3.5 h-3.5 text-emerald-700 shrink-0 stroke-[2]" />
+                              <span className="truncate">{spec}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Group 4: Emphasized Primary CTA & Direct WhatsApp */}
+                      <div className="pt-4 border-t border-neutral-200/80 flex flex-wrap items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => handleFacilityInquiry(current.title)}
+                          className="px-6 py-3 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-sm hover:shadow-md rounded-md flex items-center gap-2 group cursor-pointer"
                         >
-                          <span>Get Quote</span>
-                          <ArrowRight className="w-3 h-3" />
-                        </a>
+                          <span>Request Division Quote</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-[#c2a76f] group-hover:translate-x-1 transition-transform" />
+                        </button>
 
                         <a
                           href={`https://wa.me/918077622461?text=${encodeURIComponent(`Hi D R & Sons Trade Desk, I am inquiring about Division ${current.number}: ${current.title}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-900 hover:text-emerald-950"
+                          className="px-4 py-3 bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-300 text-xs font-semibold uppercase tracking-wider transition-all rounded-md flex items-center gap-2 shadow-2xs"
                         >
                           <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
                           <span>WhatsApp Desk</span>
@@ -1825,369 +1580,11 @@ export default function App() {
                       </div>
 
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
 
-          {/* Smooth Pagination Indicators */}
-          <div className="flex items-center justify-center gap-2 pt-2">
-            {divisionsData.map((div, idx) => (
-              <button
-                type="button"
-                key={`indicator-${div.id}`}
-                onClick={() => scrollToDivision(idx)}
-                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  activeDivision === idx ? 'w-8 bg-emerald-700' : 'w-2 bg-neutral-300 hover:bg-neutral-400'
-                }`}
-                aria-label={`Go to Division ${div.number}`}
-              />
-            ))}
-          </div>
-
-        </div>
-      </section>
-
-      {/* SECTION: ROTARY SEMI-CIRCLE DIVISION DIAL (Desktop View - White Theme - Left Screen Aligned) */}
-      <section 
-        id="divisions-rotary-concept" 
-        ref={rotarySectionRef}
-        style={{ scrollMarginTop: '64px' }}
-        className={`w-full py-3 bg-white border-b border-neutral-200 relative overflow-hidden select-none h-[calc(100vh-64px)] min-h-[560px] flex flex-col justify-between ${
-          desktopDivisionView === 'rotary' ? 'hidden lg:flex' : 'hidden'
-        }`}
-      >
-        {/* Subtle Background Engineering Grid */}
-        <div className="absolute inset-0 bg-[radial-gradient(#15803d_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
-        <div className="absolute -left-36 top-1/2 -translate-y-1/2 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col flex-1 h-full min-h-0 relative z-10 justify-between">
-
-          {/* Section Header */}
-          <div className="flex items-center justify-between border-b border-neutral-200 pb-2.5 shrink-0">
-            <div>
-              <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-800 font-bold block mb-0.5">
-                Core Portfolio · 4 Registered Divisions
-              </span>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 leading-tight">
-                Manufacturing <span className="font-serif-brand italic text-emerald-950 font-normal">Divisions</span>
-              </h2>
-            </div>
-
-            <div className="font-mono text-xs text-neutral-400 font-bold">
-              <span className="text-emerald-900">0{rotaryDivision + 1}</span>
-              <span className="mx-1">/</span>
-              <span>04</span>
-            </div>
-          </div>
-
-          {/* MAIN ROTARY DIAL WORKSPACE: Left Semi-Circle Arc Flush Left + Directly Attached Widescreen Detail Box */}
-          <div className="relative w-full flex-1 min-h-0 flex items-stretch overflow-visible my-2">
-
-            {/* LEFT COLUMN: THE SEMI-CIRCLE ROTARY ARC (Flush with Left Side of Screen - Draggable) */}
-            <div 
-              ref={arcContainerRef}
-              className="w-[220px] shrink-0 h-full relative cursor-grab active:cursor-grabbing select-none overflow-visible z-20 flex items-center"
-              onMouseDown={handleArcMouseDown}
-              onMouseMove={handleArcMouseMove}
-              onMouseUp={handleArcMouseUp}
-              onMouseLeave={handleArcMouseUp}
-            >
-              {(() => {
-                const centerY = arcHeight / 2;
-                const hubX = 6;
-                const radius = 214;
-                return (
-                  <>
-                    {/* Semi-Circle SVG Track on Left Side of Screen */}
-                    <svg 
-                      className="absolute inset-0 w-full h-full pointer-events-none" 
-                      fill="none"
-                    >
-                      {/* Outer decorative dashed trajectory arc */}
-                      <path 
-                        d={`M ${hubX} ${centerY - (radius + 18)} A ${radius + 18} ${radius + 18} 0 0 1 ${hubX} ${centerY + (radius + 18)}`}
-                        stroke="#e2e8f0" 
-                        strokeWidth="1.5" 
-                        strokeDasharray="4 6" 
-                      />
-
-                      {/* Primary Solid Semi-Circle Guide Line */}
-                      <path 
-                        d={`M ${hubX} ${centerY - radius} A ${radius} ${radius} 0 0 1 ${hubX} ${centerY + radius}`}
-                        stroke="url(#semiCircleWhiteGradient)" 
-                        strokeWidth="3.5" 
-                        strokeLinecap="round" 
-                      />
-
-                      {/* Inner precision tick marks arc */}
-                      <path 
-                        d={`M ${hubX} ${centerY - (radius - 28)} A ${radius - 28} ${radius - 28} 0 0 1 ${hubX} ${centerY + (radius - 28)}`}
-                        stroke="#10b981" 
-                        strokeWidth="1" 
-                        strokeDasharray="3 5" 
-                        opacity="0.3" 
-                      />
-
-                      {/* Center Hub Marker on far left edge */}
-                      <circle cx={hubX} cy={centerY} r="10" fill="#ecfdf5" stroke="#059669" strokeWidth="2" />
-                      <circle cx={hubX} cy={centerY} r="4" fill="#047857" />
-
-                      {/* Direct Dock Connector Beam attaching straight into description card socket */}
-                      <line 
-                        x1={hubX + radius - 10} 
-                        y1={centerY} 
-                        x2={hubX + radius} 
-                        y2={centerY} 
-                        stroke="#059669" 
-                        strokeWidth="3.5" 
-                        strokeDasharray="3 3"
-                      />
-
-                      {/* Gradient Definitions */}
-                      <defs>
-                        <linearGradient id="semiCircleWhiteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
-                          <stop offset="50%" stopColor="#047857" stopOpacity="1" />
-                          <stop offset="100%" stopColor="#10b981" stopOpacity="0.4" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
-
-                    {/* ROTARY NODES (Circular Shape Photos attached along the arc) */}
-                    <div className="relative w-full h-full">
-                      {divisionsData.map((div, idx) => {
-                        const isActive = rotaryDivision === idx;
-                        const delta = idx - rotaryDivision;
-                        // Separation of 36 degrees per division for full vertical spread
-                        const angleDeg = delta * 36;
-                        const angleRad = (angleDeg * Math.PI) / 180;
-                        
-                        // Radius = 214px, Center = (hubX, centerY) - Flush with left screen edge
-                        const nodeX = hubX + radius * Math.cos(angleRad);
-                        const nodeY = centerY + radius * Math.sin(angleRad);
-                        
-                        // Hide items rotating too far out of frame
-                        const isVisible = Math.abs(delta) <= 2;
-
-                        return (
-                          <motion.div
-                            key={`rotary-node-white-${div.id}`}
-                            initial={false}
-                            animate={{
-                              x: nodeX,
-                              y: nodeY,
-                              scale: isActive ? 1.15 : 0.82,
-                              opacity: isVisible ? 1 : 0,
-                              zIndex: isActive ? 40 : 20 - Math.abs(delta)
-                            }}
-                            transition={{ type: 'spring', stiffness: 260, damping: 25 }}
-                            className="absolute -top-11 -left-11 cursor-pointer"
-                            onClick={() => setRotaryDivision(idx)}
-                          >
-                            {/* Circular Shape Photo Container */}
-                            <div className="relative group">
-                              <div
-                                className={`w-22 h-22 rounded-full p-1 transition-all duration-300 relative ${
-                                  isActive
-                                    ? 'ring-4 ring-emerald-600 ring-offset-2 ring-offset-white shadow-xl scale-105 bg-white'
-                                    : 'border-2 border-neutral-300 bg-white opacity-70 group-hover:opacity-100 group-hover:border-emerald-600 group-hover:scale-105 shadow-2xs'
-                                }`}
-                              >
-                                {/* Inner Circular Image */}
-                                <div className="w-full h-full rounded-full overflow-hidden bg-neutral-100 relative">
-                                  <img
-                                    src={div.image}
-                                    alt={div.shortName}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                  />
-                                  {!isActive && (
-                                    <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
-                                  )}
-                                </div>
-
-                                {/* Division Number Pill Badge */}
-                                <span
-                                  className={`absolute -top-1 -right-0.5 px-1.5 py-0.5 font-mono text-[9px] font-bold rounded-xs border transition-colors ${
-                                    isActive
-                                      ? 'bg-[#0a2318] text-white border-emerald-500 shadow-xs'
-                                      : 'bg-neutral-100 text-neutral-700 border-neutral-300'
-                                  }`}
-                                >
-                                  {div.number}
-                                </span>
-
-                                {/* Active Focal Indicator Ping */}
-                                {isActive && (
-                                  <span className="absolute -right-1 top-1/2 -translate-y-1/2 w-3 h-3 bg-emerald-600 rounded-full ring-2 ring-white animate-ping" />
-                                )}
-                              </div>
-
-                              {/* Title Tooltip on inactive hover */}
-                              {!isActive && (
-                                <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap z-50">
-                                  <div className="px-2 py-0.5 bg-[#0a2318] text-white text-[10px] font-mono rounded-xs shadow-md border border-emerald-800">
-                                    {div.shortName}
-                                  </div>
-                                </div>
-                              )}
-
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  </>
+                  </motion.div>
                 );
               })()}
-
-            </div>
-
-            {/* RIGHT COLUMN: ATTACHED WIDESCREEN SPECIFICATIONS & COMMERCE DETAIL BOX */}
-            <div className="flex-1 min-w-0 h-full relative z-10">
-              <AnimatePresence mode="wait">
-                {(() => {
-                  const current = divisionsData[rotaryDivision];
-                  return (
-                    <motion.div
-                      key={`rotary-detail-box-wide-${current.id}`}
-                      initial={{ opacity: 0, x: 16 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -16 }}
-                      transition={{ duration: 0.22, ease: 'easeOut' }}
-                      className="bg-white border border-emerald-900/20 p-5 sm:p-6 lg:p-7 shadow-[0_20px_50px_-15px_rgba(7,31,20,0.1),0_0_0_1px_rgba(5,150,105,0.12)] relative h-full flex flex-col justify-between hover:border-emerald-600/40 transition-all overflow-hidden"
-                    >
-                      {/* Top Accent Gradient Line */}
-                      <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-emerald-600 via-emerald-400 to-[#0a2318]" />
-
-                      {/* Physical Docking Notch connecting circle to card */}
-                      <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-4.5 h-32 bg-[#0a2318] border-y border-l border-emerald-500/50 rounded-l-lg pointer-events-none flex flex-col items-center justify-around py-3 shadow-md z-20">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                        <div className="w-1 h-14 bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600 rounded-full" />
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      </div>
-
-                      {/* Card Header Row */}
-                      <div className="flex items-center justify-between gap-3 border-b border-neutral-200/80 pb-3 shrink-0">
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <span className="px-2 py-0.5 bg-emerald-900 text-white font-mono text-[9px] font-bold tracking-widest uppercase">
-                              DIV 0{current.number}
-                            </span>
-                            <span className="text-[10px] font-mono tracking-widest text-emerald-800 font-bold uppercase">
-                              D R &amp; SONS REGISTERED INDUSTRIAL WING
-                            </span>
-                          </div>
-                          <h3 className="text-xl sm:text-2xl font-black text-[#071f14] tracking-tight truncate leading-tight">
-                            {current.title}
-                          </h3>
-                        </div>
-
-                        <div className="shrink-0 flex items-center gap-2 font-mono">
-                          <span className="hidden sm:inline-flex items-center px-2.5 py-1 bg-emerald-50 text-emerald-900 border border-emerald-800/20 text-[10px] font-bold tracking-wider">
-                            FSSAI · BIS IS 14543
-                          </span>
-                          <span className="px-3 py-1 bg-[#0a2318] text-white text-xs font-bold font-mono tracking-wider shadow-xs border border-emerald-500/40">
-                            SKU #{current.number}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* 2-Column Content Architecture across Full Screen Width (Photo Showcase + Technical Specifications) */}
-                      <div className="grid grid-cols-12 gap-6 items-stretch flex-1 py-3 min-h-0">
-                        
-                        {/* Sub-Panel 1 (6 Cols - 50% Width): Large Showcase Facility Photo & Commercial Key Deliverables */}
-                        <div className="col-span-6 flex flex-col justify-between h-full space-y-2.5 border-r border-neutral-200/80 pr-6">
-                          <div className="relative group flex-1 min-h-[240px] overflow-hidden border border-neutral-300 shadow-sm bg-neutral-900">
-                            <img 
-                              src={current.image} 
-                              alt={current.title} 
-                              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                            />
-                            <div className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-black/80 backdrop-blur-md font-mono text-[9px] uppercase tracking-wider text-emerald-300 border border-white/20 font-bold flex items-center gap-1.5 shadow-xs">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                              <span>Direct Facility Line</span>
-                            </div>
-                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 py-2 text-white">
-                              <span className="text-[10px] font-mono tracking-wide text-white/95 font-semibold block truncate">Cleanroom Continuous Processing · Batch Certified</span>
-                            </div>
-                          </div>
-
-                          {/* Commercial Deliverables Chips */}
-                          <div className="space-y-1.5 shrink-0 pt-1">
-                            <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-neutral-500 font-bold">
-                              <span>Commercial Deliverables:</span>
-                              <span className="text-emerald-800 font-semibold">Bulk Supply</span>
-                            </div>
-                            <div className="flex flex-wrap gap-1.5">
-                              {current.keyItems.map((item, i) => (
-                                <span 
-                                  key={i} 
-                                  className="px-2.5 py-1 bg-neutral-50 hover:bg-emerald-50 border border-neutral-200 hover:border-emerald-600 text-[10px] text-neutral-800 font-medium shadow-2xs truncate max-w-[240px] transition-colors"
-                                >
-                                  {item}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Sub-Panel 2 (6 Cols - 50% Width): Tagline, Summary, Specs 2x2, Applications Bar & Quality Assurance */}
-                        <div className="col-span-6 flex flex-col justify-between h-full space-y-3 pl-2">
-                          {/* Tagline & Summary */}
-                          <div className="space-y-1.5 shrink-0">
-                            <p className="text-base sm:text-lg font-serif-brand italic font-semibold text-emerald-950 leading-snug">
-                              “{current.tagline}”
-                            </p>
-                            <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed">
-                              {current.summary}
-                            </p>
-                          </div>
-
-                          {/* 2x2 Technical Process Highlights */}
-                          <div className="space-y-2 flex-1 flex flex-col justify-center">
-                            <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-neutral-500 font-bold border-b border-neutral-100 pb-1">
-                              <span className="text-neutral-600">Verified Process Highlights</span>
-                              <span className="text-emerald-800">ISO 22000 Quality Gate</span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2.5 text-xs">
-                              {current.specs.slice(0, 4).map((spec, i) => (
-                                <div key={i} className="flex items-center gap-2.5 bg-[#f8faf8] px-3.5 py-2.5 border border-emerald-900/10 shadow-2xs hover:border-emerald-600/40 transition-colors">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
-                                  <span className="truncate text-xs font-semibold text-neutral-800">{spec}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Commercial Applications Info Bar */}
-                          <div className="bg-gradient-to-r from-emerald-50 via-emerald-50/50 to-white px-3.5 py-2.5 border-l-3 border-emerald-700 flex items-center gap-2 shadow-2xs shrink-0">
-                            <span className="font-mono text-emerald-950 font-bold text-[10px] uppercase tracking-wider shrink-0">
-                              Applications:
-                            </span>
-                            <span className="truncate text-xs text-neutral-800 font-medium">{current.applications}</span>
-                          </div>
-
-                          {/* Quality Assurance & Production Compliance Bar */}
-                          <div className="flex items-center justify-between pt-2 border-t border-neutral-200/80 text-[10px] font-mono text-neutral-500 shrink-0">
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                              <span className="text-emerald-900 font-bold uppercase tracking-wider">Quality Assurance:</span>
-                              <span>100% Batch Testing &amp; COA Verified</span>
-                            </div>
-                            <span className="text-emerald-800 font-semibold uppercase tracking-wider">FSSAI · BIS IS 14543</span>
-                          </div>
-                        </div>
-
-                      </div>
-
-                    </motion.div>
-                  );
-                })()}
-              </AnimatePresence>
-            </div>
-
+            </AnimatePresence>
           </div>
 
         </div>
@@ -2208,19 +1605,19 @@ export default function App() {
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
                 <span className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-semibold block">
-                  Industrial Workflow &amp; Technical Architecture
+                  Industrial Architecture
                 </span>
               </div>
-              <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-neutral-900">
-                Production <span className="font-serif-brand italic text-emerald-900 font-normal">Infrastructure &amp; Process Pipeline</span>
+              <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-neutral-900 text-balance">
+                Production Facilities &amp; Process Pipeline
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-light">
+              <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed font-normal">
                 Explore our commercial manufacturing workflow across 4 industrial processing lines, tracing raw intake through precision thermal and mechanical transformation to sealed, certified commercial goods.
               </p>
             </div>
 
             <div className="hidden lg:flex items-center gap-2.5 text-xs font-mono">
-              <span className="px-3 py-1.5 bg-white border border-neutral-200 text-neutral-600 shadow-2xs">
+              <span className="px-3 py-1.5 bg-white border border-neutral-200 text-neutral-700 shadow-2xs rounded-md">
                 Cleanroom Standard: <strong className="text-emerald-900 font-bold">{currentFacilityLine.cleanroomClass}</strong>
               </span>
             </div>
@@ -2242,7 +1639,7 @@ export default function App() {
                       setSelectedFacilityLine(idx);
                       setSelectedFacilityStage(0);
                     }}
-                    className={`p-4 border text-left transition-all duration-200 cursor-pointer relative rounded-sm ${
+                    className={`p-4 border text-left transition-all duration-200 cursor-pointer relative rounded-xl ${
                       isSelected 
                         ? 'bg-[#0a2318] text-white border-[#0a2318] shadow-lg ring-1 ring-emerald-500/30' 
                         : 'bg-white text-neutral-800 border-neutral-200 hover:border-emerald-800/40 hover:bg-[#f6f9f7] shadow-xs'
@@ -2250,16 +1647,16 @@ export default function App() {
                   >
                     {/* Active Indicator Top Stripe (Metallic Gold / Emerald Glow) */}
                     {isSelected && (
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c2a76f] via-emerald-400 to-[#c2a76f] rounded-t-sm" />
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c2a76f] via-emerald-400 to-[#c2a76f] rounded-t-xl" />
                     )}
                     
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <span className={`text-[10px] font-mono font-bold tracking-wider ${
                         isSelected ? 'text-[#c2a76f]' : 'text-emerald-800'
                       }`}>
-                        LINE {line.number}
+                        LINE <span className="tabular-nums font-mono">{line.number}</span>
                       </span>
-                      <div className={`w-7 h-7 flex items-center justify-center rounded-sm ${
+                      <div className={`w-7 h-7 flex items-center justify-center rounded-lg ${
                         isSelected ? 'bg-white/10 text-emerald-300 border border-white/15' : 'bg-emerald-50 text-emerald-900 border border-emerald-900/10'
                       }`}>
                         <LineIcon className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -2271,13 +1668,13 @@ export default function App() {
                     }`}>
                       {line.shortTitle}
                     </h3>
-                    <p className={`text-[11px] mt-0.5 line-clamp-1 font-mono ${
-                      isSelected ? 'text-neutral-300' : 'text-neutral-500'
+                    <p className={`text-[11px] mt-0.5 line-clamp-1 ${
+                      isSelected ? 'text-neutral-300' : 'text-neutral-600'
                     }`}>
                       {line.division}
                     </p>
-                    <span className={`text-[10px] font-mono block mt-1.5 truncate ${
-                      isSelected ? 'text-emerald-400 font-semibold' : 'text-neutral-400'
+                    <span className={`text-[10px] font-mono block mt-1.5 truncate tabular-nums ${
+                      isSelected ? 'text-emerald-400 font-semibold' : 'text-neutral-500'
                     }`}>
                       {line.capacity}
                     </span>
@@ -2287,21 +1684,21 @@ export default function App() {
             </div>
 
             {/* Main Unified Console Card */}
-            <div className="bg-white border border-neutral-300 rounded-lg shadow-[0_20px_50px_-20px_rgba(10,35,24,0.1)] overflow-hidden">
+            <div className="bg-white border border-neutral-200 rounded-2xl shadow-xl overflow-hidden">
               
               {/* Process Conduit Scrubber Bar (5 Stages) */}
               <div className="px-6 py-4 bg-[#f8faf8] border-b border-neutral-200">
                 <div className="flex items-center justify-between text-xs font-mono mb-3">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-neutral-900 uppercase">
-                      Line {currentFacilityLine.number} Workflow:
+                      Line <span className="tabular-nums">{currentFacilityLine.number}</span> Workflow:
                     </span>
-                    <span className="text-emerald-800 font-semibold">
+                    <span className="text-emerald-800 font-semibold font-sans">
                       {currentFacilityLine.shortTitle}
                     </span>
                   </div>
-                  <span className="text-[11px] text-neutral-500">
-                    Stage {currentFacilityStage.stepNumber} of 05 · <strong className="text-neutral-800">{currentFacilityStage.stepLabel}</strong>
+                  <span className="text-[11px] text-neutral-600">
+                    Stage <strong className="tabular-nums font-mono text-neutral-900">{currentFacilityStage.stepNumber}</strong> of 05 · <strong className="text-neutral-900 font-sans">{currentFacilityStage.stepLabel}</strong>
                   </span>
                 </div>
 
@@ -2338,17 +1735,17 @@ export default function App() {
                                 ? 'bg-[#0a2318] text-white ring-4 ring-[#c2a76f]/40 shadow-md scale-110'
                                 : isPast
                                 ? 'bg-emerald-700 text-white shadow-xs'
-                                : 'bg-white border-2 border-neutral-300 text-neutral-500 group-hover:border-emerald-600 group-hover:text-neutral-800'
+                                : 'bg-white border-2 border-neutral-300 text-neutral-600 group-hover:border-emerald-600 group-hover:text-neutral-900'
                             }`}
                           >
-                            {isPast ? <Check className="w-3.5 h-3.5 stroke-[2.5]" /> : stg.stepNumber}
+                            {isPast ? <Check className="w-3.5 h-3.5 stroke-[2.5]" /> : <span className="tabular-nums">{stg.stepNumber}</span>}
                           </div>
                           
                           <span 
-                            className={`text-[11px] font-mono mt-1.5 whitespace-nowrap transition-colors max-w-[110px] text-center truncate ${
+                            className={`text-[11px] mt-1.5 whitespace-nowrap transition-colors max-w-[120px] text-center truncate ${
                               isActive
                                 ? 'text-emerald-950 font-bold'
-                                : 'text-neutral-500 group-hover:text-neutral-800 font-medium'
+                                : 'text-neutral-600 group-hover:text-neutral-900 font-medium'
                             }`}
                           >
                             {stg.stepLabel}
@@ -2370,11 +1767,11 @@ export default function App() {
                   <div className="space-y-4">
                     {/* Phase Header Badge */}
                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 pb-3">
-                      <span className="px-2.5 py-1 bg-emerald-50 text-emerald-900 border border-emerald-900/15 font-mono text-[10px] font-bold tracking-wider uppercase rounded-xs">
+                      <span className="px-2.5 py-1 bg-emerald-50 text-emerald-900 border border-emerald-900/15 font-mono text-[10px] font-bold tracking-wider uppercase rounded-md">
                         {currentFacilityStage.phase}
                       </span>
-                      <span className="text-[11px] font-mono text-neutral-400 uppercase">
-                        LINE {currentFacilityLine.number} // {currentFacilityLine.id.toUpperCase()}
+                      <span className="text-[11px] font-mono text-neutral-500 uppercase">
+                        Stage <span className="tabular-nums font-bold text-neutral-800">{currentFacilityStage.stepNumber}</span> of 05
                       </span>
                     </div>
 
@@ -2388,17 +1785,17 @@ export default function App() {
                         transition={{ duration: 0.22, ease: 'easeOut' }}
                         className="space-y-3.5"
                       >
-                        <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 leading-snug">
+                        <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 leading-snug text-balance">
                           {currentFacilityStage.title}
                         </h3>
 
-                        <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-light">
+                        <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed font-normal">
                           {currentFacilityStage.summary}
                         </p>
 
                         {/* Highlight Callout */}
                         {currentFacilityStage.highlight && (
-                          <div className="p-3 bg-emerald-50/60 border-l-2 border-emerald-700 text-xs text-emerald-950 font-medium leading-relaxed rounded-r-xs">
+                          <div className="p-3 bg-emerald-50/70 border-l-2 border-emerald-700 text-xs text-emerald-950 font-medium leading-relaxed rounded-r-md">
                             {currentFacilityStage.highlight}
                           </div>
                         )}
@@ -2408,13 +1805,13 @@ export default function App() {
                           {currentFacilityStage.telemetry.map((t, tIdx) => (
                             <div 
                               key={`tel-${selectedFacilityLine}-${selectedFacilityStage}-${tIdx}`} 
-                              className="p-2.5 sm:p-3 border border-neutral-200 bg-[#fafbfa] rounded-xs"
+                              className="p-2.5 sm:p-3 border border-neutral-200 bg-[#fafbfa] rounded-lg"
                             >
                               <div className="flex items-center justify-between gap-1 text-[10px] font-mono uppercase text-neutral-500">
                                 <span className="truncate">{t.label}</span>
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                               </div>
-                              <span className="text-xs font-mono font-bold text-neutral-900 block mt-1 truncate">
+                              <span className="text-xs font-mono font-bold text-neutral-900 block mt-1 truncate tabular-nums">
                                 {t.value}
                               </span>
                             </div>
@@ -2422,7 +1819,7 @@ export default function App() {
                         </div>
 
                         {/* QA Standard Protocol */}
-                        <div className="flex items-center gap-2 pt-2 text-xs font-mono text-neutral-600 border-t border-neutral-100">
+                        <div className="flex items-center gap-2 pt-2 text-xs font-mono text-neutral-700 border-t border-neutral-100">
                           <ShieldCheck className="w-4 h-4 text-emerald-800 shrink-0" />
                           <span className="truncate">QA Standard: <strong className="text-neutral-900">{currentFacilityStage.qaStandard}</strong></span>
                         </div>
@@ -2437,7 +1834,7 @@ export default function App() {
                         type="button"
                         disabled={selectedFacilityStage === 0}
                         onClick={handlePrevFacilityStage}
-                        className={`px-3 py-1.5 text-xs font-mono border flex items-center gap-1.5 transition-all rounded-xs ${
+                        className={`px-3 py-1.5 text-xs font-mono border flex items-center gap-1.5 transition-all rounded-md ${
                           selectedFacilityStage === 0
                             ? 'opacity-30 cursor-not-allowed bg-neutral-100 text-neutral-400 border-neutral-200'
                             : 'bg-white hover:bg-neutral-50 text-neutral-800 border-neutral-300 cursor-pointer shadow-2xs active:scale-95'
@@ -2447,7 +1844,7 @@ export default function App() {
                         <span>Prev Stage</span>
                       </button>
 
-                      <span className="text-xs font-mono text-neutral-500 px-2 font-bold">
+                      <span className="text-xs font-mono text-neutral-600 px-2 font-bold tabular-nums">
                         {currentFacilityStage.stepNumber} / 05
                       </span>
 
@@ -2455,7 +1852,7 @@ export default function App() {
                         type="button"
                         disabled={selectedFacilityStage === totalFacilityStages - 1}
                         onClick={handleNextFacilityStage}
-                        className={`px-3 py-1.5 text-xs font-mono border flex items-center gap-1.5 transition-all rounded-xs ${
+                        className={`px-3 py-1.5 text-xs font-mono border flex items-center gap-1.5 transition-all rounded-md ${
                           selectedFacilityStage === totalFacilityStages - 1
                             ? 'opacity-30 cursor-not-allowed bg-neutral-100 text-neutral-400 border-neutral-200'
                             : 'bg-white hover:bg-neutral-50 text-neutral-800 border-neutral-300 cursor-pointer shadow-2xs active:scale-95'
@@ -2469,10 +1866,10 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => handleFacilityInquiry(`${currentFacilityLine.division} - Stage ${currentFacilityStage.stepNumber}: ${currentFacilityStage.title}`)}
-                      className="px-4 py-2 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-colors shadow-xs rounded-xs"
+                      className="px-4 py-2 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-colors shadow-xs rounded-md group"
                     >
                       <span>Inquire for Stage {currentFacilityStage.stepNumber}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-[#c2a76f]" />
+                      <ArrowRight className="w-3.5 h-3.5 text-[#c2a76f] group-hover:translate-x-0.5 transition-transform" />
                     </button>
                   </div>
 
@@ -2500,10 +1897,10 @@ export default function App() {
 
                   {/* Top Overlay Pill */}
                   <div className="relative z-10 p-4 sm:p-5 flex items-center justify-between">
-                    <span className="px-2.5 py-1 bg-black/60 backdrop-blur-md border border-white/20 text-white font-mono text-[10px] font-bold uppercase tracking-wider rounded-xs">
-                      STAGE {currentFacilityStage.stepNumber} // 05
+                    <span className="px-2.5 py-1 bg-black/60 backdrop-blur-md border border-white/20 text-white font-mono text-[10px] font-bold uppercase tracking-wider rounded-md">
+                      STAGE <span className="tabular-nums font-mono">{currentFacilityStage.stepNumber}</span> / 05
                     </span>
-                    <span className="px-2.5 py-1 bg-emerald-950/80 backdrop-blur-md border border-emerald-500/30 text-emerald-300 font-mono text-[10px] uppercase font-bold tracking-wider rounded-xs">
+                    <span className="px-2.5 py-1 bg-emerald-950/80 backdrop-blur-md border border-emerald-500/30 text-emerald-300 font-mono text-[10px] uppercase font-bold tracking-wider rounded-md tabular-nums">
                       {currentFacilityLine.capacity}
                     </span>
                   </div>
@@ -2514,7 +1911,7 @@ export default function App() {
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       <span>{currentFacilityLine.cleanroomClass}</span>
                     </div>
-                    <div className="text-neutral-200 font-light text-[11px] line-clamp-2 leading-relaxed">
+                    <div className="text-neutral-100 font-normal text-[11px] line-clamp-2 leading-relaxed">
                       {currentFacilityLine.equipment}
                     </div>
                   </div>
@@ -2542,29 +1939,29 @@ export default function App() {
                       setSelectedFacilityLine(idx);
                       setSelectedFacilityStage(0);
                     }}
-                    className={`px-3 py-2 text-xs font-mono whitespace-nowrap border shrink-0 transition-all rounded-xs cursor-pointer flex items-center gap-1.5 ${
+                    className={`px-3 py-2 text-xs font-mono whitespace-nowrap border shrink-0 transition-all rounded-lg cursor-pointer flex items-center gap-1.5 ${
                       isSelected
                         ? 'bg-[#0a2318] text-white border-[#0a2318] font-bold shadow-xs'
                         : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-400'
                     }`}
                   >
-                    <span className={isSelected ? 'text-[#c2a76f]' : 'text-neutral-400 font-bold'}>
+                    <span className={`tabular-nums font-mono ${isSelected ? 'text-[#c2a76f]' : 'text-neutral-400 font-bold'}`}>
                       0{line.number}
                     </span>
-                    <span>{line.shortTitle}</span>
+                    <span className="font-sans font-medium">{line.shortTitle}</span>
                   </button>
                 );
               })}
             </div>
 
             {/* 2. 5-Segment Touchable Progress Indicator Bar */}
-            <div className="bg-white border border-neutral-300 p-3 rounded-lg shadow-2xs space-y-2">
-              <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-neutral-500 font-medium truncate">
-                  Line {currentFacilityLine.number} · {currentFacilityLine.shortTitle}
+            <div className="bg-white border border-neutral-200 p-3.5 rounded-xl shadow-2xs space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-neutral-600 font-medium truncate">
+                  Line <span className="tabular-nums font-mono font-bold">{currentFacilityLine.number}</span> · {currentFacilityLine.shortTitle}
                 </span>
-                <span className="text-emerald-900 font-bold shrink-0">
-                  Stage {currentFacilityStage.stepNumber} of 05
+                <span className="text-emerald-900 font-bold shrink-0 font-mono text-[11px]">
+                  Stage <span className="tabular-nums">{currentFacilityStage.stepNumber}</span> of 05
                 </span>
               </div>
 
@@ -2590,7 +1987,7 @@ export default function App() {
 
             {/* 3. Native In-Page Swipeable Stage Card */}
             <div
-              className="bg-white border border-neutral-300 rounded-lg shadow-md overflow-hidden select-none touch-pan-y"
+              className="bg-white border border-neutral-200 rounded-2xl shadow-md overflow-hidden select-none touch-pan-y"
               style={{ WebkitOverflowScrolling: 'touch' }}
               onTouchStart={(e) => {
                 facilityTouchStart.current = {
@@ -2632,17 +2029,17 @@ export default function App() {
                     
                     {/* Top Badges */}
                     <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                      <span className="bg-[#0a2318] text-white font-mono text-[10px] font-bold px-2 py-0.5 border border-emerald-500/40 rounded-xs shadow-xs">
-                        STAGE 0{currentFacilityStage.stepNumber} / 05
+                      <span className="bg-[#0a2318] text-white font-mono text-[10px] font-bold px-2 py-0.5 border border-emerald-500/40 rounded-md shadow-xs">
+                        STAGE <span className="tabular-nums">0{currentFacilityStage.stepNumber}</span> / 05
                       </span>
-                      <span className="bg-black/70 backdrop-blur-md text-emerald-300 font-mono text-[9px] px-2 py-0.5 border border-white/20 rounded-xs">
+                      <span className="bg-black/70 backdrop-blur-md text-emerald-300 font-mono text-[9px] px-2 py-0.5 border border-white/20 rounded-md">
                         {currentFacilityStage.stepLabel}
                       </span>
                     </div>
 
                     {/* Bottom Line Details */}
                     <div className="absolute bottom-2.5 left-3 right-3 text-white font-mono text-[10px] flex items-center justify-between">
-                      <span className="text-emerald-400 font-bold uppercase truncate">{currentFacilityLine.capacity}</span>
+                      <span className="text-emerald-400 font-bold uppercase truncate tabular-nums">{currentFacilityLine.capacity}</span>
                       <span className="text-neutral-300 uppercase tracking-wide text-[9px] truncate ml-2">{currentFacilityLine.cleanroomClass}</span>
                     </div>
                   </div>
@@ -2654,17 +2051,17 @@ export default function App() {
                       <span className="text-[10px] font-mono text-emerald-800 uppercase block font-bold tracking-wider">
                         {currentFacilityStage.phase}
                       </span>
-                      <h4 className="text-sm font-bold text-neutral-900 leading-snug mt-0.5">
+                      <h4 className="text-sm font-bold text-neutral-900 leading-snug mt-0.5 text-balance">
                         {currentFacilityStage.title}
                       </h4>
-                      <p className="text-xs text-neutral-600 font-light leading-relaxed mt-1">
+                      <p className="text-xs text-neutral-700 font-normal leading-relaxed mt-1">
                         {currentFacilityStage.summary}
                       </p>
                     </div>
 
                     {/* Highlight */}
                     {currentFacilityStage.highlight && (
-                      <div className="p-2.5 bg-emerald-50/70 border-l-2 border-emerald-700 text-[11px] text-emerald-950 leading-relaxed font-medium rounded-r-xs">
+                      <div className="p-2.5 bg-emerald-50/70 border-l-2 border-emerald-700 text-[11px] text-emerald-950 leading-relaxed font-medium rounded-r-md">
                         {currentFacilityStage.highlight}
                       </div>
                     )}
@@ -2672,11 +2069,11 @@ export default function App() {
                     {/* 2x2 Telemetry Grid */}
                     <div className="grid grid-cols-2 gap-2 pt-0.5">
                       {currentFacilityStage.telemetry.map((tel, tIdx) => (
-                        <div key={`mob-tel-${tIdx}`} className="p-2 bg-neutral-50 border border-neutral-200 rounded-xs shadow-2xs">
+                        <div key={`mob-tel-${tIdx}`} className="p-2 bg-neutral-50 border border-neutral-200 rounded-lg shadow-2xs">
                           <span className="text-[9px] font-mono uppercase text-neutral-500 block truncate font-medium">
                             {tel.label}
                           </span>
-                          <span className="text-xs font-mono font-bold text-neutral-900 block truncate mt-0.5">
+                          <span className="text-xs font-mono font-bold text-neutral-900 block truncate mt-0.5 tabular-nums">
                             {tel.value}
                           </span>
                         </div>
@@ -2684,7 +2081,7 @@ export default function App() {
                     </div>
 
                     {/* QA Standard Tag */}
-                    <div className="flex items-center gap-1.5 text-[10px] font-mono text-neutral-600 pt-1 border-t border-neutral-200/80">
+                    <div className="flex items-center gap-1.5 text-[10px] font-mono text-neutral-700 pt-1 border-t border-neutral-200/80">
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-800 shrink-0" />
                       <span className="truncate">QA: <strong className="text-neutral-900">{currentFacilityStage.qaStandard}</strong></span>
                     </div>
@@ -2699,7 +2096,7 @@ export default function App() {
                     type="button"
                     disabled={selectedFacilityStage === 0}
                     onClick={handlePrevFacilityStage}
-                    className={`px-3 py-1.5 font-mono text-xs border flex items-center gap-1.5 transition-all rounded-xs ${
+                    className={`px-3 py-1.5 font-mono text-xs border flex items-center gap-1.5 transition-all rounded-md ${
                       selectedFacilityStage === 0
                         ? 'opacity-30 cursor-not-allowed bg-neutral-100 text-neutral-400 border-neutral-200'
                         : 'bg-white hover:bg-neutral-50 text-neutral-800 border-neutral-300 cursor-pointer shadow-2xs active:scale-95'
@@ -2717,7 +2114,7 @@ export default function App() {
                     type="button"
                     disabled={selectedFacilityStage === totalFacilityStages - 1}
                     onClick={handleNextFacilityStage}
-                    className={`px-3 py-1.5 font-mono text-xs border flex items-center gap-1.5 transition-all rounded-xs ${
+                    className={`px-3 py-1.5 font-mono text-xs border flex items-center gap-1.5 transition-all rounded-md ${
                       selectedFacilityStage === totalFacilityStages - 1
                         ? 'opacity-30 cursor-not-allowed bg-neutral-100 text-neutral-400 border-neutral-200'
                         : 'bg-white hover:bg-neutral-50 text-neutral-800 border-neutral-300 cursor-pointer shadow-2xs active:scale-95'
@@ -2731,7 +2128,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => handleFacilityInquiry(`${currentFacilityLine.division} - Stage ${currentFacilityStage.stepNumber}: ${currentFacilityStage.title}`)}
-                  className="w-full py-2.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-[0.99] transition-transform rounded-xs"
+                  className="w-full py-2.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-[0.99] transition-transform rounded-md"
                 >
                   <span>Inquire for {currentFacilityLine.shortTitle}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-[#c2a76f]" />
@@ -2750,7 +2147,7 @@ export default function App() {
         <div className="w-full max-w-7xl mx-auto">
           
           {/* Main Visual Container with Rounded Frame & Background Image */}
-          <div className="relative w-full rounded-[28px] sm:rounded-[36px] overflow-hidden min-h-[640px] sm:min-h-[700px] flex items-center justify-start shadow-xl border border-neutral-200/80 bg-neutral-900">
+          <div className="relative w-full rounded-3xl overflow-hidden min-h-[640px] sm:min-h-[700px] flex items-center justify-start shadow-xl border border-neutral-200/80 bg-neutral-900">
             
             {/* Background Facility Bottling Line Image */}
             <img 
@@ -2763,14 +2160,14 @@ export default function App() {
             <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent md:from-black/50 md:via-transparent md:to-black/10" />
 
             {/* Floating Minimalist Form Card on the Left */}
-            <div className="relative z-10 w-full md:max-w-[490px] lg:max-w-[510px] m-4 sm:m-8 lg:m-12 md:mr-auto bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-10 shadow-2xl space-y-6">
+            <div className="relative z-10 w-full md:max-w-[490px] lg:max-w-[510px] m-4 sm:m-8 lg:m-12 md:mr-auto bg-white rounded-2xl p-6 sm:p-10 shadow-2xl space-y-6">
               
               <div>
-                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 leading-tight">
-                  Start your production journey today
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 leading-tight text-balance">
+                  Request a Commercial Manufacturing Quote
                 </h3>
-                <p className="text-xs sm:text-sm text-neutral-500 mt-2 leading-relaxed">
-                  Complete the form and get a dedicated commercial specification &amp; quotation within 24 hours.
+                <p className="text-xs sm:text-sm text-neutral-600 mt-2 leading-relaxed font-normal">
+                  Direct commercial desk for contract packaging, bulk wholesale, and custom formulation specifications. Dedicated quote within 24 hours.
                 </p>
               </div>
 
@@ -2799,7 +2196,7 @@ export default function App() {
                           setFormErrors((prev) => ({ ...prev, name: err || undefined }));
                         }}
                         placeholder="Your full name *"
-                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-colors bg-transparent ${
+                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none transition-colors bg-transparent ${
                           formTouched.name && formErrors.name
                             ? 'border-red-500 focus:border-red-600'
                             : formTouched.name && !formErrors.name && inquiryForm.name.trim().length >= 2
@@ -2849,7 +2246,7 @@ export default function App() {
                           setFormErrors((prev) => ({ ...prev, company: err || undefined }));
                         }}
                         placeholder="Company / Organization (optional)"
-                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-colors bg-transparent ${
+                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none transition-colors bg-transparent ${
                           formTouched.company && formErrors.company
                             ? 'border-red-500 focus:border-red-600'
                             : formTouched.company && !formErrors.company && inquiryForm.company.trim().length >= 2
@@ -2899,7 +2296,7 @@ export default function App() {
                           setFormErrors((prev) => ({ ...prev, email: err || undefined }));
                         }}
                         placeholder="Corporate email address *"
-                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-colors bg-transparent ${
+                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none transition-colors bg-transparent ${
                           formTouched.email && formErrors.email
                             ? 'border-red-500 focus:border-red-600'
                             : formTouched.email && !formErrors.email && inquiryForm.email.trim() && !validateEmail(inquiryForm.email)
@@ -2949,7 +2346,7 @@ export default function App() {
                           setFormErrors((prev) => ({ ...prev, phone: err || undefined }));
                         }}
                         placeholder="Phone number (e.g. +91 80776 22461)"
-                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-colors bg-transparent ${
+                        className={`w-full py-2.5 pr-8 border-b text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none transition-colors bg-transparent ${
                           formTouched.phone && formErrors.phone
                             ? 'border-red-500 focus:border-red-600'
                             : formTouched.phone && !formErrors.phone && inquiryForm.phone.trim() && !validatePhone(inquiryForm.phone)
@@ -3002,7 +2399,7 @@ export default function App() {
                         setInquiryForm((prev) => ({ ...prev, message: sanitized }));
                       }}
                       placeholder="How can we help? (e.g. order volume, custom requirements)"
-                      className="w-full py-2.5 border-b border-neutral-200 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent"
+                      className="w-full py-2.5 border-b border-neutral-200 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:border-neutral-900 transition-colors bg-transparent"
                     />
                   </div>
 
@@ -3021,9 +2418,9 @@ export default function App() {
                             }));
                           }
                         }}
-                        className="mt-0.5 w-3.5 h-3.5 rounded-xs accent-[#0a2318] border-neutral-300 text-neutral-900 focus:ring-neutral-800"
+                        className="mt-0.5 w-3.5 h-3.5 rounded-sm accent-[#0a2318] border-neutral-300 text-neutral-900 focus:ring-neutral-800"
                       />
-                      <span className="text-[11px] text-neutral-500 leading-snug">
+                      <span className="text-[11px] text-neutral-600 leading-snug">
                         By submitting this form, you agree to the processing of your personal data in accordance with our{' '}
                         <button
                           type="button"
@@ -3046,37 +2443,47 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* Send Message Button (Sharp Professional Button) */}
+                  {/* Send Message Button (Sharp Professional Button with Loading State) */}
                   <div className="pt-2">
                     <button
                       type="submit"
-                      className="inline-flex items-center gap-3 px-8 py-3.5 bg-[#0a2318] hover:bg-[#143e2b] text-white text-xs font-semibold tracking-wider uppercase shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                      disabled={isSubmittingInquiry}
+                      className="inline-flex items-center justify-center gap-3 px-8 py-3.5 bg-[#0a2318] hover:bg-[#143e2b] disabled:opacity-80 disabled:cursor-wait text-white text-xs font-semibold tracking-wider uppercase shadow-md hover:shadow-lg transition-all cursor-pointer group rounded-md w-full sm:w-auto"
                     >
-                      <span>Send message</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-white group-hover:translate-x-1 transition-transform" />
+                      {isSubmittingInquiry ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin text-[#c2a76f]" />
+                          <span>Routing to WhatsApp Desk...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Request Commercial Quote</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-[#c2a76f] group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
                     </button>
                   </div>
 
                 </form>
               ) : (
-                <div className="p-6 bg-emerald-50 border border-emerald-800/30 text-neutral-900 space-y-3">
+                <div className="p-6 bg-emerald-50 border border-emerald-800/30 text-neutral-900 space-y-3 rounded-xl">
                   <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
                     <Check className="w-4 h-4" />
                     <span>Inquiry Prepared</span>
                   </div>
                   <p className="text-xs text-neutral-700 leading-relaxed">
-                    Routing your inquiry directly to our WhatsApp Trade Desk (<strong className="font-mono">8077622461</strong>){redirectCountdown !== null && redirectCountdown > 0 ? ` in ${redirectCountdown}s...` : ' now.'}
+                    Routing your inquiry directly to our WhatsApp Trade Desk (<strong className="font-mono tabular-nums">8077622461</strong>){redirectCountdown !== null && redirectCountdown > 0 ? (<span> in <strong className="tabular-nums font-mono">{redirectCountdown}s</strong>...</span>) : ' now.'}
                   </p>
                   <div className="flex flex-wrap items-center gap-3 pt-1">
                     <a
                       href={whatsappRedirectUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0a2318] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#143e2b] transition-colors"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0a2318] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#143e2b] transition-colors rounded-md shadow-xs"
                     >
-                      <MessageSquare className="w-3.5 h-3.5" />
+                      <MessageSquare className="w-3.5 h-3.5 text-[#c2a76f]" />
                       <span>Open WhatsApp Now</span>
-                      <ExternalLink className="w-3 h-3" />
+                      <ExternalLink className="w-3 h-3 text-[#c2a76f]" />
                     </a>
                     <button
                       onClick={() => {
@@ -3087,7 +2494,7 @@ export default function App() {
                         setFormTouched({});
                         setPrivacyAccepted(true);
                       }}
-                      className="text-xs text-neutral-600 underline cursor-pointer"
+                      className="text-xs text-neutral-600 underline cursor-pointer hover:text-neutral-900"
                     >
                       Reset Form
                     </button>
@@ -3101,7 +2508,7 @@ export default function App() {
                   href="https://wa.me/918077622461" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="font-mono font-semibold text-emerald-900 flex items-center gap-1"
+                  className="font-mono font-semibold text-emerald-900 flex items-center gap-1 tabular-nums"
                 >
                   <MessageSquare className="w-3 h-3 text-emerald-700" />
                   <span>WhatsApp: 8077622461</span>
@@ -3149,7 +2556,7 @@ export default function App() {
             </div>
 
             {/* Quick Contact Card */}
-            <div className="bg-white border border-neutral-200 p-4 sm:p-5 space-y-2 shrink-0 lg:min-w-[320px]">
+            <div className="bg-white border border-neutral-200 p-4 sm:p-5 space-y-2 shrink-0 lg:min-w-[320px] rounded-xl shadow-xs">
               <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-400">
                 Direct Commercial Hotline
               </div>
@@ -3158,7 +2565,7 @@ export default function App() {
                   href="https://wa.me/918077622461" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="font-mono text-sm font-bold text-[#143e2b] hover:underline flex items-center gap-1.5"
+                  className="font-mono text-sm font-bold text-[#143e2b] hover:underline flex items-center gap-1.5 tabular-nums"
                 >
                   <MessageSquare className="w-4 h-4 text-emerald-700" />
                   <span>WhatsApp: +91 8077622461</span>
@@ -3167,7 +2574,7 @@ export default function App() {
                   <span className="font-mono text-[11px]">contact@drsonsinternational.com</span>
                   <button
                     onClick={() => handleCopyEmail('contact@drsonsinternational.com')}
-                    className="p-1 border border-neutral-300 text-neutral-600 hover:bg-neutral-50 cursor-pointer"
+                    className="p-1 border border-neutral-300 text-neutral-600 hover:bg-neutral-50 cursor-pointer rounded-md transition-colors"
                     title="Copy Email"
                   >
                     {copiedEmail ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
@@ -3407,7 +2814,7 @@ export default function App() {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-left">
                 <button
                   onClick={() => setLegalModalTab('regulatory')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
                 >
                   <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">FSSAI Act 2006</div>
                   <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Food Safety Regs</div>
@@ -3415,7 +2822,7 @@ export default function App() {
 
                 <button
                   onClick={() => setLegalModalTab('regulatory')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
                 >
                   <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">BIS IS 14543</div>
                   <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Packaged Water</div>
@@ -3423,7 +2830,7 @@ export default function App() {
 
                 <button
                   onClick={() => setLegalModalTab('regulatory')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
                 >
                   <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">Legal Metrology</div>
                   <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">250ml - 1L Pack</div>
@@ -3431,7 +2838,7 @@ export default function App() {
 
                 <button
                   onClick={() => setLegalModalTab('privacy')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
                 >
                   <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">DPDP Act 2023</div>
                   <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Data Governance</div>
@@ -3439,7 +2846,7 @@ export default function App() {
 
                 <button
                   onClick={() => setLegalModalTab('statutory')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
                 >
                   <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">Companies Act</div>
                   <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">MCA Pvt. Ltd.</div>
@@ -3447,7 +2854,7 @@ export default function App() {
 
                 <button
                   onClick={() => setLegalModalTab('regulatory')}
-                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group"
+                  className="p-2.5 border border-neutral-200 bg-white hover:border-emerald-800 transition-colors text-left cursor-pointer group rounded-lg shadow-2xs"
                 >
                   <div className="text-[9px] font-mono text-emerald-800 uppercase tracking-wider font-semibold">SPCB / CPCB</div>
                   <div className="text-[11px] font-bold text-neutral-900 group-hover:text-emerald-950">Zero Discharge</div>
@@ -3502,12 +2909,12 @@ export default function App() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ duration: 0.2 }}
-              className="bg-white border border-neutral-200 w-full max-w-3xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden"
+              className="bg-white border border-neutral-200 w-full max-w-3xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden rounded-2xl"
             >
               {/* Modal Header */}
               <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-[#fafbfa]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 border border-emerald-900/20 bg-emerald-50 text-emerald-900 flex items-center justify-center">
+                  <div className="w-8 h-8 border border-emerald-900/20 bg-emerald-50 text-emerald-900 flex items-center justify-center rounded-lg">
                     <Scale className="w-4 h-4" />
                   </div>
                   <div>
@@ -3522,7 +2929,7 @@ export default function App() {
 
                 <button 
                   onClick={() => setLegalModalTab(null)}
-                  className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer"
+                  className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer rounded-md"
                   title="Close"
                 >
                   <X className="w-4 h-4" />
@@ -3868,7 +3275,7 @@ export default function App() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-neutral-500">Direct Desk:</span>
-                        <span className="font-bold text-emerald-900">+91 8077622461</span>
+                        <span className="font-bold text-emerald-900 tabular-nums font-mono">+91 8077622461</span>
                       </div>
                     </div>
                   </div>
@@ -3880,7 +3287,7 @@ export default function App() {
               <div className="p-3 border-t border-neutral-200 bg-[#fafbfa] flex items-center justify-end">
                 <button
                   onClick={() => setLegalModalTab(null)}
-                  className="px-4 py-1.5 bg-[#143e2b] text-white text-xs font-semibold uppercase tracking-wider cursor-pointer"
+                  className="px-4 py-1.5 bg-[#143e2b] hover:bg-[#0a2318] text-white text-xs font-semibold uppercase tracking-wider cursor-pointer rounded-md transition-colors"
                 >
                   Close
                 </button>
