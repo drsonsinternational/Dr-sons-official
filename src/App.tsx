@@ -53,14 +53,18 @@ interface NotificationState {
 }
 
 export default function App() {
-  // Website is now officially LIVE for all public visitors!
-  // Optional preview of maintenance screen available via ?maintenance=true
+  // Maintenance Mode is officially ACTIVE
+  // Public visitors see the under-construction maintenance portal.
+  // Team can bypass using passcode (e.g. 'drsons' or 'admin') or via ?live=true in URL.
   const [showMaintenancePreview, setShowMaintenancePreview] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      return params.get('maintenance') === 'true';
+      if (params.get('live') === 'true' || params.get('preview') === 'true') {
+        return false;
+      }
+      return true;
     }
-    return false;
+    return true;
   });
 
   const [activeDivision, setActiveDivision] = useState<number>(0);
